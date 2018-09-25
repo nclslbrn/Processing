@@ -1,4 +1,4 @@
-int numTrianglePerCircle = 20;
+int numTrianglePerCircle = 7;
 int[][][][][] triangles;
 color[][][] trianglesColor;
 Grid grid;
@@ -7,14 +7,14 @@ ArrayList<Point_in_triangle> points = new ArrayList<Point_in_triangle>();
 void setup() {
    size(1280, 720);
 	 frameRate(24);
-	 smooth();
+	 smooth(30);
    init();
 }
 
 void init() {
-
+    background(0);
 	  grid = new Grid();
-	  grid.cellWidth = 200;
+	  grid.cellWidth = (int) random(200, 500);
 	  grid.init();
 
 		triangles = new int[grid.cols][grid.rows][ numTrianglePerCircle ][3][3];
@@ -32,10 +32,17 @@ void init() {
 
 								triangles[ x ][ y ][ t ] = getRandomPoints( _x, _y, grid.cellWidth/2 );
 								trianglesColor[ x ][ y ][ t ] = randomColor();
+
+                Point_in_triangle newPoint;
+                newPoint = new Point_in_triangle(
+                    getRandomPoints( _x, _y, grid.cellWidth/2 ),
+                    randomColor()
+                );
+                points.add( newPoint );
+
 						}
 				}
 		}
-		println( triangles.length );
 
 }
 
@@ -43,43 +50,11 @@ void draw() {
 
   pushMatrix();
   translate( grid.outer_x_margin + (grid.cellWidth/2) , grid.outer_y_margin + (grid.cellWidth/2) );
+  for( int p = 0; p < points.size() - 1; p++) {
 
+      Point_in_triangle point = points.get(p);
+      point.display();
 
-	int y = 0;
-
-	for( int cols = 0; cols < triangles.length; cols++ ) {
-
-			for( int rows = 0; rows < triangles[cols].length; rows++ ) {
-
-					int _x = cols * grid.cellWidth;
-					int _y = rows * grid.cellWidth;
-
-					for( int t = 0; t < triangles[cols][rows].length; t++ ) {
-
-							noStroke();
-							fill( trianglesColor[cols][rows][t] );
-							triangle(
-								triangles[cols][rows][t][0][0],
-								triangles[cols][rows][t][0][1],
-
-								triangles[cols][rows][t][1][0],
-								triangles[cols][rows][t][1][1],
-
-								triangles[cols][rows][t][2][0],
-								triangles[cols][rows][t][2][1]
-							);
-/*
-							noFill();
-							stroke(0);
-							rect(
-				        _x,
-				        _y,
-				        grid.cellWidth,
-				        grid.cellWidth
-						 );
-*/
-					}
-			}
   }
   popMatrix();
 //  noLoop();
