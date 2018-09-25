@@ -1,0 +1,14 @@
+.DS_Store
+modes
+templates
+tools
+librairies
+applet
+examples
+out
+application.linux32
+application.linux64
+application.windows32
+application.windows64
+application.macosx
+build/*
