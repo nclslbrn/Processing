@@ -1,6 +1,7 @@
 int numTrianglePerCircle = 7;
 int drawStartTime = 0;
 int drawDuration = 15000;
+int alphaValue = 150;
 Grid grid;
 ArrayList<Point_in_triangle> points = new ArrayList<Point_in_triangle>();
 
@@ -15,6 +16,7 @@ void init() {
 
     background(0);
 	  grid = new Grid();
+    points.clear();
 	  grid.cellWidth = (int) random(200, 500);
 	  grid.init();
 
@@ -30,7 +32,8 @@ void init() {
                 Point_in_triangle newPoint;
                 newPoint = new Point_in_triangle(
                     getRandomPoints( _x, _y, grid.cellWidth/2 ),
-                    randomColor()
+                    randomColor(),
+                    alphaValue
                 );
                 points.add( newPoint );
 

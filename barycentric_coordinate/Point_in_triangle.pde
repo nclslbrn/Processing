@@ -2,14 +2,16 @@ class Point_in_triangle {
 
 	int[][] triangle;
 	color col = color(0);
+	int alpha = 0;
 	PVector a, b, c = new PVector();
 
-	Point_in_triangle( int[][] triangle, color col ) {
+	Point_in_triangle( int[][] triangle, color col, int alpha ) {
 
 			PVector a, b, c = new PVector();
 
 			this.triangle = triangle;
 			this.col = col;
+			this.alpha = alpha;
 	}
 
 	void display() {
@@ -19,7 +21,7 @@ class Point_in_triangle {
 			this.c = new PVector( triangle[2][0], triangle[2][1] );
 
 			this.col = col;
-			this.col = color( red( col ), green( col ), blue( col ), 125 );
+			this.col = color( red( col ), green( col ), blue( col ), this.alpha );
 
 			PVector ab = new PVector( a.x - b.x, a.y - b.y );
 			PVector ac = new PVector( a.x - c.x, a.y - c.y );
