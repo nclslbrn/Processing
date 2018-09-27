@@ -27,11 +27,19 @@ ArrayList<Particle> particles = new ArrayList<Particle>();
 String[] dissidents = {
 	"Ai_Weiwei", "Bao_Tong", "Chen_Pokong",	"Gao_Zhisheng",
   "He_Depu", "Hu_Jia", "Huang_Qi", "Ilham_Tohti",
-  "Jian_Tianyong", "Jiang_Yefei", "Liao_Yiwu",	"Liu_Xiaobo",
+  "Jian_Yanyong", "Jiang_Yefei", "Liao_Yiwu",	"Liu_Xiaobo",
 	"Tang_Baiqiao",	"Wang_Dan",	"Wei_Jingsheng", "Wu_Gan",
   "Xu_Zhiyong",	"Yuan_Hongbing", "Zeng_Jinyan"
 };
+String [] dissidentsName = {
+	"艾未未", "鮑彤", "陳破空", "高智晟",
+	"何德普", "胡佳", "黃琦", "伊力哈木",
+	"蔣彥永", "蔣葉菲", "廖亦武", "刘晓波",
+	"唐柏桥", "王丹", "魏京生", "吴淦",
+	"许志永", "袁红冰", "曾金燕"
+};
 PFont font;
+PFont cnFont;
 
 SoundFile[] cymbals;
 SoundFile yankin; // 120 bpm C# 0'32
@@ -39,16 +47,17 @@ SoundFile yankin; // 120 bpm C# 0'32
 int numCymbals = 6;
 int cymbalChoosen = 0;
 int dissidentIndex = 0;
-String dissidentName = "";
+String dissidentNameRoman = "";
 
-float pixelSteps = 3;
+float pixelSteps = 5;
 int animBegin = 0;
 int animTime = 0;
 
+int newColor;
 int imageBlackThreshold = color(55);
-int bgColor = color(255, 247, 247, 180);
+int bgColor = 0;
+int alphaBack = 245;
 boolean drawAsPoints = false;
-float particleXDisplace = 1;
 
 PImage pic;
 
@@ -61,13 +70,13 @@ public void settings() {
 
 public void setup() {
 
-		font = loadFont("AlteHaasGrotesk_Bold-110.vlw");
-
+	//	font = loadFont("AlteHaasGrotesk_Bold-110.vlw");
+		cnFont = createFont("NotoSansCJKtc-Regular.otf", 45);
 		frameRate(25);
-		background(255, 247, 247);
+		background(0);
 		
 		rectMode(CORNER);
-		textFont(font, 45);
+		textFont(cnFont, 45);
 		textAlign(CENTER);
 
 		cymbals = new SoundFile[numCymbals];
@@ -99,15 +108,15 @@ public PVector generateRandomPos(int x, int y, float mag) {
 
 public void getPicture() {
 
-	  dissidentName = dissidents[dissidentIndex];
-	  pic = loadImage(dissidentName + ".jpg");
-	  String[] name = split( dissidentName, "_");
+	  dissidentNameRoman = dissidents[dissidentIndex];
+	  pic = loadImage(dissidentNameRoman + ".jpg");
+	  String[] name = split( dissidentNameRoman, "_");
 
-	  dissidentName = name[0] + " " + name[1];
+	  dissidentNameRoman = name[0] + " " + name[1];
 
 		int particleCount = particles.size();
 		int particleIndex = 0;
-	  int newColor = 0;
+	  newColor = randomColor();
 	  loadPixels();
 	  pic.loadPixels();
 		ArrayList<Integer> coordsIndexes = new ArrayList<Integer>();
@@ -127,7 +136,7 @@ public void getPicture() {
 				int x = coordIndex % width;
 				int y = coordIndex / width;
 
-				if( pic.get(x, y) < imageBlackThreshold ) {
+				if( pic.get(x, y) > imageBlackThreshold ) {
 
 		  			Particle newParticle;
 
@@ -147,12 +156,9 @@ public void getPicture() {
 			  				PVector randomPos = generateRandomPos(width/2, height/2, (width+height)/2);
 			  				newParticle.pos.x = randomPos.x;
 			  				newParticle.pos.y = randomPos.y;
-								newParticle.particleXDisplace = particleXDisplace;
-			  				newParticle.maxSpeed = random(2.0f, 5.0f);
+			  				newParticle.maxSpeed = random(2.0f, 8.0f);
 			  				newParticle.maxForce = newParticle.maxSpeed*0.025f;
-			  				newParticle.particleSize = random(3, 6);
-			  				newParticle.colorBlendRate = random(0.0025f, 0.03f);
-
+			  				newParticle.size = random(1, 2);
 			  				particles.add(newParticle);
 
 		  			}
@@ -160,7 +166,6 @@ public void getPicture() {
 		  			// Blend it from its current color
 		  			newParticle.startColor = lerpColor(newParticle.startColor, newParticle.targetColor, newParticle.colorWeight);
 		  			newParticle.targetColor = newColor;
-		  			newParticle.colorWeight = 0;
 
 		  			// Assign the particle's new target to seek
 		  			newParticle.target.x = x;
@@ -182,20 +187,49 @@ public void getPicture() {
 		cymbalChoosen = (int)random( 1, numCymbals );
 		cymbals[cymbalChoosen].play();
 
-	  // println( dissidentName + " " + (dissidentIndex + 1) + "/" +  dissidents.length + " time :" + animTime);
+	  println( dissidentNameRoman + " " + (dissidentIndex + 1) + "/" +  dissidents.length);
 
 }
 public void draw() {
 
-	  fill(bgColor);
-	  noStroke();
-	  rect(0, 0, width, height);
+    if( millis() > animBegin + animTime  ) {
 
+        cymbals[cymbalChoosen].stop();
+        // yankin.stop();
+        dissidentIndex++;
+        alphaBack = 245;
+
+         if( dissidentIndex == dissidents.length ) {
+
+            dissidentIndex = 0;
+            println("END: " + millis());
+        }
+        getPicture();
+
+    } else {
+
+
+        if( millis() > (animTime * 0.90f) + animBegin) {
+
+            if( millis() > (animTime * 0.90f) + animBegin ) {
+               alphaBack--;
+            }
+            if( millis() > (animTime * 0.95f) + animBegin ) {
+               alphaBack--;
+            }
+            background(pic);
+        }
+        fill(color( bgColor, alphaBack));
+        noStroke();
+        rect(0, 0, width, height);
+
+				fill( newColor );
+				text( dissidentsName[dissidentIndex] + " / " + dissidentNameRoman , 0, 0, width, height );
+    }
 	  for (int x = particles.size()-1; x > -1; x--) {
 
 		    // Simulate and draw pixels
 		    Particle particle = particles.get(x);
-				particle.particleXDisplace = particleXDisplace;
 		    particle.move();
 		    particle.draw();
 
@@ -208,47 +242,6 @@ public void draw() {
 
 	  }
 
-	  fill(0);
-	  text( dissidentName, -1, height - 65, width, height);
-	  text( dissidentName, 1, height - 65, width, height);
-	  text( dissidentName, 0, height - 63, width, height);
-
-	  fill( 255, 247, 247 );
-	  text( dissidentName, 0, height - 64, width, height);
-
-	  //fill(0);
-	  //String debugg = millis() + ">" +(animBegin + animTime);
-	  //text( debugg, 0, 0, width, 125 );
-
-		if( millis() > animBegin + animTime  ) {
-
-				cymbals[cymbalChoosen].stop();
-				// yankin.stop();
-		    dissidentIndex++;
-				particleSize = 2.0f;
-
-		   	if( dissidentIndex == dissidents.length ) {
-
-						dissidentIndex = 0;
-			      println("END: " + millis());
-				}
-				getPicture();
-
-		} else {
-
-				if( millis() > (animTime * 0.90f) + animBegin ) {
-
-						particleSize+= 0.2f;
-
-				}
-				if( millis() > (animTime * 0.95f) + animBegin ) {
-
-						particleSize-= 0.4f;
-
-				}
-
-		}
-
 }
 class Particle {
 
@@ -260,12 +253,12 @@ class Particle {
   float closeEnoughTarget = 50;
   float maxSpeed = 3.5f;
   float maxForce = 0.1f;
-  float particleSize = 2;
+  float size = 2;
   boolean isKilled = false;
 
-  int startColor = color(0);
-  int targetColor = color(0);
-  float colorWeight = 0;
+  int startColor = color(random(0, 255), random(0, 255), random(0, 255));
+  int targetColor = color(random(0, 255), random(0, 255), random(0, 255));
+  float colorWeight = 0.01f;
   float colorBlendRate = 0.025f;
 
   public void move() {
@@ -298,12 +291,14 @@ class Particle {
     // Draw particle
     int currentColor = lerpColor(this.startColor, this.targetColor, this.colorWeight);
     if (drawAsPoints) {
+      
       stroke(currentColor);
       point(this.pos.x, this.pos.y);
+      
     } else {
-
+      
       stroke(currentColor);
-			line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + this.particleSize  );
+			line(this.pos.x , this.pos.y, this.pos.x, this.pos.y+ this.size );
     //  ellipse(this.pos.x, this.pos.y, this.particleSize, this.particleSize);
     }
 
@@ -329,8 +324,39 @@ class Particle {
     }
   }
 }
+public int randomColor() {
+
+  int[] colors = {
+    0xff1abc9c,
+    0xff16a085,
+    0xff2ecc71,
+    0xff27ae60,
+    0xff3498db,
+    0xff2980b9,
+    0xff9b59b6,
+    0xff8e44ad,
+    0xff34495e,
+    0xff2c3e50,
+    0xfff1c40f,
+    0xfff39c12,
+    0xffe67e22,
+    0xffd35400,
+    0xffe74c3c,
+    0xffc0392b,
+    0xffecf0f1,
+    0xffbdc3c7,
+    0xff95a5a6,
+    0xff7f8c8d
+  };
+
+  int colorID = (int)random( 0, colors.length );
+  println( colorID );
+  int choosenColor = color( colors[ colorID ] );
+
+  return choosenColor;
+}
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "recognition" };
+    String[] appletArgs = new String[] { "--present", "--window-color=#666666", "--stop-color=#cccccc", "recognition" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

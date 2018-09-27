@@ -6,7 +6,7 @@ Grid grid;
 ArrayList<Point_in_triangle> points = new ArrayList<Point_in_triangle>();
 
 void setup() {
-   size(800, 800);
+   size(960, 960, FX2D);
 	 frameRate(24);
 	 smooth(30);
    init();
@@ -17,7 +17,7 @@ void init() {
     background(0);
 	  grid = new Grid();
     points.clear();
-	  grid.cellWidth = (int) random(200, 500);
+	  grid.cellWidth = (int) random(400, 600);
 	  grid.init();
 
 	  for( int x = 0; x < grid.cols; x++ ) {

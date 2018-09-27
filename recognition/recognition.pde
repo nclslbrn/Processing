@@ -9,11 +9,19 @@ ArrayList<Particle> particles = new ArrayList<Particle>();
 String[] dissidents = {
 	"Ai_Weiwei", "Bao_Tong", "Chen_Pokong",	"Gao_Zhisheng",
   "He_Depu", "Hu_Jia", "Huang_Qi", "Ilham_Tohti",
-  "Jian_Tianyong", "Jiang_Yefei", "Liao_Yiwu",	"Liu_Xiaobo",
+  "Jian_Yanyong", "Jiang_Yefei", "Liao_Yiwu",	"Liu_Xiaobo",
 	"Tang_Baiqiao",	"Wang_Dan",	"Wei_Jingsheng", "Wu_Gan",
   "Xu_Zhiyong",	"Yuan_Hongbing", "Zeng_Jinyan"
 };
+String [] dissidentsName = {
+	"艾未未", "鮑彤", "陳破空", "高智晟",
+	"何德普", "胡佳", "黃琦", "伊力哈木",
+	"蔣彥永", "蔣葉菲", "廖亦武", "刘晓波",
+	"唐柏桥", "王丹", "魏京生", "吴淦",
+	"许志永", "袁红冰", "曾金燕"
+};
 PFont font;
+PFont cnFont;
 
 SoundFile[] cymbals;
 SoundFile yankin; // 120 bpm C# 0'32
@@ -21,7 +29,7 @@ SoundFile yankin; // 120 bpm C# 0'32
 int numCymbals = 6;
 int cymbalChoosen = 0;
 int dissidentIndex = 0;
-String dissidentName = "";
+String dissidentNameRoman = "";
 
 float pixelSteps = 5;
 int animBegin = 0;
@@ -44,13 +52,13 @@ void settings() {
 
 void setup() {
 
-		font = loadFont("AlteHaasGrotesk_Bold-110.vlw");
-
+	//	font = loadFont("AlteHaasGrotesk_Bold-110.vlw");
+		cnFont = createFont("NotoSansCJKtc-Regular.otf", 45);
 		frameRate(25);
 		background(0);
 		smooth(4);
 		rectMode(CORNER);
-		textFont(font, 45);
+		textFont(cnFont, 45);
 		textAlign(CENTER);
 
 		cymbals = new SoundFile[numCymbals];
@@ -82,15 +90,15 @@ PVector generateRandomPos(int x, int y, float mag) {
 
 void getPicture() {
 
-	  dissidentName = dissidents[dissidentIndex];
-	  pic = loadImage(dissidentName + ".jpg");
-	  String[] name = split( dissidentName, "_");
+	  dissidentNameRoman = dissidents[dissidentIndex];
+	  pic = loadImage(dissidentNameRoman + ".jpg");
+	  String[] name = split( dissidentNameRoman, "_");
 
-	  dissidentName = name[0] + " " + name[1];
+	  dissidentNameRoman = name[0] + " " + name[1];
 
 		int particleCount = particles.size();
 		int particleIndex = 0;
-	  newColor = color( random(75, 255), random(75, 255), random(75, 255));
+	  newColor = randomColor();
 	  loadPixels();
 	  pic.loadPixels();
 		ArrayList<Integer> coordsIndexes = new ArrayList<Integer>();
@@ -161,12 +169,10 @@ void getPicture() {
 		cymbalChoosen = (int)random( 1, numCymbals );
 		cymbals[cymbalChoosen].play();
 
-	  println( dissidentName + " " + (dissidentIndex + 1) + "/" +  dissidents.length);
+	  println( dissidentNameRoman + " " + (dissidentIndex + 1) + "/" +  dissidents.length);
 
 }
 void draw() {
-
-	  
 
     if( millis() > animBegin + animTime  ) {
 
@@ -174,7 +180,7 @@ void draw() {
         // yankin.stop();
         dissidentIndex++;
         alphaBack = 245;
-        
+
          if( dissidentIndex == dissidents.length ) {
 
             dissidentIndex = 0;
@@ -183,21 +189,24 @@ void draw() {
         getPicture();
 
     } else {
-       
-            
+
+
         if( millis() > (animTime * 0.90) + animBegin) {
-          
+
             if( millis() > (animTime * 0.90) + animBegin ) {
                alphaBack--;
             }
-            if( millis() > (animTime * 0.95) + animBegin ) {    
-                alphaBack--;
+            if( millis() > (animTime * 0.95) + animBegin ) {
+               alphaBack--;
             }
             background(pic);
         }
         fill(color( bgColor, alphaBack));
         noStroke();
         rect(0, 0, width, height);
+
+				fill( newColor );
+				text( dissidentsName[dissidentIndex] + " / " + dissidentNameRoman , 0, 0, width, height );
     }
 	  for (int x = particles.size()-1; x > -1; x--) {
 
