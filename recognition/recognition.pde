@@ -3,8 +3,16 @@
  * Nicolas Lebrun - Creative Commons Licence (CC-Zero)
  */
 import processing.sound.*;
+
+// debugg
+//import controlP5.*;
+//ControlP5 cp5;
+
+PerlinNoiseField field;
 ArrayList<Particle> particles = new ArrayList<Particle>();
 
+float fieldIntensity = 250;
+float noiseScale = 100;
 
 String[] dissidents = {
 	"Ai_Weiwei", "Bao_Tong", "Chen_Pokong",	"Gao_Zhisheng",
@@ -31,14 +39,15 @@ int cymbalChoosen = 0;
 int dissidentIndex = 0;
 String dissidentNameRoman = "";
 
-float pixelSteps = 5;
+float pixelSteps = 3;
 int animBegin = 0;
 int animTime = 0;
 
 color newColor;
 color imageBlackThreshold = color(55);
 int bgColor = 0;
-int alphaBack = 245;
+int alphaBlackInit = 100;
+int alphaBack = alphaBlackInit;
 boolean drawAsPoints = false;
 
 PImage pic;
@@ -46,7 +55,7 @@ PImage pic;
 void settings() {
 
 		//fullScreen(FX2D);
-		size(751, 960, FX2D);
+		size(751, 960, P3D);
 
 }
 
@@ -56,11 +65,26 @@ void setup() {
 		cnFont = createFont("NotoSansCJKtc-Regular.otf", 45);
 		frameRate(25);
 		background(0);
-		smooth(4);
+		smooth(12);
 		rectMode(CORNER);
 		textFont(cnFont, 45);
 		textAlign(CENTER);
+/*
+		cp5 = new ControlP5(this);
+		cp5.addSlider("fieldIntensity")
+			.setPosition( 0, height - 40)
+			.setSize( width, 15)
+			.setRange( 0, 300)
+			.setValue( 10 )
+			.setColorCaptionLabel( color( 20, 20, 20) );
 
+		cp5.addSlider("alphaBack")
+			.setPosition( 0, height - 20)
+			.setSize( width, 15)
+			.setRange( 0, 255)
+			.setValue( 150 )
+			.setColorCaptionLabel( color( 20, 20, 20) );
+*/
 		cymbals = new SoundFile[numCymbals];
 		yankin = new SoundFile( this, "chinese-traditional-yanqin-trap-loop.mp3");
 		for( int c = 1; c < numCymbals; c++ ) {
@@ -71,7 +95,7 @@ void setup() {
 
 		getPicture();
 		yankin.loop();
-
+		initForceFieldPerlinNoise();
 }
 // Picks a random position from a point's radius
 PVector generateRandomPos(int x, int y, float mag) {
@@ -86,7 +110,11 @@ PVector generateRandomPos(int x, int y, float mag) {
 
 	  return pos;
 }
+void initForceFieldPerlinNoise() {
 
+		field = new PerlinNoiseField(fieldIntensity, noiseScale);
+
+}
 
 void getPicture() {
 
@@ -169,7 +197,6 @@ void getPicture() {
 		cymbalChoosen = (int)random( 1, numCymbals );
 		cymbals[cymbalChoosen].play();
 
-	  println( dissidentNameRoman + " " + (dissidentIndex + 1) + "/" +  dissidents.length);
 
 }
 void draw() {
@@ -179,14 +206,15 @@ void draw() {
         cymbals[cymbalChoosen].stop();
         // yankin.stop();
         dissidentIndex++;
-        alphaBack = 245;
+        alphaBack = alphaBlackInit;
 
          if( dissidentIndex == dissidents.length ) {
 
             dissidentIndex = 0;
             println("END: " + millis());
         }
-        getPicture();
+				field.fieldIntensity = fieldIntensity;
+				getPicture();
 
     } else {
 
@@ -194,25 +222,32 @@ void draw() {
         if( millis() > (animTime * 0.90) + animBegin) {
 
             if( millis() > (animTime * 0.90) + animBegin ) {
-               alphaBack--;
+							 field.fieldIntensity = field.fieldIntensity - 2;
             }
             if( millis() > (animTime * 0.95) + animBegin ) {
                alphaBack--;
             }
-            background(pic);
+            //background(pic);
         }
         fill(color( bgColor, alphaBack));
         noStroke();
         rect(0, 0, width, height);
 
 				fill( newColor );
-				text( dissidentsName[dissidentIndex] + " / " + dissidentNameRoman , 0, 0, width, height );
+				text( dissidentsName[dissidentIndex] + " / " + dissidentNameRoman , 0, height-60, width, height);
     }
 	  for (int x = particles.size()-1; x > -1; x--) {
 
 		    // Simulate and draw pixels
 		    Particle particle = particles.get(x);
-		    particle.move();
+				PVector position = particle.pos;
+				float angle = field.getNoiseValue( particle.pos );
+
+				particle.move();
+				particle.pos = new PVector(
+						particle.pos.x += cos( angle ) * (particle.pos.x - position.x),
+						particle.pos.y += sin( angle ) * (particle.pos.y - position.y)
+				);
 		    particle.draw();
 
 		    // Remove any dead pixels out of bounds

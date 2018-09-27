@@ -21,8 +21,16 @@ public class recognition extends PApplet {
  * Nicolas Lebrun - Creative Commons Licence (CC-Zero)
  */
 
+
+// debugg
+//import controlP5.*;
+//ControlP5 cp5;
+
+PerlinNoiseField field;
 ArrayList<Particle> particles = new ArrayList<Particle>();
 
+float fieldIntensity = 250;
+float noiseScale = 100;
 
 String[] dissidents = {
 	"Ai_Weiwei", "Bao_Tong", "Chen_Pokong",	"Gao_Zhisheng",
@@ -49,14 +57,15 @@ int cymbalChoosen = 0;
 int dissidentIndex = 0;
 String dissidentNameRoman = "";
 
-float pixelSteps = 5;
+float pixelSteps = 3;
 int animBegin = 0;
 int animTime = 0;
 
 int newColor;
 int imageBlackThreshold = color(55);
 int bgColor = 0;
-int alphaBack = 245;
+int alphaBlackInit = 100;
+int alphaBack = alphaBlackInit;
 boolean drawAsPoints = false;
 
 PImage pic;
@@ -64,7 +73,7 @@ PImage pic;
 public void settings() {
 
 		//fullScreen(FX2D);
-		size(751, 960, FX2D);
+		size(751, 960, P3D);
 
 }
 
@@ -78,7 +87,22 @@ public void setup() {
 		rectMode(CORNER);
 		textFont(cnFont, 45);
 		textAlign(CENTER);
+/*
+		cp5 = new ControlP5(this);
+		cp5.addSlider("fieldIntensity")
+			.setPosition( 0, height - 40)
+			.setSize( width, 15)
+			.setRange( 0, 300)
+			.setValue( 10 )
+			.setColorCaptionLabel( color( 20, 20, 20) );
 
+		cp5.addSlider("alphaBack")
+			.setPosition( 0, height - 20)
+			.setSize( width, 15)
+			.setRange( 0, 255)
+			.setValue( 150 )
+			.setColorCaptionLabel( color( 20, 20, 20) );
+*/
 		cymbals = new SoundFile[numCymbals];
 		yankin = new SoundFile( this, "chinese-traditional-yanqin-trap-loop.mp3");
 		for( int c = 1; c < numCymbals; c++ ) {
@@ -89,7 +113,7 @@ public void setup() {
 
 		getPicture();
 		yankin.loop();
-
+		initForceFieldPerlinNoise();
 }
 // Picks a random position from a point's radius
 public PVector generateRandomPos(int x, int y, float mag) {
@@ -104,7 +128,11 @@ public PVector generateRandomPos(int x, int y, float mag) {
 
 	  return pos;
 }
+public void initForceFieldPerlinNoise() {
 
+		field = new PerlinNoiseField(fieldIntensity, noiseScale);
+
+}
 
 public void getPicture() {
 
@@ -187,7 +215,6 @@ public void getPicture() {
 		cymbalChoosen = (int)random( 1, numCymbals );
 		cymbals[cymbalChoosen].play();
 
-	  println( dissidentNameRoman + " " + (dissidentIndex + 1) + "/" +  dissidents.length);
 
 }
 public void draw() {
@@ -197,14 +224,15 @@ public void draw() {
         cymbals[cymbalChoosen].stop();
         // yankin.stop();
         dissidentIndex++;
-        alphaBack = 245;
+        alphaBack = alphaBlackInit;
 
          if( dissidentIndex == dissidents.length ) {
 
             dissidentIndex = 0;
             println("END: " + millis());
         }
-        getPicture();
+				field.fieldIntensity = fieldIntensity;
+				getPicture();
 
     } else {
 
@@ -212,25 +240,32 @@ public void draw() {
         if( millis() > (animTime * 0.90f) + animBegin) {
 
             if( millis() > (animTime * 0.90f) + animBegin ) {
-               alphaBack--;
+							 field.fieldIntensity = field.fieldIntensity - 2;
             }
             if( millis() > (animTime * 0.95f) + animBegin ) {
                alphaBack--;
             }
-            background(pic);
+            //background(pic);
         }
         fill(color( bgColor, alphaBack));
         noStroke();
         rect(0, 0, width, height);
 
 				fill( newColor );
-				text( dissidentsName[dissidentIndex] + " / " + dissidentNameRoman , 0, 0, width, height );
+				text( dissidentsName[dissidentIndex] + " / " + dissidentNameRoman , 0, height-60, width, height);
     }
 	  for (int x = particles.size()-1; x > -1; x--) {
 
 		    // Simulate and draw pixels
 		    Particle particle = particles.get(x);
-		    particle.move();
+				PVector position = particle.pos;
+				float angle = field.getNoiseValue( particle.pos );
+
+				particle.move();
+				particle.pos = new PVector(
+						particle.pos.x += cos( angle ) * (particle.pos.x - position.x),
+						particle.pos.y += sin( angle ) * (particle.pos.y - position.y)
+				);
 		    particle.draw();
 
 		    // Remove any dead pixels out of bounds
@@ -265,6 +300,7 @@ class Particle {
     // Check if particle is close enough to its target to slow down
     float proximityMult = 1.0f;
     float distance = dist(this.pos.x, this.pos.y, this.target.x, this.target.y);
+		
     if (distance < this.closeEnoughTarget) {
       proximityMult = distance/this.closeEnoughTarget;
     }
@@ -291,12 +327,12 @@ class Particle {
     // Draw particle
     int currentColor = lerpColor(this.startColor, this.targetColor, this.colorWeight);
     if (drawAsPoints) {
-      
+
       stroke(currentColor);
       point(this.pos.x, this.pos.y);
-      
+
     } else {
-      
+
       stroke(currentColor);
 			line(this.pos.x , this.pos.y, this.pos.x, this.pos.y+ this.size );
     //  ellipse(this.pos.x, this.pos.y, this.particleSize, this.particleSize);
@@ -324,6 +360,21 @@ class Particle {
     }
   }
 }
+class PerlinNoiseField {
+
+    float fieldIntensity;
+    float noiseScale;
+
+    PerlinNoiseField(float fieldIntensity, float noiseScale)  {
+        this.fieldIntensity = fieldIntensity;
+        this.noiseScale = noiseScale;
+    }
+
+
+    public float getNoiseValue(PVector position) {
+        return noise(position.x / noiseScale, position.y / noiseScale) * fieldIntensity;
+    }
+}
 public int randomColor() {
 
   int[] colors = {
@@ -335,28 +386,21 @@ public int randomColor() {
     0xff2980b9,
     0xff9b59b6,
     0xff8e44ad,
-    0xff34495e,
-    0xff2c3e50,
     0xfff1c40f,
     0xfff39c12,
     0xffe67e22,
     0xffd35400,
     0xffe74c3c,
     0xffc0392b,
-    0xffecf0f1,
-    0xffbdc3c7,
-    0xff95a5a6,
-    0xff7f8c8d
   };
 
   int colorID = (int)random( 0, colors.length );
-  println( colorID );
   int choosenColor = color( colors[ colorID ] );
 
   return choosenColor;
 }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "--present", "--window-color=#666666", "--stop-color=#cccccc", "recognition" };
+    String[] appletArgs = new String[] { "recognition" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

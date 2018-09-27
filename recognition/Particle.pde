@@ -20,6 +20,7 @@ class Particle {
     // Check if particle is close enough to its target to slow down
     float proximityMult = 1.0;
     float distance = dist(this.pos.x, this.pos.y, this.target.x, this.target.y);
+		
     if (distance < this.closeEnoughTarget) {
       proximityMult = distance/this.closeEnoughTarget;
     }
@@ -46,12 +47,12 @@ class Particle {
     // Draw particle
     color currentColor = lerpColor(this.startColor, this.targetColor, this.colorWeight);
     if (drawAsPoints) {
-      
+
       stroke(currentColor);
       point(this.pos.x, this.pos.y);
-      
+
     } else {
-      
+
       stroke(currentColor);
 			line(this.pos.x , this.pos.y, this.pos.x, this.pos.y+ this.size );
     //  ellipse(this.pos.x, this.pos.y, this.particleSize, this.particleSize);
