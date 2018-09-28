@@ -39,7 +39,7 @@ int cymbalChoosen = 0;
 int dissidentIndex = 0;
 String dissidentNameRoman = "";
 
-float pixelSteps = 3;
+float pixelSteps = 5;
 int animBegin = 0;
 int animTime = 0;
 
@@ -64,6 +64,7 @@ void setup() {
 	//	font = loadFont("AlteHaasGrotesk_Bold-110.vlw");
 		cnFont = createFont("NotoSansCJKtc-Regular.otf", 45);
 		frameRate(25);
+    noCursor();
 		background(0);
 		smooth(12);
 		rectMode(CORNER);
