@@ -1,13 +1,32 @@
-int thunderBranchAtStart, thunderXPos;
+int thunderBranchAtStart;
 ArrayList<Thunder> thunder = new ArrayList<Thunder>();
 ArrayList<Thunder> branches = new ArrayList<Thunder>();
 int newBranchProbability = 1; //per ten
 
-void setup() {
-  size( 960, 540);
-	init();
-}
+color[] skyColor = { color( 73, 51, 84 ), color( 59, 54, 110 ) };
 
+
+void setup() {
+	  size( 1280, 720);
+		//fullScreen();
+		smooth();
+		frameRate(25);
+		init();
+		drawThunder();
+
+}
+void sky() {
+
+		for( int y = 0; y < height; y++) {
+
+				float colorScale = map( y, 0, height, 0.1, 0.9);
+				color lineColor = lerpColor( skyColor[0], skyColor[1],colorScale );
+
+				stroke( lineColor );
+				line( 0, y, width, y );
+
+		}
+}
 
 void init() {
 		thunder.clear();
@@ -24,59 +43,70 @@ void init() {
 
 				thunder.add( branch );
 		}
-		drawThunder();
 }
+
+
 void draw() {
 
+	int randomFrameStep = (int) random( 12, 24 );
+
+	if( frameCount % 12 == 0 ) {
+
+		background(15);
+	}
+
+
+	if( frameCount % randomFrameStep == 0 ) {
+			sky();
+			init();
+			drawThunder();
+	}
 }
 
 
 void drawThunder() {
-	background(0);
-	stroke( 255 );
 
-	for( int t = 0; t < thunder.size(); t++ ) {
+		stroke( 255 );
 
-			Thunder currentBranch = thunder.get(t);
-			PVector tempPos = currentBranch.pos;
-			point( tempPos.x, tempPos.y );
+		for( int t = 0; t < thunder.size(); t++ ) {
 
-			for( int y = 0; y < height; y++ ) {
+				Thunder currentBranch = thunder.get(t);
+				PVector tempPos = currentBranch.pos;
 
-					boolean isSplitting = newBranchProbability > random(10) * 10 - 1;
+				for( int y = 0; y < height; y++ ) {
 
-					if( isSplitting ) {
+						boolean isSplitting = newBranchProbability > random(10) * 10 - 1;
 
-							Thunder newBranch = new Thunder();
-							newBranch.previousPos =  tempPos;
-							newBranch.pos = tempPos;
-							branches.add( newBranch );
-					}
-					PVector newPos = currentBranch.newPos( tempPos, y );
-					tempPos = newPos;
-					point( newPos.x, newPos.y );
+						if( isSplitting ) {
 
-			}
-			currentBranch.pos = tempPos;
-	}
-	for( int n = 0; n < branches.size(); n++ ) {
+								Thunder newBranch = new Thunder();
+								newBranch.previousPos =  tempPos;
+								newBranch.pos = tempPos;
+								branches.add( newBranch );
+						}
+						PVector newPos = currentBranch.newPos( tempPos, y );
+						tempPos = newPos;
 
-			Thunder currentBranch = branches.get(n);
-			PVector tempPos = currentBranch.pos;
-			point( tempPos.x, tempPos.y );
 
-			for( int y = (int) tempPos.y; y < height; y++ ) {
+				}
+				currentBranch.pos = tempPos;
+		}
+		for( int n = 0; n < branches.size(); n++ ) {
 
-					PVector newPos = currentBranch.newPos( tempPos, y );
-					tempPos = newPos;
-					point( newPos.x, newPos.y );
+				Thunder currentBranch = branches.get(n);
+				PVector tempPos = currentBranch.pos;
 
-			}
-			currentBranch.pos = tempPos;
+				for( int y = (int) tempPos.y; y < height; y++ ) {
 
-	}
+						PVector newPos = currentBranch.newPos( tempPos, y );
+						tempPos = newPos;
 
-	//noLoop();
+				}
+				currentBranch.pos = tempPos;
+
+		}
+
+		//noLoop();
 }
 
 void mousePressed() {
