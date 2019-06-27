@@ -6,6 +6,7 @@ Use [Atom](https://atom.io/) with the [processing package](https://github.com/bl
 
 - or -
 
-Use [VSCode editor](https://code.visualstudio.com/) with the [Processing Language](https://marketplace.visualstudio.com/items?itemName=Tobiah.language-pde) to build and run sketches. Need a tasks file in each sketch folder (project/.vscode/tasks.json)
+Use [VSCode editor](https://code.visualstudio.com/) with the [Processing Language](https://marketplace.visualstudio.com/items?itemName=Tobiah.language-pde) to build and run sketches from /.vscode/tasks.json.
 
-Both editors require to install processing-java from processing UI.
+
+Both editors require to install processing-java path from Processing UI.
