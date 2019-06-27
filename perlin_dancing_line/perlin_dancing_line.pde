@@ -1,8 +1,8 @@
 ArrayList<PVector> points = new ArrayList<PVector>();
 
-int n_range = 10;
+float n_range = 1;
 int step = 2;
-float threshold = .96;
+float threshold = .9;
 
 void setup() {
 
@@ -13,8 +13,8 @@ void setup() {
     getNoise();
 }
 void getNoise() {
+    
     background(255, 255, 255, 0.25);
-
     points = new ArrayList<PVector>();
 
     for( int x = 0; x < width; x+= step ) {
@@ -27,17 +27,22 @@ void getNoise() {
             float n_value = noise( n_x, n_y ) * 255;
 
             if( n_value < 100 && random(1) > threshold ) {
+                
+                stroke( n_value );
                 line( x, y, x+step, y+step );
-
+                /*
                 points.add( 
                     new PVector(
                         x + random(-10, 10),
                         y + random(-10, 10)
                     )
                 );
+                */
             }
         }
     }
+    n_range = n_range + 0.1;
+    println("n_range: "+n_range);
 }
 
 void draw() {
