@@ -4,6 +4,7 @@
  * Processing port of the initial html/js Chat Project (2017)
  * @link https://github.com/nclslbrn/CHAT
  * @link https://nicolas-lebrun.fr/fr/project/chat/
+ * @libray HTTP requests for Processing https://github.com/runemadsen/HTTP-Requests-for-Processing
  */
 
 import http.requests.*;
