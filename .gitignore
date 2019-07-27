@@ -1,5 +1,6 @@
 build/
 .DS_Store
+records
 modes
 templates
 tools
