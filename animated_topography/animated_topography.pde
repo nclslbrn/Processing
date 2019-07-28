@@ -1,35 +1,29 @@
 OpenSimplexNoise noise;
 
-boolean recording = false;
+boolean recording = true;
 int numFrames = 75;
 int margin = 16;
 float radius = 0.05;
 int step = 2;
+int strokeColor = 0;
 
 void setup() {
 
     size(800, 800);
     background(255);
     frameRate(25);
-    stroke(0);
-    noFill();
-
+    stroke(strokeColor);
     noise = new OpenSimplexNoise();
 }
-
-
 
 
 void draw() {
 
     float t = 1.0 * frameCount / numFrames;
-
-    background(255);
-
     float scale = 0.005;
 
+    background(255);
     loadPixels();
-
 
     for (int x = margin; x < width - margin; x+=step ) {
         
@@ -48,15 +42,13 @@ void draw() {
 
             if( b ) {
                 
-                color col = color( b ? 0 : 255 );
-                pixels[x + width * y] = color(col);
-                   
+                pixels[x + width * y] = color( strokeColor );
+                point(x, y);
             }
         }
     }
 
     updatePixels();
-
 
     if (frameCount <= numFrames && recording) {
         saveFrame("records/frame-###.jpg");
