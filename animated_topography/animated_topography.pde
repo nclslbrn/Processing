@@ -1,21 +1,24 @@
 OpenSimplexNoise noise;
 
-boolean recording = true;
+boolean recording = false;
+int numFrames = 75;
+int margin = 16;
+float radius = 0.05;
+int step = 2;
 
 void setup() {
 
-    size(500, 500);
+    size(800, 800);
     background(255);
-   // smooth(15);
+    frameRate(25);
     stroke(0);
     noFill();
 
     noise = new OpenSimplexNoise();
 }
 
-int numFrames = 75;
 
-float radius = 0.1;
+
 
 void draw() {
 
@@ -23,15 +26,14 @@ void draw() {
 
     background(255);
 
-    float scale = 0.0075;
+    float scale = 0.005;
 
-    if( recording ) {
-        loadPixels();
-    }
+    loadPixels();
 
-    for (int x = 0; x < width; x++) {
 
-        for (int y = 0; y < height; y++) {
+    for (int x = margin; x < width - margin; x+=step ) {
+        
+        for (int y = margin; y < height - margin; y+=step ) {
 
             float noiseValue = (float) noise.eval(
                 scale * x,
@@ -42,24 +44,18 @@ void draw() {
             float roundNoise = round( (noiseValue * 100 ) );
             roundNoise = roundNoise / 100;
 
-            boolean b = (roundNoise % 0.05) == 0;
+            boolean b = (roundNoise % 0.01) == 0;
 
-            float col = b ? 0 : 255;
-
-            if( recording ) {
+            if( b ) {
                 
+                color col = color( b ? 0 : 255 );
                 pixels[x + width * y] = color(col);
-
-            } else {
-                stroke(col);
-                point( x, y );
-
+                   
             }
         }
     }
-    if( recording ) {
-        updatePixels();
-    }
+
+    updatePixels();
 
 
     if (frameCount <= numFrames && recording) {
