@@ -9,17 +9,17 @@
 OpenSimplexNoise noise;
 
 int radius, circunference, centX, centY, agentCount, outsideAgentCount;
-boolean recording = false;
+boolean recording = true;
 float angle, t;
-int border = 10;
+int border = 5;
 int margin = 10;
 
 float agentSize = 1;
 float agentAlpha = 90;
 float agentStepSize = 5;
 
-float fieldIntensity = 35;
-float noiseScale = 1200;
+float fieldIntensity = 25;
+float noiseScale = 800;
 
 ArrayList<PVector> circlePoints = new ArrayList<PVector>();
 ArrayList<Agent> agents;
@@ -77,7 +77,6 @@ void mooveAgents() {
   
   //t = outsideAgentCount % agentCount / agentCount;
   t = map(outsideAgentCount%(agentCount*4), 0, agentCount*4, 0.0, 1.0);
-  println(t);  
 
   for (Agent a : agents) {
 
@@ -121,7 +120,7 @@ void draw() {
   }
 
   if (outsideAgentCount >= agentCount*2 && recording) {
-    saveFrame("records/frame-###.jpg");
+    //saveFrame("records/frame-###.jpg");
   }
 
   if (outsideAgentCount == agentCount*2 && recording ) {
