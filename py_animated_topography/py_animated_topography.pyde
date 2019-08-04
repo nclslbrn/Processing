@@ -39,6 +39,7 @@ def draw():
       b = ( roundNoise % 0.01 ) == 0
 
       if b:
+
         pixels[x+width*y] = color( strokeColor )
         point(x, y)
 

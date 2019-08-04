@@ -1,30 +1,52 @@
+// Based on a work of Etienne Jacob
+// https://gist.github.com/Bleuje/907dfc2da1be07fad3edc8ed9cd888ed
+
+
 OpenSimplexNoise noise;
 
 boolean recording = true;
 int numFrames = 75;
 int margin = 16;
 float radius = 0.05;
-int step = 2;
+int step = 1;
 int strokeColor = 0;
+int tickMargin = 32;
 
 void setup() {
 
     size(800, 800);
     background(255);
-    frameRate(25);
     stroke(strokeColor);
-    noise = new OpenSimplexNoise();
+    noise = new OpenSimplexNoise();    
 }
 
 
 void draw() {
 
     float t = 1.0 * frameCount / numFrames;
-    float scale = 0.005;
+    float scale = 0.01;
 
     background(255);
     loadPixels();
 
+    for( int x = margin; x <= width-margin; x+= tickMargin ) {
+
+        for( int _y = margin; _y <= height-margin; _y++ ) {
+
+            pixels[x+width*_y] = color( 255, 100, 100 );
+        }
+    }
+
+    for( int y = margin; y <= height-margin; y+= tickMargin  ) {
+
+        for( int _x = margin; _x <= width-margin; _x++ ) {
+
+            pixels[_x+width*y] = color( 255, 100, 100 );
+        }
+
+    }
+
+    
     for (int x = margin; x < width - margin; x+=step ) {
         
         for (int y = margin; y < height - margin; y+=step ) {
@@ -38,12 +60,18 @@ void draw() {
             float roundNoise = round( (noiseValue * 100 ) );
             roundNoise = roundNoise / 100;
 
-            boolean b = (roundNoise % 0.01) == 0;
+            boolean b = (roundNoise % 0.15) == 0;
 
             if( b ) {
-                
-                pixels[x + width * y] = color( strokeColor );
-                point(x, y);
+
+                for( int _x = 0; _x <= step; _x++ ) {
+                    for( int _y = 0; _y <= step; _y++ ) {
+                        
+                        pixels[x +_x + width * y +_y] = color( strokeColor );
+
+                    }
+                }
+
             }
         }
     }
@@ -54,7 +82,6 @@ void draw() {
         saveFrame("records/frame-###.jpg");
     }
     if (frameCount == numFrames && recording) {
-        println("finished");
-        stop();
+        exit();
     }
 }
