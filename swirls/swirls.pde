@@ -18,7 +18,7 @@ float agentSize = 1;
 float agentAlpha = 90;
 float agentStepSize = 5;
 
-float fieldIntensity = 25;
+float fieldIntensity = 18;
 float noiseScale = 800;
 
 ArrayList<PVector> circlePoints = new ArrayList<PVector>();
@@ -27,13 +27,13 @@ ArrayList<Agent> agents;
 
 void setup() {
 
-  size(800, 800);
+  size(1920, 1080);
   stroke(255, agentAlpha);
   strokeWeight(agentSize);
   
   noise = new OpenSimplexNoise();
 
-  radius = ceil( width / 3);
+  radius = ceil( width / 5);
   centX = width / 2;
   centY = height / 2;
 
@@ -76,9 +76,10 @@ void init() {
 void mooveAgents() {
   
   //t = outsideAgentCount % agentCount / agentCount;
-  t = map(outsideAgentCount%(agentCount*4), 0, agentCount*4, 0.0, 1.0);
 
   for (Agent a : agents) {
+    
+    t = map(outsideAgentCount%(agentCount*4), 0, agentCount*4, 0.0, 1.0);
 
     a.angle = getNoiseIntensity(a.position, t);
     
@@ -119,11 +120,11 @@ void draw() {
     line(a.previousPosition.x, a.previousPosition.y, a.position.x, a.position.y);
   }
 
-  if (outsideAgentCount >= agentCount*2 && recording) {
-    //saveFrame("records/frame-###.jpg");
+  if (outsideAgentCount <= agentCount*26 && recording) {
+      saveFrame("records/frame-###.jpg");
   }
 
-  if (outsideAgentCount == agentCount*2 && recording ) {
+  if (outsideAgentCount == agentCount*26 && recording ) {
     exit();
   }
 
