@@ -10,16 +10,19 @@ OpenSimplexNoise noise;
 
 int radius, circunference, centX, centY, agentCount, outsideAgentCount;
 boolean recording = true;
+
+int rototionTiming = 1024;
+int rotationStart = 0;
 float angle, t;
 int border = 5;
 int margin = 10;
 
 float agentSize = 1;
 float agentAlpha = 90;
-float agentStepSize = 5;
+float agentStepSize = 6;
 
-float fieldIntensity = 18;
-float noiseScale = 800;
+float fieldIntensity = 12;
+float noiseScale = 600;
 
 ArrayList<PVector> circlePoints = new ArrayList<PVector>();
 ArrayList<Agent> agents;
@@ -27,7 +30,7 @@ ArrayList<Agent> agents;
 
 void setup() {
 
-  size(1920, 1080);
+  size(1280, 750);
   stroke(255, agentAlpha);
   strokeWeight(agentSize);
   
@@ -68,6 +71,7 @@ void init() {
   if( recording ) {
     while( outsideAgentCount < agentCount ) {
       mooveAgents();
+      rotationStart = frameCount;
     }
   }
 }
@@ -79,7 +83,9 @@ void mooveAgents() {
 
   for (Agent a : agents) {
     
-    t = map(outsideAgentCount%(agentCount*4), 0, agentCount*4, 0.0, 1.0);
+    t = map( frameCount, rotationStart, rotationStart+ rototionTiming, 0.0, 1.0);
+    
+    //t = map(outsideAgentCount%(agentCount*4), 0, agentCount*4, 0.0, 1.0);
 
     a.angle = getNoiseIntensity(a.position, t);
     
@@ -116,6 +122,7 @@ void draw() {
   background(0);
   mooveAgents();
 
+
   for (Agent a : agents){
     line(a.previousPosition.x, a.previousPosition.y, a.position.x, a.position.y);
   }
@@ -126,6 +133,10 @@ void draw() {
 
   if (outsideAgentCount == agentCount*26 && recording ) {
     exit();
+  }
+
+  if( frameCount >= rotationStart+ rototionTiming ) {
+    rotationStart = frameCount;
   }
 
 }
