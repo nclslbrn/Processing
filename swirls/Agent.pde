@@ -12,7 +12,7 @@ class Agent
     {
         position = new PVector(random(width), random(height)); // Position aléatoire
         previousPosition = position.get(); // Attention à bien copier le PVector avec la méthode 'get()';
-        angle = random(2 * PI); // Angle aléatoire
+        angle = random(1) * TWO_PI; // Angle aléatoire
         stepSize = 1;
         isPositionResetWhenOutside = true;
     }
