@@ -7,8 +7,8 @@ OpenSimplexNoise noise;
 boolean recording = true;
 int numFrames = 75;
 int margin = 16;
-float radius = 0.05;
-int step = 1;
+float radius = 0.5;
+int step = 2;
 int strokeColor = 0;
 int tickMargin = 32;
 
@@ -24,11 +24,11 @@ void setup() {
 void draw() {
 
     float t = 1.0 * frameCount / numFrames;
-    float scale = 0.01;
+    float scale = 0.005;
 
     background(255);
     loadPixels();
-
+/*
     for( int x = margin; x <= width-margin; x+= tickMargin ) {
 
         for( int _y = margin; _y <= height-margin; _y++ ) {
@@ -45,7 +45,7 @@ void draw() {
         }
 
     }
-
+*/
     
     for (int x = margin; x < width - margin; x+=step ) {
         
