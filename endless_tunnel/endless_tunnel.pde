@@ -3,14 +3,17 @@ PFont font;
 float zDist = 36, 
       zstep = 1.8, 
       rad = 120,
-      radFactor = 0.9;
+      radFactor = 0.85,
+      globalZIncrement = PI / 50000;
 
 Boolean englishVersion = false;
+Boolean firstFrameSaved = false;
 
 String sentence;
 String frenchSentence = "jusqu'ici tout va bien, ";
 String englishSentence = "so far so good, ";
 
+int animCount = 0;
 int pointPerCircle = 5;
 int pointSize = 36;
 float zmin, zmax, rotation;
@@ -70,17 +73,20 @@ void draw() {
     
     float middleZ = zstep /2;
     float r = map(pv.z, zmin, zmax, rad*.1, rad);
+    float arcSize = PI * (2 * r) / pointPerCircle;
+    float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
     float ellipeSize = r / pointSize;
-
-    
+    float arcWidth = map(i+1, 0, nb - 1, rad*.1, rad) - r;
     int stroke = (int) map(pv.z, zmin, zmax, 50, 255);
+
+    println("arcWidth :" +arcWidth);
 
     stroke(stroke);
     fill(stroke); 
 
     pushMatrix();
     translate(width/2, height/2, pv.z);
-    
+
     for( int p = 1; p <= pointPerCircle; p++ ) {
       
       float halfAngle = angle/2;
@@ -92,47 +98,56 @@ void draw() {
       float _x = r * cos(angle*(p+1)+rotation);
       float _y = r * sin(angle*(p+1)+rotation);
     
-      float x_first_third = r * cos(thirdAngle+(angle*p)+rotation);
-      float y_first_third = r * sin(thirdAngle+(angle*p)+rotation);
+      float x_first_third = medianSize * cos(thirdAngle+(angle*p)+rotation);
+      float y_first_third = medianSize * sin(thirdAngle+(angle*p)+rotation);
 
-      float x_last_third = r * cos((thirdAngle*2)+(angle*p)+rotation);
-      float y_last_third = r * sin((thirdAngle*2)+(angle*p)+rotation);
+      float x_last_third = medianSize * cos((thirdAngle*2)+(angle*p)+rotation);
+      float y_last_third = medianSize * sin((thirdAngle*2)+(angle*p)+rotation);
 
-      float middleX = (r*radFactor) * cos(halfAngle+(angle*p)+rotation);
-      float middleY = (r*radFactor) * sin(halfAngle+(angle*p)+rotation);
-      
-      
-      
+      float middleX = medianSize * cos(halfAngle+(angle*p)+rotation);
+      float middleY = medianSize * sin(halfAngle+(angle*p)+rotation);
       
       float textRotZ = angle*p + angle/2 + rotation;
 
       ellipse(x, y, ellipeSize, ellipeSize);
       
-      //line(middleX, middleY, 0, middleX, middleY, pv.z);
-      
-      line(x, y, 0, x, y, pv.z);
+      line(x, y, 0, x, y, zstep);
       line(x, y, 0, _x, _y, 0);
-      line(x_first_third, y_first_third, 0, x_first_third, y_first_third, pv.z);
-      line(x_last_third, y_last_third, 0, x_last_third, y_last_third, pv.z);
+      line(x_first_third, y_first_third, 2, x_first_third, y_first_third, arcWidth-2);
+      line(x_last_third, y_last_third, 2, x_last_third, y_last_third, arcWidth-2);
 
       textFont(font, ellipeSize * 10);
 
       pushMatrix();
-      translate(middleX, middleY, middleZ );
-      
-     
+      translate(middleX, middleY, zstep );
+           
       rotateZ(textRotZ);
       rotateY(HALF_PI);
       rotateX(PI);
       
       text(text[i], 0, 0, 0);
       popMatrix();
+    
     }
     popMatrix();
-    rotation+= 0.0001;
+    rotation+= globalZIncrement;
 
     if (pv.z > zmax) {
       circles[i].z = zmin;
+      animCount++;
     }
+    if( rotation % PI == 0 ) {
+      saveFrame("records/frame-###.jpg");
+      println("loop");
+    }
+
+    /** Debug
+    saveFrame("records/frame-###.jpg");
+    exit();
+  
+    if( animCount >= sentence.length() ) {
+      saveFrame("records/frame-###.jpg");
+    }
+    */
   }
 }
