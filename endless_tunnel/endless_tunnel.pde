@@ -74,12 +74,13 @@ void draw() {
     float middleZ = zstep /2;
     float r = map(pv.z, zmin, zmax, rad*.1, rad);
     float arcSize = PI * (2 * r) / pointPerCircle;
+   
     float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
-    float ellipeSize = r / pointSize;
-    float arcWidth = map(i+1, 0, nb - 1, rad*.1, rad) - r;
+    float arcWidth = zstep * nb;
+    
     int stroke = (int) map(pv.z, zmin, zmax, 50, 255);
 
-    println("arcWidth :" +arcWidth);
+    float ellipeSize = r / pointSize;
 
     stroke(stroke);
     fill(stroke); 
@@ -111,20 +112,20 @@ void draw() {
 
       ellipse(x, y, ellipeSize, ellipeSize);
       
-      line(x, y, 0, x, y, zstep);
+      line(x, y, 0, x, y, arcWidth);
       line(x, y, 0, _x, _y, 0);
-      line(x_first_third, y_first_third, 2, x_first_third, y_first_third, arcWidth-2);
-      line(x_last_third, y_last_third, 2, x_last_third, y_last_third, arcWidth-2);
+      line(x_first_third, y_first_third, 0, x_first_third, y_first_third, arcWidth);
+      line(x_last_third, y_last_third, 0, x_last_third, y_last_third, arcWidth);
 
       textFont(font, ellipeSize * 10);
 
       pushMatrix();
-      translate(middleX, middleY, zstep );
+      translate(middleX, middleY, arcWidth/2 );
            
       rotateZ(textRotZ);
       rotateY(HALF_PI);
       rotateX(PI);
-      
+      //debug: ellipse(0, 0, ellipeSize, ellipeSize);
       text(text[i], 0, 0, 0);
       popMatrix();
     
@@ -133,7 +134,7 @@ void draw() {
     rotation+= globalZIncrement;
 
     if (pv.z > zmax) {
-      circles[i].z = zmin;
+      circles[i].z = zmin + zstep;
       animCount++;
     }
     if( rotation % PI == 0 ) {
