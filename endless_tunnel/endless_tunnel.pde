@@ -1,23 +1,21 @@
 PFont font;
 
+StringDict sentences;
+String language = "fr"; // <-- Set language here (fr, en, sp, de)
+String sentence;
+
 float zDist = 36, 
       zstep = 1.8, 
       rad = 120,
-      radFactor = 0.85,
-      globalZIncrement = PI / 50000;
+      globalZIncrement = PI / 50000,
+      zmin,
+      zmax, 
+      rotation;
 
-Boolean englishVersion = false;
-Boolean firstFrameSaved = false;
-
-String sentence;
-String frenchSentence = "jusqu'ici tout va bien, ";
-String englishSentence = "so far so good, ";
-
-int animCount = 0;
-int pointPerCircle = 5;
-int pointSize = 36;
-float zmin, zmax, rotation;
-int nb;
+int animCount = 0,
+    pointPerCircle = 5,
+    pointSize = 36,
+    nb;
 
 PVector[] circles;
 char[] text;
@@ -25,16 +23,20 @@ char[] text;
 void setup() {
   //fullScreen(P3D);
   size(860, 860, P3D);
-  textAlign(CENTER, CENTER);
+  textAlign(RIGHT, CENTER);
   //noLoop();
   
-  font = loadFont("Novecentosanswide-Bold-99.vlw");
-  
-  if( englishVersion ) {
-    sentence = englishSentence;
-  } else {
-    sentence = frenchSentence;
-  }
+  //font = loadFont("Novecentosanswide-Bold-99.vlw");
+  font = loadFont("InterUI-Bold-99.vlw");
+
+  sentences = new StringDict();
+  sentences.set("fr", "jusqu'ici tout va bien, ");
+  sentences.set("en", "so far so good, ");
+  sentences.set("sp", "hasta ahora todo bien, ");
+  sentences.set("de", "so weit, so gut, ");
+
+  sentence = sentences.get(language); 
+
   
   zmin = width / -5;
   zmax = width * 0.8;
@@ -76,7 +78,7 @@ void draw() {
     float arcSize = PI * (2 * r) / pointPerCircle;
    
     float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
-    float arcWidth = zstep * nb;
+    float arcWidth = zstep;
     
     int stroke = (int) map(pv.z, zmin, zmax, 50, 255);
 
@@ -120,7 +122,7 @@ void draw() {
       textFont(font, ellipeSize * 10);
 
       pushMatrix();
-      translate(middleX, middleY, arcWidth/2 );
+      translate(middleX, middleY, middleZ );
            
       rotateZ(textRotZ);
       rotateY(HALF_PI);
