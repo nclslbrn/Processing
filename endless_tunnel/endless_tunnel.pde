@@ -1,35 +1,43 @@
 PFont font;
+String language = "fr"; // <-- Set language here (fr, en, sp, de)
 
 StringDict sentences;
-String language = "fr"; // <-- Set language here (fr, en, sp, de)
 String sentence;
 
 float zDist = 36, 
       zstep = 1.5, 
       rad = 120,
       rotationProbability = 0.15,
-      globalRotationIncrement,
+      globalRotationIncrement = 0.001,
+      globalXRotation = 45,
+      globalYRotation = 0,
+      globalZRotation = 0,
       zmin,
       zmax,
       arcWidth,
-      tunnelSize,
-      globalXRotation,
-      globalYRotation,
-      globalZRotation;
+      tunnelSize;
 
 int animCount = 0,
-    pointPerCircle = 8,
+    pointPerCircle = 5,
     pointSize = 36,
     nb;
 
 boolean isRotating = false;
 
 PVector[] circles;
+PVector[] circlesLeft;
+PVector[] circlesRight;
+PVector[] circlesTop;
+PVector[] circlesBottom;
+
 char[] text;
+char[] axes = { "d", "l", "r", "t", "b" };
+char randomAxe = "d"; 
+
 
 void setup() {
   //fullScreen(P3D);
-  size(640, 640, P3D);
+  size(720, 450, P3D);
   textAlign(CENTER, CENTER);
   //noLoop();
   
@@ -45,36 +53,94 @@ void setup() {
   sentence = sentences.get(language); 
 
   
-  zmin = width * -0.8;
-  zmax = width * 0.8;
+  zmin = width * -0.3;
+  zmax = width * 0.5;
   nb = sentence.length();
 
   circles = new PVector[nb];
+  circlesLeft = new PVector[nb];
+  circlesRight = new PVector[nb];
+  circlesTop = new PVector[nb];
+  circlesBottom = new PVector[nb];
   text = new char[nb];
 
   int c = 0;
 
   for (int i = 0; i < nb; i++) {
-    
+
     text[i] = sentence.charAt(i);
-    circles[i] = new PVector(0, 0, map(i, 0, nb, zmax, zmin));
+
+    circles[i] = new PVector(width/2, height/2, map(i, 0, nb, zmax, zmin));
+    
   }
   arcWidth = circles[1].z - circles[0].z;
   tunnelSize = arcWidth * sentence.length();
-  globalRotationIncrement = .01;
-  println(globalRotationIncrement + "/360" );
+  
+  float verticalRadius = sqrt( sq( tunnelSize ) + sq( width/2 ) );
+  float horizontalRadius = sqrt( sq( tunnelSize) + sq( height/2) );
+
+  for( int i = 0; i < nb; i++ ) {
+
+    float z = map(i, 0, nb, zmax, zmin);
+    float angle = HALF_PI / nb * i;
+
+    circlesLeft[i] = new PVector( 
+      verticalRadius*cos(angle), 
+      height/2,
+      z*sin(angle)
+    );
+
+    circlesRight[i] = new PVector(
+      verticalRadius*cos(HALF_PI-angle),
+      height/2,
+      z*sin(HALF_PI-angle)
+    );
+
+    circlesTop[i] = new PVector(
+      width/2,
+      horizontalRadius*cos(angle),
+      z*sin(angle)
+    );
+
+    circlesBottom[i] = new PVector(
+      width/2,
+      horizontalRadius*cos(HALF_PI-angle),
+      z*sin(HALF_PI-angle)
+    );
+  }
 }
 
 void draw() {
 
   background(10);
   PVector pv;
+  PVector[] currentCircle;
   float angle = TWO_PI / pointPerCircle;
+  
+  switch( randomAxe ) {
+    case 'd':
+      currentCircle = circles;
+      break;
+    case 'l':
+      currentCircle = circlesLeft;
+      break;
+    case 'r':
+      currentCircle = circlesRight;
+      break;
+    case 't':
+      currentCircle = circlesTop;
+      break;
+    case 'b':
+      currentCircle = circlesBottom;
+      break;
+    default:
+      currentCircle = circles;
+      break;
+  }
+
   for (int i = 0; i < nb; i++) {
 
-    pv = circles[i];
-    pv.x = width/2 + random(-1, 1);
-    pv.y = height/2+ random(-1, 1);
+    pv = currentCircle[i];
     pv.z += zstep;
 
     float r = map(pv.z, zmin, zmax, rad*.1, rad);
@@ -82,17 +148,20 @@ void draw() {
     float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
     float middleZ = arcWidth /2;
     
-    int stroke = (int) map(pv.z, zmin, zmax, 50, 255);
+    int stroke = (int) map(pv.z, zmin, zmax, 10, 255);
 
     float ellipeSize = r / pointSize;
+    float x_rotation = globalXRotation;
+
+    //pv.x = pv.x * acos(radians(45-x_rotation));
 
     stroke(stroke);
     fill(stroke); 
     pushMatrix();
     translate(pv.x, pv.y, pv.z);
-    rotateX(globalXRotation);
-    rotateY(globalYRotation);
+    //rotateX(radians(x_rotation));
     rotateZ(radians(globalZRotation));
+     
 
     for( int p = 1; p <= pointPerCircle; p++ ) {
       
@@ -115,7 +184,7 @@ void draw() {
       float middleY = medianSize * sin(halfAngle+(angle*p));
       
       float textRotZ = angle*p + angle/2;
-      
+
       ellipse(x, y, ellipeSize, ellipeSize);
       
       line(x, y, 0, x, y, arcWidth);
@@ -126,29 +195,34 @@ void draw() {
       textFont(font, ellipeSize * 10);
 
       pushMatrix();
-      translate(middleX, middleY, middleZ );
-           
-      rotateZ(textRotZ);
-      rotateY(HALF_PI);
-      rotateX(PI);
-      //debug: ellipse(0, 0, ellipeSize, ellipeSize);
-      text(text[i], 0, 0, 0);
+        translate(middleX, middleY, middleZ );
+            
+        rotateZ(textRotZ);
+        rotateY(HALF_PI);
+        rotateX(PI);
+        //debug: ellipse(0, 0, ellipeSize, ellipeSize);
+        text(text[i], 0, 0, 0);
       popMatrix();
-    
+
+
     }
     popMatrix();
 
     if (pv.z > zmax) {
       circles[i].z = zmin + zstep;
       animCount++;
+      randomAxe = axes[ (int) random( axes.length )];
+      println( randomAxe );
     }
     
-    globalZRotation+= globalRotationIncrement;
-    println(globalZRotation);
-    if( globalZRotation == 360 || globalZRotation % 360 == 0 ) {
+    globalZRotation = globalZRotation + globalRotationIncrement;
+
+    if( globalZRotation == 360 || 
+      ( round(globalZRotation) % 360 == 0 && globalZRotation != 0) 
+    ) {
       //saveFrame("records/frame-###.jpg");
       println("loop");
-      exit();
+     // exit();
     } else {
     //saveFrame("records/frame-###.jpg");
     }
