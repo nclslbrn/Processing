@@ -7,8 +7,8 @@ String sentence;
 float zDist = 36, 
       zstep = 1.5, 
       rad = 120,
-      rotationProbability = 0.15,
-      globalRotationIncrement = 0.00001,
+      rotationProbability = 0.5,
+      globalRotationIncrement = 0.0001,
       rotate_x = 0,
       rotate_y = 0,
       rotate_z = 0,
@@ -124,38 +124,32 @@ void draw() {
     case 'd':
       currentCircle = circles;
       rotate_x = rotate_y = 0;
-      println( "rotate_z: " + rotate_z );
       isRotating = false;
       break;
     case 'l':
       currentCircle = circlesLeft;
       rotate_x += globalRotationIncrement;
-      println( "rotate_x: " + rotate_x );
       if( rotate_x > 0 ) isRotating = false;
       break;
     case 'r':
       currentCircle = circlesRight;
       rotate_x -= globalRotationIncrement;
-      println( "rotate_x: " + rotate_x );
       if( rotate_x < 0 ) isRotating = false;
       break;
     case 't':
       currentCircle = circlesTop;
       rotate_y += globalRotationIncrement;
-      println( "rotate_y: " + rotate_y );
       if( rotate_y > 0 ) isRotating = false;
       break;
     case 'b':
       currentCircle = circlesBottom;
       rotate_y -= globalRotationIncrement;
-      println( "rotate_y: " + rotate_y );
       if( rotate_y < 0 ) isRotating = false;
       break;
     default:
       currentCircle = circles;
       isRotating = false;
       rotate_x = rotate_y = 0;
-      println( "rotate_z: " + rotate_z );
       break;
   }
   for (int i = 0; i < nb; i++) {
@@ -236,6 +230,7 @@ void draw() {
       if( random(1) < rotationProbability & !isRotating ) {
 
         randomAxe = axes[ (int) random( axes.length )];
+        println("randomAxe: "+randomAxe);
         switch( randomAxe ) {
           case 'd':
             rotate_x = rotate_y = 0;
@@ -279,7 +274,7 @@ void draw() {
       //saveFrame("records/frame-###.jpg");
      // exit();
     } else {
-    //saveFrame("records/frame-###.jpg");
+      saveFrame("records/frame-###.jpg");
     }
   }
   
