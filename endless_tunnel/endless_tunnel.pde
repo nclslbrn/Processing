@@ -1,17 +1,17 @@
-PFont font;
-String language = "fr"; // <-- Set language here (fr, en, sp, de)
-
+PFont      font;
+//  Set language here (fr, en, sp, de)
+String     language = "fr"; 
 StringDict sentences;
 String     sentence;
 
-float zDist               = 64, 
-      zstep               = 1.5, 
-      rad                 = 120,
+float rad                 = 120,
       rotationProbability = 0.75,
-      rotationSpeed       = 0.00005,
+      rotationSpeed       = 0.00025,
+      rotationAngle       = TWO_PI,
       rotate_x            = 0,
       rotate_y            = 0,
       rotate_z            = 0,
+      zstep, 
       zmin,
       zmax,
       arcWidth,
@@ -19,7 +19,7 @@ float zDist               = 64,
 
 int animCount      = 0,
     // number of points draw along the circle
-    pointPerCircle = 5, // need to be > 3
+    pointPerCircle = 4, // need to be > 3
     // define ellipse and text size
     pointSize      = 36, 
     nb;
@@ -41,7 +41,7 @@ char randomAxe = 'd';
 
 void setup() {
   fullScreen(P3D);
-  //size(960, 620, P3D);
+  //size(960, 960, P3D);
   textAlign(CENTER, CENTER);
   
   font = loadFont("Novecentosanswide-Bold-99.vlw");
@@ -54,7 +54,7 @@ void setup() {
 
   sentence = sentences.get(language); 
   
-  zmin = width * -0.5;
+  zmin = width * -0.85;
   zmax = width * 0.5;
   nb   = sentence.length();
 
@@ -66,38 +66,39 @@ void setup() {
   text          = new char[nb];
   tunnelSize    = (zmin - zmax) * -1;
   arcWidth      = tunnelSize/nb;
-
+  zstep         = (tunnelSize/nb) / 30;
 
   for (int i = 0; i < nb; i++) {
 
     float z     = map(i, 0, nb, zmax, zmin);
-    float angle = HALF_PI / nb * (i*2);
-    
-    text[i]     = sentence.charAt(i);
-    circles[i]  = new PVector(width/2, height/2, z);
+    float angle = i < nb / 2 ? rotationAngle / nb * i : 0;
+    float scale = arcWidth - arcWidth / nb * i;
 
+    text[i]         = sentence.charAt(i);
+    circles[i]      = new PVector(width/2, height/2, z);
+    
     circlesLeft[i] = new PVector( 
-      width/2 + arcWidth * cos(angle), 
+      width/ 2 + (scale * cos(angle)), 
       height/2,
-      z + arcWidth * sin(angle)
+      z + (arcWidth * sin(angle))
     );
 
     circlesRight[i] = new PVector(
-      width/2 - arcWidth * sin(angle),
+      width/2 - (scale * sin(angle)),
       height/2,
-      z + arcWidth * cos(angle)
+      z + (arcWidth * cos(angle))
     );
 
     circlesTop[i] = new PVector(
       width/2,
-      height/2 + arcWidth * cos(angle),
-      z + arcWidth * sin(angle)
+      height/2 + (scale * cos(angle)),
+      z + (arcWidth * sin(angle))
     );
 
     circlesBottom[i] = new PVector(
       width/2,
-      height/2 - arcWidth * sin(angle),
-      z + arcWidth * cos(angle)
+      height/2 - (scale * sin(angle)),
+      z + (arcWidth * cos(angle))
     );
   }
 }
@@ -156,7 +157,7 @@ void draw() {
     pv.z += zstep;
 
     float r = map(pv.z, zmin, zmax, rad*.1, rad);
-    float arcSize = PI * (2 * r) / pointPerCircle;
+    float arcSize = (PI * (2 * r) / pointPerCircle)* 0.85;
     float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
     float middleZ = arcWidth /2;
     
@@ -220,7 +221,7 @@ void draw() {
 
     if (pv.z > zmax) {
       
-      currentCircle[i].z = zmin + zstep;
+      currentCircle[i].z = zmin;
       animCount++;
       
     }
