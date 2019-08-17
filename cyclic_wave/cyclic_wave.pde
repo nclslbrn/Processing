@@ -45,13 +45,13 @@ void setup() {
 void draw() {
 
   background(0);
-  float t = 1.0 * frameCount / numFrames;
+  float t = frameCount-1 / numFrames;
   
   pushMatrix();
   translate(center.x, center.y, -height/2);
   rotateX(PI/3);
 
-  for( int arcID = 1; arcID < arcs.size(); arcID++ ) {
+  for( int arcID = 0; arcID < arcs.size(); arcID++ ) {
 
     EllipseSection arc = arcs.get(arcID);
     float currentAngle = arc.initialAngle;

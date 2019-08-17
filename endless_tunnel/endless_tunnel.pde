@@ -41,7 +41,7 @@ char randomAxe = 'd';
 
 void setup() {
   //fullScreen(P3D);
-  size(960, 560, P3D);
+  size(800, 800, P3D);
   textAlign(CENTER, CENTER);
   
   font = loadFont("Novecentosanswide-Bold-99.vlw");
@@ -274,4 +274,5 @@ void draw() {
       rotate_z += rotationSpeed;
     }
   }
+  saveFrame("records/frame-###.jpg");
 }

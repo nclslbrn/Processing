@@ -6,8 +6,8 @@ float threshold = .9;
 
 void setup() {
 
-    size(960, 960);
-    frameRate(12);
+    size(800, 800);
+    //frameRate(12);
     strokeWeight(1);
     stroke(150);
     getNoise();
@@ -43,6 +43,8 @@ void getNoise() {
     }
     n_range = n_range + 0.1;
     println("n_range: "+n_range);
+    saveFrame("records/frame-###.jpg"); 
+
 }
 
 void draw() {

@@ -55,7 +55,7 @@ PImage pic;
 void settings() {
 
 		//fullScreen(FX2D);
-		size(751, 960, P3D);
+		size(800, 800, P3D);
 
 }
 
@@ -259,5 +259,6 @@ void draw() {
 		    }
 
 	  }
+  	saveFrame("records/frame-###.jpg");
 
 }

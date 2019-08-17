@@ -3,59 +3,61 @@ int drawStartTime = 0;
 int drawDuration = 15000;
 int alphaValue = 150;
 Grid grid;
-ArrayList<Point_in_triangle> points = new ArrayList<Point_in_triangle>();
+ArrayList < Point_in_triangle > points = new ArrayList < Point_in_triangle > ();
 
 void setup() {
-   size(960, 960, FX2D);
-	 frameRate(24);
-	 smooth(30);
-   init();
+    size(800, 800, FX2D);
+    frameRate(24);
+    smooth(30);
+    init();
 }
 
 void init() {
 
     background(0);
-	  grid = new Grid();
+    grid = new Grid();
     points.clear();
-	  grid.cellWidth = (int) random(400, 600);
-	  grid.init();
+    grid.cellWidth = (int) random(400, 600);
+    grid.init();
 
-	  for( int x = 0; x < grid.cols; x++ ) {
+    for (int x = 0; x < grid.cols; x++) {
 
-				for( int y = 0; y < grid.rows; y++) {
+        for (int y = 0; y < grid.rows; y++) {
 
-						int _x = x * grid.cellWidth;
-						int _y = y * grid.cellWidth;
+            int _x = x * grid.cellWidth;
+            int _y = y * grid.cellWidth;
 
-						for( int t = 0; t < numTrianglePerCircle; t++ ) {
+            for (int t = 0; t < numTrianglePerCircle; t++) {
 
                 Point_in_triangle newPoint;
                 newPoint = new Point_in_triangle(
-                    getRandomPoints( _x, _y, grid.cellWidth/2 ),
+                    getRandomPoints(_x, _y, grid.cellWidth / 2),
                     randomColor(),
                     alphaValue
                 );
-                points.add( newPoint );
+                points.add(newPoint);
 
-						}
-				}
-		}
+            }
+        }
+    }
     drawStartTime = millis();
 }
 
 void draw() {
 
-  pushMatrix();
-  translate( grid.outer_x_margin + (grid.cellWidth/2) , grid.outer_y_margin + (grid.cellWidth/2) );
-  for( int p = 0; p < points.size() - 1; p++) {
+    pushMatrix();
+    translate(grid.outer_x_margin + (grid.cellWidth / 2), grid.outer_y_margin + (grid.cellWidth / 2));
+    for (int p = 0; p < points.size() - 1; p++) {
 
-      Point_in_triangle point = points.get(p);
-      point.display();
+        Point_in_triangle point = points.get(p);
+        point.display();
 
-  }
-  popMatrix();
+    }
+    popMatrix();
 
-  if( millis() > drawStartTime + drawDuration ) {
-      init();
-  }
+    if (millis() > drawStartTime + drawDuration) {
+        init();
+    }
+    saveFrame("records/frame-###.jpg");
+
 }

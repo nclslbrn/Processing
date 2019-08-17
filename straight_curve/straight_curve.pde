@@ -32,8 +32,8 @@ int prec, pasT, bd;
 
 
 void setup() {
-
-  size(869, 1010);
+	size(800,800);
+  //size(869, 1010);
 	smooth(10);
 	noStroke();
 	textSize(8);
@@ -151,6 +151,7 @@ void draw() {
     } else { // last cell of the column
 
 				//noLoop();
+  			saveFrame("records/frame-###.jpg");
 				init();
 
 		 }

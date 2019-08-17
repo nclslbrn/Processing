@@ -5,7 +5,7 @@ OpenSimplexNoise noise;
 
 boolean recording = true;
 int numFrames = 75;
-int step = 1;
+int step = 4;
 int centerX, centerY;
 
 float ease(float p, float g) {

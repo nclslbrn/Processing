@@ -63,5 +63,5 @@ void draw() {
     frameRadius = radius + (radiusStep * n );
   }
   
-  rotation = angle * animCursor;
+  //rotation = angle * animCursor;
 }

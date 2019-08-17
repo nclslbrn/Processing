@@ -128,7 +128,7 @@ void draw() {
   }
 
   if (outsideAgentCount <= agentCount*26 && recording) {
-      saveFrame("records/frame-###.jpg");
+    saveFrame("records/frame-###.jpg");
   }
 
   if (outsideAgentCount == agentCount*26 && recording ) {

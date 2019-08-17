@@ -20,13 +20,13 @@ int animBegin = 0;
 int animTime = 0;
 int textSizeInit = 64;
 int totalQuotes = 0;
-int msPerCharacter = 75;
+int msPerCharacter = 100;
 color bgColor = color(0, 100);
 boolean drawAsPoints = true;
 
 void settings() {
 	//fullScreen(FX2D);
-	size(1000, 1000, FX2D);
+	size(800, 800, FX2D);
 
 }
 void setup() {
@@ -241,5 +241,6 @@ void draw() {
 
 				}
 		}
+    saveFrame("records/frame-###.jpg");
 
 }
