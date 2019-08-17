@@ -20,4 +20,5 @@ Initially the repo is located on the sketchbook folder, with examples, modes, li
 Both editors require to install processing-java path from Processing UI.
 
 <img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-nd.eu.png" alt="Creative Commons Logo" width="148" height="49">
-These sketches are under [Creative Commons License (V3)](https://creativecommons.org/licenses/by/3.0/)
+
+These sketches are under [Creative Commons License V3](https://creativecommons.org/licenses/by/3.0/)
