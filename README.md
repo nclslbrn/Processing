@@ -6,14 +6,18 @@
 [![perlin_dancing_line](https://raw.githubusercontent.com/nclslbrn/Processing/master/perlin_dancing_line/perlin_dancing_line.jpg)](https://github.com/nclslbrn/Processing/tree/master/perlin_dancing_line)|[![recognition](https://raw.githubusercontent.com/nclslbrn/Processing/master/recognition/recognition.jpg)](https://github.com/nclslbrn/Processing/tree/master/recognition)|[![straight_curve](https://raw.githubusercontent.com/nclslbrn/Processing/master/straight_curve/straight_curve.jpg)](https://github.com/nclslbrn/Processing/tree/master/straight_curve)|
 [![swirls](https://raw.githubusercontent.com/nclslbrn/Processing/master/swirls/swirls.jpg)](https://github.com/nclslbrn/Processing/tree/master/swirls)|
 --------
-A repository to sync a sketchbook between multiple computers.
 
+A repository to sync a Processing (personal) sketchbook between multiple computers and back-up them.
+Initially the repo is located on the sketchbook folder, with examples, modes, libraries, templates, and tools folders but you can clone it anywhere on your computer, if you have Processing IDE installed and for specifics sketches, some libraries installed like Minim, these sketches should works. 
 
-Use [Atom](https://atom.io/) with the [processing package](https://github.com/bleikamp/processing) to build and run sketches.
+## Use different editor than Processing IDE 
 
-- or -
+- Use [Atom](https://atom.io/) with the [processing package](https://github.com/bleikamp/processing) to build and run sketches.
 
-Use [VSCode editor](https://code.visualstudio.com/) with the [Processing Language](https://marketplace.visualstudio.com/items?itemName=Tobiah.language-pde) to build and run sketches from /.vscode/tasks.json (CMD + SHIFT + B).
+- Use [VSCode editor](https://code.visualstudio.com/) with the [Processing Language](https://marketplace.visualstudio.com/items?itemName=Tobiah.language-pde) to build and run sketches from /.vscode/tasks.json (CMD + SHIFT + B).
 
 
 Both editors require to install processing-java path from Processing UI.
+
+<img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-nd.eu.png" alt="Creative Commons Logo" width="148" height="49">
+These sketches are under [Creative Commons License (V3)](https://creativecommons.org/licenses/by/3.0/)
