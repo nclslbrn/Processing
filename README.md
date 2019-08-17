@@ -1,7 +1,6 @@
 # Processing sketches
-|-|-|-|
 
-[![F_Morellet_by_N_Lebrun](https://raw.githubusercontent.com/nclslbrn/Processing/master/F_Morellet_by_N_Lebrun/F_Morellet_by_N_Lebrun.jpg)](https://github.com/nclslbrn/Processing/tree/master/F_Morellet_by_N_Lebrun)
+[![F_Morellet_by_N_Lebrun](https://raw.githubusercontent.com/nclslbrn/Processing/master/F_Morellet_by_N_Lebrun/F_Morellet_by_N_Lebrun.jpg?v=4&s=284)](https://github.com/nclslbrn/Processing/tree/master/F_Morellet_by_N_Lebrun)
 |
 [![animated_topography](https://raw.githubusercontent.com/nclslbrn/Processing/master/animated_topography/animated_topography.jpg)](https://github.com/nclslbrn/Processing/tree/master/animated_topography)
 |
