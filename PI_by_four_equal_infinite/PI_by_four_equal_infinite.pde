@@ -1,23 +1,28 @@
 
-float gold = 1.618033;
-int   pointSpeed = 128;
-int   animCount  = 56;
+PVector[] circleCenter, infinitePoints;
 
-PVector[] circleCenter;
-PVector[] infinitePoints;
-int   pointPerCircle;
-int   totalPoint;
-int   animPointSum;
-float mainCircleRadius;
-float mainCircleAngleStep;
+int   pointSpeed = 64,
+      animCount  = 156,
+      pointPerCircle,
+      totalPoint,
+      animPointSum;
+
+float splitProbabity = 0.5,
+      gridCircleRadius,
+      mainCircleRadius,
+      mainCircleAngleStep;
+
 
 void setup() {
-  size(800, 800);
+
+  size(800, 800, P3D);
   fill(255);
   noStroke();
   ellipseMode(CENTER);
 
   mainCircleRadius = width/6;
+  gridCircleRadius = mainCircleRadius / 4;
+
   pointPerCircle = (int) (2 * PI * mainCircleRadius);
   circleCenter = new PVector[2];
   circleCenter[0] = new PVector(width*0.333333333, height/2);
@@ -46,12 +51,11 @@ void setup() {
     infinitePoints[pointNum] = new PVector(start.x, start.y);
     pointNum++;
   }
-  background(0);
-  println(infinitePoints.length );
-  println(totalPoint);
 }
 
 void draw() {
+  background(0);
+  fill(255);
 
   float speed = frameCount <= pointSpeed ? 
     1.0*(frameCount-1)/pointSpeed
@@ -63,15 +67,7 @@ void draw() {
     :
     (1.0* (frameCount % animCount)) / animCount;
 
-  fill(0, 0, 0, lenght*255);
-  rect(0, 0, width, height);
-  
-  
-  fill(255);
   int pointId = (int) map(speed, 0, 1, 0, totalPoint );
-  println(pointId);
-  ellipse(infinitePoints[pointId].x, infinitePoints[pointId].y, 10, 10);
-
 
   int pointCount;
 
@@ -81,19 +77,23 @@ void draw() {
     pointCount = (int) map( lenght, 0.5, 1, infinitePoints.length-1, 1 );
   }
 
+  float xCount = 1;
+  float yCount = 1;
+
+ 
   for( int p = 0; p <= pointCount; p++ ) {
     
     int newPointId = pointId - p;
-    if(newPointId <= 0 ) {
-      newPointId = (infinitePoints.length-1) - newPointId;
+    if(newPointId < 0 ) {
+      newPointId = (infinitePoints.length-1) + newPointId;
     }
-    /*
-    println(pointId - p + " => " + newPointId );
-    if( infinitePoints[newPointId] != null ) {
-      ellipse(infinitePoints[newPointId].x, infinitePoints[newPointId].y, 1, 1);
-    } else {
-      println( newPointId );
-    }
-   */ 
+
+    ellipse(
+      infinitePoints[newPointId].x,
+      infinitePoints[newPointId].y, 
+      6,
+      6
+    );
+    if( p == pointCount ) saveFrame("records/frame-###.jpg");
   }
 }
