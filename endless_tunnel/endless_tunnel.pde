@@ -4,9 +4,13 @@ String     language = "fr";
 StringDict sentences;
 String     sentence;
 
-float radius              = 120,
+float // radius of circle
+      radius              = 120,
+      // percent of probability that the tunnel will turn
       rotationProbability = 0.75,
+      // speed of every rotation
       rotationSpeed       = 0.00025,
+      // angle of x and y rotation
       rotationAngle       = TWO_PI,
       rotate_x            = 0,
       rotate_y            = 0,
@@ -18,7 +22,7 @@ float radius              = 120,
       tunnelSize;
 
 int // number of points draw along the circle
-    pointPerCircle = 5, // need to be > 3
+    pointPerCircle = 4, // need to be > 3
     // define ellipse and text size
     pointSize      = 36,
     // number of tunnel section (depends of sentene lenght)
@@ -32,16 +36,16 @@ PVector[] circlesRight;
 PVector[] circlesTop;
 PVector[] circlesBottom;
 
+
 // Array of axis (left, right, top, bottom)
 char[] axes = { 'l', 'r', 't', 'b' };
 char[] text;
 
-char randomAxe = 'd'; 
-
+char randomAxe = 'd';
 
 void setup() {
   //fullScreen(P3D);
-  size(800, 800, P3D);
+  size(1280, 720, P3D);
   textAlign(CENTER, CENTER);
   
   font = loadFont("Novecentosanswide-Bold-99.vlw");
@@ -54,7 +58,7 @@ void setup() {
 
   sentence = sentences.get(language); 
   
-  zmin = width * -0.85;
+  zmin = width * -0.5;
   zmax = width * 0.5;
   nb   = sentence.length();
 
@@ -66,15 +70,21 @@ void setup() {
   text          = new char[nb];
   tunnelSize    = (zmin - zmax) * -1;
   arcWidth      = tunnelSize/nb;
-  zstep         = (tunnelSize/nb) / 30;
+  zstep         = (tunnelSize/nb) / 15;
 
   for (int i = 0; i < nb; i++) {
 
     float z     = map(i, 0, nb, zmax, zmin);
-    float angle = lerp( 0, rotationAngle, i/nb);
-    float scale = lerp(0, tunnelSize, i/nb);
-    
-//    tunnelSize * (i/nb);
+
+    float angle, scale;
+ 
+    if( i < nb / 2 ) {
+      angle = map(i, 0, nb/2, 0, rotationAngle);
+      scale = map(i, 0, nb/2, 0, radius);
+    } else {
+      angle = map(i, nb/2, nb, rotationAngle, 0);
+      scale = map(i, nb/2, nb, radius, 0);
+    }
 
     text[i]         = sentence.charAt(i);
     circles[i]      = new PVector(width/2, height/2, z);
@@ -82,39 +92,41 @@ void setup() {
     circlesLeft[i] = new PVector( 
       width/ 2 + (scale * cos(angle)), 
       height/2,
-      z //+ (arcWidth * sin(angle))
+      z + (zstep * sin(angle))
     );
 
     circlesRight[i] = new PVector(
       width/2 - (scale * sin(angle)),
       height/2,
-      z //+ (arcWidth * cos(angle))
+      z + (zstep * cos(angle))
     );
 
     circlesTop[i] = new PVector(
       width/2,
       height/2 + (scale * cos(angle)),
-      z //+ (arcWidth * sin(angle))
+      z + (zstep * sin(angle))
     );
 
     circlesBottom[i] = new PVector(
       width/2,
       height/2 - (scale * sin(angle)),
-      z //+ (arcWidth * cos(angle))
+      z + (zstep * cos(angle))
     );
   }
 }
 
 
-void draw() {
 
+void draw() {
   background(10);
+
   PVector pv;
   PVector[] currentCircle;
   
   float angle = TWO_PI / pointPerCircle;
+  
   switch( randomAxe ) {
-
+    
     case 'd':
       currentCircle = circles;
       rotate_x = rotate_y = 0;
@@ -124,25 +136,25 @@ void draw() {
     case 'l':
       currentCircle = circlesLeft;
       rotate_x += rotationSpeed;
-      if( rotate_x > 0 ) isRotating = false;
+      if( rotate_x - rotationSpeed > 0 ) isRotating = false;
       break;
 
     case 'r':
       currentCircle = circlesRight;
       rotate_x -= rotationSpeed;
-      if( rotate_x < 0 ) isRotating = false;
+      if( rotate_x - rotationSpeed < 0 ) isRotating = false;
       break;
 
     case 't':
       currentCircle = circlesTop;
       rotate_y += rotationSpeed;
-      if( rotate_y > 0 ) isRotating = false;
+      if( rotate_y - rotationSpeed > 0 ) isRotating = false;
       break;
 
     case 'b':
       currentCircle = circlesBottom;
       rotate_y -= rotationSpeed;
-      if( rotate_y < 0 ) isRotating = false;
+      if( rotate_y - rotationSpeed < 0 ) isRotating = false;
       break;
 
     default:
@@ -151,10 +163,23 @@ void draw() {
       rotate_x = rotate_y = 0;
       break;
   }
-
+   
+  
   for (int i = 0; i < nb; i++) {
-    
+
+    float ease = 0;
     pv = currentCircle[i];
+    
+    if( i < nb*0.125) {
+      ease = map(i, 0, nb*0.125, 1.0, 0.0);
+    }
+    if( i > nb*0.875) {
+      ease = map(i, nb*0.875, nb, 0.0, 1.0);
+    }
+    if( i < nb*0.125 || i > nb*0.875 ) {
+      pv.lerp(circles[i], ease);
+    }
+    pv.z = currentCircle[i].z;
     pv.z += zstep;
 
     float r = map(pv.z, zmin, zmax, radius*.1, radius);
@@ -225,12 +250,12 @@ void draw() {
       
     }
     
-
     if( rotate_z - rotationSpeed > TWO_PI ) {
 
       if( random(1) < rotationProbability & !isRotating ) {
 
         randomAxe = axes[ (int) random( axes.length )];
+
         switch( randomAxe ) {
       
           case 'l':
@@ -268,11 +293,14 @@ void draw() {
 
       }
       println("randomAxe: "+randomAxe);
+
       rotate_z = 0;
     
     } else {
+
       rotate_z += rotationSpeed;
+    
     }
   }
-  saveFrame("records/frame-###.jpg");
+  //saveFrame("records/frame-###.jpg");
 }
