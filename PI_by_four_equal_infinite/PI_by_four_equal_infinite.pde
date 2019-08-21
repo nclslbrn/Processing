@@ -2,16 +2,26 @@
 PVector[] circleCenter, infinitePoints;
 
 int   pointSpeed = 64,
-      animCount  = 156,
+      animCount  = 256,
       pointPerCircle,
       totalPoint,
       animPointSum;
 
 float splitProbabity = 0.5,
-      gridCircleRadius,
+      cellSize,
       mainCircleRadius,
       mainCircleAngleStep;
 
+float ease(float p) {
+  return 3*p*p - 2*p*p*p;
+}
+
+float ease(float p, float g) {
+  if (p < 0.5) 
+    return 0.5 * pow(2*p, g);
+  else
+    return 1 - 0.5 * pow(2*(1 - p), g);
+}
 
 void setup() {
 
@@ -21,8 +31,7 @@ void setup() {
   ellipseMode(CENTER);
 
   mainCircleRadius = width/6;
-  gridCircleRadius = mainCircleRadius / 4;
-
+  cellSize = width/16;
   pointPerCircle = (int) (2 * PI * mainCircleRadius);
   circleCenter = new PVector[2];
   circleCenter[0] = new PVector(width*0.333333333, height/2);
@@ -56,7 +65,7 @@ void setup() {
 void draw() {
   background(0);
   fill(255);
-
+  
   float speed = frameCount <= pointSpeed ? 
     1.0*(frameCount-1)/pointSpeed
     :
@@ -72,28 +81,27 @@ void draw() {
   int pointCount;
 
   if( lenght <= 0.5) {
-    pointCount = (int) map( lenght, 0, 0.5, 1, infinitePoints.length-1 );
-  }else {
-    pointCount = (int) map( lenght, 0.5, 1, infinitePoints.length-1, 1 );
+    pointCount = (int) map( lenght, 0, 0.5, infinitePoints.length/32, infinitePoints.length-1 );
+  } else {
+    pointCount = (int) map( lenght, 0.5, 1, infinitePoints.length-1, infinitePoints.length/32 );
   }
 
-  float xCount = 1;
-  float yCount = 1;
-
- 
   for( int p = 0; p <= pointCount; p++ ) {
     
     int newPointId = pointId - p;
+    float fill = map( p, 0, pointCount, 204, 0);
     if(newPointId < 0 ) {
       newPointId = (infinitePoints.length-1) + newPointId;
     }
-
+    
+    fill( 46, fill, 113 );
     ellipse(
       infinitePoints[newPointId].x,
-      infinitePoints[newPointId].y, 
-      6,
-      6
+      infinitePoints[newPointId].y,
+      32,
+      32
     );
     if( p == pointCount ) saveFrame("records/frame-###.jpg");
   }
+  
 }
