@@ -21,11 +21,11 @@ float // radius of circle
 
 int // number of points draw along the circle
     pointPerCircle = 5, // need to be > 3
-    // define ellipse and text size (inverted value)
+    // define ellipse and text size 
     pointSize      = 36,
     // rotate x and y count
     rotate_count = 0,
-    // number of tunnel section (depends of sentence lenght)
+    // number of tunnel section (depends of sentence length)
     nb;
 
 boolean recording = false;
@@ -42,8 +42,10 @@ PVector[] currentCircle;
 char[] axes = { 'l', 'r', 't', 'b' };
 char[] text;
 
+// default axis 
 char randomAxe = 'd';
 
+// ease function for radius & color computation
 float ease(float p) {
   return 3*p*p - 2*p*p*p;
 }
@@ -124,8 +126,8 @@ void setup() {
       scale = map(i, (nb-1)/2, nb-1, radius, 0);
     }
 
-    text[i]         = sentence.charAt(i);
-    circles[i]      = new PVector(width/2, height/2, z);
+    text[i]        = sentence.charAt(i);
+    circles[i]     = new PVector(width/2, height/2, z);
     
     circlesLeft[i] = new PVector( 
       width/ 2 + (scale * cos(angle)), 
@@ -170,12 +172,12 @@ void draw() {
 
     float ease = map( currentCircle[i].z, zmin, zmax, 0, 1);
 
-    float r = ease(ease) * radius;
+    float r = ease(ease, 0.75) * radius;
     float arcSize = (PI * (2 * r) / pointPerCircle)* 0.85;
     float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
     float middleZ = arcWidth /2;
 
-    float stroke = ease(ease) * 255;
+    float stroke = ease(ease, 0.9) * 255;
 
     float ellipeSize = r / pointSize;
 
