@@ -28,7 +28,7 @@ int // number of points draw along the circle
     // number of tunnel section (depends of sentence lenght)
     nb;
 
-boolean recording = true;
+boolean recording = false;
 
 PVector[] circles;
 PVector[] circlesLeft;
