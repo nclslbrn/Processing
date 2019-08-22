@@ -27,8 +27,9 @@ float softplus(float q,float p){
 
 void setup() {
   size(800, 800);
+  frameRate(24);
   noStroke();
-  cellSize = width / 5;
+  cellSize = width / 16;
   halfCellSize = cellSize / 2;
   cols = (width * 1.5) /cellSize;
   rows = (height * 1.5)  / cellSize;
@@ -53,7 +54,7 @@ void draw() {
 
   pushMatrix();
   translate(width/2, height/2);
-  rotate(PI*t);
+  rotate(HALF_PI*t);
   translate(-width/2, -height/2);
 
   for( int x = 0; x <= cols; x++ ) {
