@@ -19,16 +19,25 @@ float // radius of circle
       arcWidth,
       tunnelSize;
 
-int // number of points draw along the circle
-    pointPerCircle = 5, // need to be > 3
+int // inverted factor of zoom / move forward
+    travellingSpeed = 5,
+    // minimum pointPerCircle: 4->square 5->pentagone ... 
+    minPoint = 4,
+    // maximum pointPerCircle size
+    maxPoint = 7,
     // define ellipse and text size 
-    pointSize      = 36,
-    // rotate x and y count
+    pointSize = 36,
+    // rotate x and y count can't be > 2
     rotate_count = 0,
+    // global count used to changed pointPercircle
+    global_count = 0,
+    // number of points draw along the circle
+    pointPerCircle,
     // number of tunnel section (depends of sentence length)
     nb;
 
-boolean recording = false;
+boolean recording = false,
+        debug     = true;
 
 PVector[] circles;
 PVector[] circlesLeft;
@@ -38,6 +47,8 @@ PVector[] circlesBottom;
 
 PVector[] futureCircle;
 PVector[] currentCircle;
+int[] currentPointPerCircle;
+
 // Array of axis (left, right, top, bottom)
 char[] axes = { 'l', 'r', 't', 'b' };
 char[] text;
@@ -82,10 +93,13 @@ PVector[] newCircle( char randomAxe ) {
   }
   return newCircle;
 }
-
+int newPointPerCircle(int minPoint, int maxPoint) {
+  return (int) random(minPoint, maxPoint);
+}
 void setup() {
-  fullScreen(P3D);
-  //size(1280, 720, P3D);
+  size(1920, 1080, P3D);
+  //fullScreen(P3D);
+  smooth(3);
   textAlign(CENTER, CENTER);
   
   font = loadFont("Novecentosanswide-Bold-99.vlw");
@@ -97,20 +111,22 @@ void setup() {
   sentences.set("de", "so weit, so gut, ");
 
   sentence = sentences.get(language); 
-  
-  zmin = -width * 0.3;
-  zmax = width * 0.5;
+  pointPerCircle = newPointPerCircle(minPoint, maxPoint);
+  // depth of the tunnel 
+  zmin = width*-0.75;
+  zmax = width*0.5;
   nb   = sentence.length();
 
-  circles       = new PVector[nb];
-  circlesLeft   = new PVector[nb];
-  circlesRight  = new PVector[nb];
-  circlesTop    = new PVector[nb];
-  circlesBottom = new PVector[nb];
-  text          = new char[nb];
-  tunnelSize    = (zmin - zmax) * -1;
-  arcWidth      = tunnelSize/nb;
-  zstep         = (tunnelSize/nb) / 26;
+  circles               = new PVector[nb];
+  circlesLeft           = new PVector[nb];
+  circlesRight          = new PVector[nb];
+  circlesTop            = new PVector[nb];
+  circlesBottom         = new PVector[nb];
+  text                  = new char[nb];
+  currentPointPerCircle = new int[nb];
+  tunnelSize            = (zmin - zmax) * -1;
+  arcWidth              = tunnelSize/nb;
+  zstep                 = (tunnelSize/nb) / travellingSpeed;
   
 
   for (int i = 0; i < nb; i++) {
@@ -126,8 +142,9 @@ void setup() {
       scale = map(i, (nb-1)/2, nb-1, radius, 0);
     }
 
-    text[i]        = sentence.charAt(i);
-    circles[i]     = new PVector(width/2, height/2, z);
+    text[i] = sentence.charAt(i);
+    currentPointPerCircle[i] = pointPerCircle;
+    circles[i] = new PVector(width/2, height/2, z);
     
     circlesLeft[i] = new PVector( 
       width/ 2 + (scale * cos(angle)), 
@@ -164,16 +181,16 @@ void draw() {
 
   background(5);
   
-  float angle = TWO_PI / pointPerCircle;
-  
   for (int i = 0; i < nb; i++) {
 
     currentCircle[i].z += zstep;
+    
+    float angle = TWO_PI / currentPointPerCircle[i];
 
     float ease = map( currentCircle[i].z, zmin, zmax, 0, 1);
 
     float r = ease(ease, 0.75) * radius;
-    float arcSize = (PI * (2 * r) / pointPerCircle)* 0.85;
+    float arcSize = (PI * (2 * r) / currentPointPerCircle[i])* 0.85;
     float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
     float middleZ = arcWidth /2;
 
@@ -187,7 +204,7 @@ void draw() {
     translate(currentCircle[i].x, currentCircle[i].y, currentCircle[i].z);
     rotateZ(rotate_z);
 
-    for( int p = 1; p <= pointPerCircle; p++ ) {
+    for( int p = 1; p <= currentPointPerCircle[i]; p++ ) {
       
       float halfAngle = angle/2;
       float thirdAngle = angle/3;
@@ -232,53 +249,60 @@ void draw() {
     }
     popMatrix();
 
-
+    // check if circle is out of frame
     if ( currentCircle[i].z > zmax) {
       
       if( i == 0 ) {
 
         if( rotate_count == 0) {
-
+          // reset futureCircle array
           futureCircle = new PVector[nb];
           
+          // choose a new axe
           if( random(1) < rotationProbability ) {
-
             randomAxe = axes[ (int) random( axes.length )];
             futureCircle = newCircle( randomAxe );
-
           } else {
-
             randomAxe = 'd';
             futureCircle = newCircle( randomAxe );
           }
-          println("New section: "+ randomAxe );
+          if( debug ) println("New section: "+ randomAxe );
         }
 
-        
+        // when the first circle is passed for the second time
         if( rotate_count == 2 ) {
-          
           rotate_count = 0;
-
+          global_count++;
         } else {
-
           rotate_count++;
 
         } 
-      } // i == 0
+      }
 
-
+      // replace every circle when they go outside
       if( rotate_count > 1 ) {
         currentCircle[i] = futureCircle[i];
+        currentPointPerCircle[i] = pointPerCircle;
       }
+      // put them on the back
       currentCircle[i].z = zmin;
     }
   } 
-
+  
+  // rotate_z loop endless
   if( rotate_z + rotationSpeed >= TWO_PI ) {
     rotate_z = 0;
-
   } else {
     rotate_z += rotationSpeed;
   }
-  if( recording) saveFrame("records/frame-###.jpg");
+
+  // change shape of tunnel
+  if( global_count > 0 && global_count == 1 ) {
+    pointPerCircle = newPointPerCircle(minPoint, maxPoint);
+    global_count = 0;
+    if( debug ) println("Shape will have " + pointPerCircle + " points");
+  }
+
+  // record if needed
+  if( recording ) saveFrame("records/frame-###.jpg");
 }
