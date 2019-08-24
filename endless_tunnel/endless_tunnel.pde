@@ -5,9 +5,9 @@ StringDict sentences;
 String     sentence;
 
 float // radius of circle
-      radius              = 120,
+      radius              = 220,
       // percent of probability that the tunnel will turn
-      rotationProbability = 0.5,
+      rotationProbability = 0.35,
       // angle of x and y rotation
       rotationAngle       = HALF_PI,
       // speed of every rotation
@@ -20,7 +20,7 @@ float // radius of circle
       tunnelSize;
 
 int // inverted factor of zoom / move forward
-    travellingSpeed = 5,
+    travellingSpeed = 20,
     // minimum pointPerCircle: 4->square 5->pentagone ... 
     minPoint = 4,
     // maximum pointPerCircle size
@@ -180,7 +180,7 @@ void setup() {
 void draw() {
 
   background(5);
-  
+   
   for (int i = 0; i < nb; i++) {
 
     currentCircle[i].z += zstep;
@@ -200,6 +200,7 @@ void draw() {
 
     stroke(stroke);
     fill(stroke);
+
     pushMatrix();
     translate(currentCircle[i].x, currentCircle[i].y, currentCircle[i].z);
     rotateZ(rotate_z);
@@ -225,7 +226,7 @@ void draw() {
       float middleY = medianSize * sin(halfAngle+(angle*p));
       
       float textRotZ = angle*p + angle/2;
-      
+    
       ellipse(x, y, ellipeSize, ellipeSize);
       line(x, y, 0, x, y, arcWidth);
 
@@ -244,10 +245,9 @@ void draw() {
         rotateX(PI);
         text(text[i], 0, 0, 0);
       popMatrix();
-
-
     }
     popMatrix();
+
 
     // check if circle is out of frame
     if ( currentCircle[i].z > zmax) {
