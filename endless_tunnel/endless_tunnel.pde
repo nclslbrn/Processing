@@ -37,7 +37,7 @@ int // inverted factor of zoom / move forward
     nb;
 
 boolean recording = false,
-        debug     = true;
+        debug     = false;
 
 PVector[] circles;
 PVector[] circlesLeft;
@@ -98,6 +98,7 @@ int newPointPerCircle(int minPoint, int maxPoint) {
 }
 void setup() {
   size(1920, 1080, P3D);
+  noCursor();
   //fullScreen(P3D);
   smooth(3);
   textAlign(CENTER, CENTER);
@@ -305,4 +306,9 @@ void draw() {
 
   // record if needed
   if( recording ) saveFrame("records/frame-###.jpg");
+
+  // used for application
+  if( mousePressed == true ) {
+    exit(); 
+  }
 }

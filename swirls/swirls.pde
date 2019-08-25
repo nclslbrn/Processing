@@ -29,8 +29,8 @@ ArrayList<Agent> agents;
 
 
 void setup() {
-
-  size(1280, 750);
+  fullScreen();
+  //size(1280, 750);
   stroke(255, agentAlpha);
   strokeWeight(agentSize);
   
@@ -128,18 +128,23 @@ void draw() {
   }
 
   if (outsideAgentCount <= agentCount*26 && recording) {
-    saveFrame("records/frame-###.jpg");
+    //saveFrame("records/frame-###.jpg");
   }
 
   if (outsideAgentCount == agentCount*26 && recording ) {
-    exit();
+    // exit();
   }
 
+  
   if( frameCount >= rotationStart+ rototionTiming ) {
     rotationStart = frameCount;
   }
-
+  
+  if( mousePressed == true ) {
+     exit(); 
+  }
 }
+
 float getNoiseIntensity(PVector position, float t ) {
   return (float) noise.eval(
     position.x / noiseScale,
