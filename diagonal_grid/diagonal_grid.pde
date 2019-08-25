@@ -1,6 +1,10 @@
-int animFrame = 64,
+int animFrame = 256,
     cellSize;
 float cols, rows, halfCellSize;
+float _x, _y;
+float zoom = 1.5;
+
+boolean recording = false;
 
 float ease(float p) {
   return 3*p*p - 2*p*p*p;
@@ -27,15 +31,15 @@ float softplus(float q,float p){
 
 void setup() {
   size(800, 800);
-  frameRate(24);
   noStroke();
-  cellSize = width / 16;
+  cellSize =(int) (width * zoom) / 5;
   halfCellSize = cellSize / 2;
-  cols = (width * 1.5) /cellSize;
-  rows = (height * 1.5)  / cellSize;
+  cols = (width * zoom) / cellSize;
+  rows = (height * zoom) / cellSize;
 }
 
 void draw() {
+  background(0);
 
   float t, t1, t2;
 
@@ -46,6 +50,7 @@ void draw() {
     t = map(frameCount%animFrame/2, 0, animFrame/2, 0.0, 1.0);
     t1 = ease( map(frameCount%animFrame/2, 0, animFrame/2, 0.0, 1.0));
   }
+
   if( frameCount < animFrame ) {
     t2 = ease( map(frameCount, 0, animFrame, 0.0, 1.0));
   } else {
@@ -54,45 +59,46 @@ void draw() {
 
   pushMatrix();
   translate(width/2, height/2);
-  rotate(HALF_PI*t);
+  rotate(TWO_PI * t2);
   translate(-width/2, -height/2);
 
   for( int x = 0; x <= cols; x++ ) {
+    
+    float cellWidth = width/cols;
+    _x = x * cellSize;
+
     for( int y = 0; y <= rows; y++ ) {
+  
+      float cellHeight = height/rows;
+      _y = y * cellSize;
       
-      float middle_t1 = map(t1, 0, 1, 0.5, 1);
-      float _halfCellSize = halfCellSize * middle_t1;
-      float _cellSize = cellSize * cos(t1);
-
-      float _x = x * cellSize;
-      float _y = y * cellSize;
-
-      float x1 = _x - cellSize;
-      float y1 = _y - cellSize;
-      float x2 = _x - halfCellSize;
-      float y2 = _y - halfCellSize;
+      float _halfCellSize = halfCellSize;
+      float _cellSize = cellSize;
+      float x1 = _x - cellWidth;
+      float y1 = _y - cellHeight;
+      float x2 = _x - (cellWidth/2);
+      float y2 = _y - (cellHeight/2);
 
       fill(0);
       beginShape(QUADS);
-      vertex(x1, y1-_halfCellSize);
-      vertex(x1+_halfCellSize, y1);
-      vertex(x1, y1+_halfCellSize);
-      vertex(x1-_halfCellSize, y1);
+      vertex(x1, y1-(cellHeight/2));
+      vertex(x1+(cellWidth/2), y1);
+      vertex(x1, y1+(cellHeight/2));
+      vertex(x1-(cellWidth/2), y1);
       endShape(CLOSE);
 
       fill(255);
       beginShape(QUADS);
-      vertex(x2, y2-_halfCellSize);
-      vertex(x2+_halfCellSize, y2);
-      vertex(x2, y2+_halfCellSize);
-      vertex(x2-_halfCellSize, y2);
+      vertex(x2, y2-(cellHeight/2));
+      vertex(x2+(cellWidth/2), y2);
+      vertex(x2, y2+(cellHeight/2));
+      vertex(x2-(cellWidth/2), y2);
       endShape(CLOSE);
-
 
     }
   }
   popMatrix();
-  if( frameCount >= animFrame && frameCount < animFrame*2) {
+  if( recording && frameCount >= animFrame && frameCount < animFrame*2) {
     saveFrame("records/frame-###.jpg");
   }
 }
