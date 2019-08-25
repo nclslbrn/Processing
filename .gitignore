@@ -11,6 +11,8 @@ out
 build
 application.linux32
 application.linux64
+application.linux-arm64
+application.linux-armv6hf
 application.windows32
 application.windows64
 application.macosx
