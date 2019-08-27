@@ -1,15 +1,15 @@
 OpenSimplexNoise noise;
 
-int ellipseNum     = 64,
-    animFrame      = 64,
-    noiseScale     = 18,
+int ellipseNum     = 56,
+    animFrame      = 126,
+    noiseScale     = 52,
     noiseRadius    = 4;
 
 float[] ellipses;
 
 float dotsMargin     = 0.045,
       step           = 1,
-      fieldIntensity = 1.5,
+      fieldIntensity = 0.7,
       minRadius,
       maxRadius,
       centX,
@@ -33,8 +33,8 @@ void setup() {
 
   noise = new OpenSimplexNoise();
 
-  minRadius = 12;
-  maxRadius = width/1.35;
+  minRadius = 64;
+  maxRadius = width;
   centX = width/2;
   centY = height/2;      
   
@@ -46,8 +46,8 @@ void setup() {
 }
 
 void draw() {
- 
-  background(0);
+
+  
   float t;
 
   if( frameCount < animFrame ) {
@@ -56,14 +56,24 @@ void draw() {
     t = map(frameCount%animFrame, 0, animFrame, 0.0, 1.0);
   }
 
+  background(0);  
+
   pushMatrix();
   translate(width/2, height/2);
   rotateX(QUARTER_PI);
-  translate(-width/2, -height/3.5, height/6);
+  translate(-width/2, -height/2, 0); //height/3);
 
   for( int i = 0; i < ellipseNum; i++ ) {
     
     ellipses[i] -= step;
+
+    float intensity;
+    if( ellipses[i] > maxRadius / 2 ) {
+      intensity = map( ellipses[i], maxRadius, maxRadius / 2, 0.5, 2);
+    } else {
+      intensity = map( ellipses[i], maxRadius / 2, minRadius, 2, 0.5);
+    }
+    
     
     for( float p = 0; p <= TWO_PI; p+= dotsMargin ) {
       
@@ -72,20 +82,23 @@ void draw() {
         centY + ellipses[i] * sin(p)
       );
 
-      float depth = (ellipses[i] / maxRadius) * noiseRadius;
       
       float noiseIntensity = (float) noise.eval(
         point.x / noiseScale, 
         point.y / noiseScale, 
-        noiseRadius * cos(TWO_PI * t), 
-        noiseRadius * sin(TWO_PI * t)
+        (noiseRadius * intensity) * cos(TWO_PI * t), 
+        (noiseRadius * intensity) * sin(TWO_PI * t)
       )* fieldIntensity;
 
+      float depth = noiseRadius * ease(noiseIntensity);
+
+      
       point(
         point.x + noiseScale * cos(noiseIntensity),
         point.y + noiseScale * sin(noiseIntensity),
-        depth * ease(noiseIntensity)
+        depth
       );
+      
     }
     
     if( ellipses[i] - step < minRadius) {
