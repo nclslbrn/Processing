@@ -8,35 +8,45 @@
 
 OpenSimplexNoise noise;
 
-int radius, circunference, centX, centY, agentCount, outsideAgentCount;
-boolean recording = true;
-
-int rototionTiming = 1024;
-int rotationStart = 0;
-float angle, t;
-int border = 5;
-int margin = 10;
-
-float agentSize = 1;
-float agentAlpha = 90;
-float agentStepSize = 6;
-
-float fieldIntensity = 12;
-float noiseScale = 600;
-
 ArrayList<PVector> circlePoints = new ArrayList<PVector>();
 ArrayList<Agent> agents;
+
+boolean recording   = true;
+
+int rototionTiming  = 64,
+    rotationStart   = 0,
+    border          = 5,
+    margin          = 10,
+    initBrightness  = 75,
+    radius,
+    circunference, 
+    centX, 
+    centY, 
+    agentCount, 
+    outsideAgentCount;
+
+float agentSize      = 1,
+      agentAlpha     = 120,
+      agentStepSize  = 6,
+      fieldIntensity = 12,
+      noiseScale     = 400,
+      angle,
+      seed,
+      phase,
+      t;
+
 
 
 void setup() {
   fullScreen();
-  //size(1280, 750);
-  stroke(255, agentAlpha);
   strokeWeight(agentSize);
-  
-  noise = new OpenSimplexNoise();
 
-  radius = ceil( width / 5);
+  //size(1280, 750);
+  
+  
+  //noise = new OpenSimplexNoise();
+
+  radius = ceil( width / 7);
   centX = width / 2;
   centY = height / 2;
 
@@ -62,6 +72,7 @@ void init() {
       a.stepSize = agentStepSize;
       a.position = new PVector(x, y);
       a.isPositionResetWhenOutside = false;
+      a.brightness = initBrightness;
       agents.add(a);
     }
     radius--;
@@ -74,19 +85,17 @@ void init() {
       rotationStart = frameCount;
     }
   }
+ 
 }
 
 
 void mooveAgents() {
   
-  //t = outsideAgentCount % agentCount / agentCount;
 
   for (Agent a : agents) {
     
-    t = map( frameCount, rotationStart, rotationStart+ rototionTiming, 0.0, 1.0);
+    t = map( frameCount, rotationStart, rotationStart + rototionTiming, 0.0, 1.0);
     
-    //t = map(outsideAgentCount%(agentCount*4), 0, agentCount*4, 0.0, 1.0);
-
     a.angle = getNoiseIntensity(a.position, t);
     
     if(
@@ -97,20 +106,23 @@ void mooveAgents() {
     ) {
 
       PVector randomPos = getRandomPointFromCircle(circlePoints);
-  
-      a.position.x = randomPos.x;
-      a.position.y = randomPos.y;
-      
-      a.previousPosition.x = randomPos.x;
-      a.previousPosition.y = randomPos.y;
+
+      float noiseIntensity = getNoiseIntensity( randomPos, t);
+
+      a.position.x = randomPos.x + random(radius) * cos(a.angle);
+      a.position.y = randomPos.y + random(radius) * sin(a.angle);
+      a.brightness = initBrightness;
+      a.previousPosition.x = a.position.x;
+      a.previousPosition.y = a.position.y;
 
       a.stepSize = agentStepSize;
       a.angle = random(2 * PI);
       outsideAgentCount++;
 
     } else {
-     
+
       a.updatePosition();
+      if( a.brightness < 255 ) a.brightness += 10;
 
     }
   }
@@ -119,38 +131,34 @@ void mooveAgents() {
 
 void draw() {
 
-  background(0);
+  
+  t = map( frameCount, rotationStart, rotationStart + rototionTiming, 0.0, 1.0);
+  
   mooveAgents();
-
+  background(0);
 
   for (Agent a : agents){
+
+    stroke(a.brightness, agentAlpha);
     line(a.previousPosition.x, a.previousPosition.y, a.position.x, a.position.y);
   }
-
-  if (outsideAgentCount <= agentCount*26 && recording) {
-    //saveFrame("records/frame-###.jpg");
-  }
-
-  if (outsideAgentCount == agentCount*26 && recording ) {
-    // exit();
-  }
-
   
-  if( frameCount >= rotationStart+ rototionTiming ) {
+  if( frameCount >= rotationStart + rototionTiming ) {
     rotationStart = frameCount;
   }
   
   if( mousePressed == true ) {
      exit(); 
   }
+  phase += 0.001;
+  seed  += 0.015;
 }
 
 float getNoiseIntensity(PVector position, float t ) {
-  return (float) noise.eval(
-    position.x / noiseScale,
-    position.y / noiseScale,
-    agentStepSize * cos( TWO_PI * t),
-    agentStepSize * sin( TWO_PI * t)
+  return (float) noise(
+    (position.x + phase) / noiseScale,
+    (position.y + phase) / noiseScale,
+    seed
   ) * fieldIntensity;
 }
 
