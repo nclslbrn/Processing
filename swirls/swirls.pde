@@ -3,10 +3,8 @@
  *
  * Agents from Ianis Lallemand 
  * https://github.com/ianisl/workshop-processing-paris-2015/
- * OpenSimplexNoise from 
  */
 
-OpenSimplexNoise noise;
 
 ArrayList<PVector> circlePoints = new ArrayList<PVector>();
 ArrayList<Agent> agents;
@@ -38,14 +36,11 @@ float agentSize      = 1,
 
 
 void setup() {
+
   fullScreen();
-  strokeWeight(agentSize);
-
   //size(1280, 750);
-  
-  
-  //noise = new OpenSimplexNoise();
 
+  strokeWeight(agentSize);
   radius = ceil( width / 7);
   centX = width / 2;
   centY = height / 2;
