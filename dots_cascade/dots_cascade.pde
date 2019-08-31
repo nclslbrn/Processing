@@ -1,23 +1,23 @@
-//OpenSimplexNoise noise;
-
-import peasy.*;
+//import peasy.*;
 import controlP5.*;
 
-PeasyCam camera;
+//PeasyCam camera;
 ControlP5 cp5;
 
-int ellipseNum     = 56,
+int ellipseNum     = 62,
     animFrame      = 75,
-    noiseScale     = 24,
-    noiseRadius    = 4;
+    noiseScale     = 256,
+    noiseRadius    = 16;
 
 float[] ellipses;
 
 float dotsMargin     = radians(2),
       step           = 1,
-      fieldIntensity = 1.2,
-      phase          = 0,
+      fieldIntensity = 24,
       zoff           = 0,
+      shapeHeight    = 0.5,
+      sinStart       = 0.2,
+      sinEnd         = 0.2,
       minRadius,
       maxRadius;
 
@@ -39,19 +39,49 @@ void setup() {
   size(800, 800, P3D);
   strokeWeight(1);
   stroke(255);
-  camera = new PeasyCam(this, width/2, height/2, height, 50);
+  //camera = new PeasyCam(this, width/2, height/2, height, 50);
   
   cp5 = new ControlP5(this);
 
   cp5.addSlider("noiseScale")
      .setPosition(5,5)
-     .setRange(8,512);
+     .setRange(8,512)
+     .setNumberOfTickMarks(20)
+     .setValue(noiseScale);
 
   cp5.addSlider("noiseRadius")
-    .setPosition(5,15)
-    .setRange(2,48);
+    .setPosition(5,40)
+    .setRange(1,32)
+    .setNumberOfTickMarks(20)
+    .setValue(noiseRadius);
+  
+  cp5.addSlider("fieldIntensity")
+    .setPosition(5,75)
+    .setRange(0.1,48)
+    .setNumberOfTickMarks(20)
+    .setValue(fieldIntensity);
 
-  cp5.setAutoDraw(false);
+
+
+  cp5.addSlider("shapeHeight")
+  .setPosition(200,5)
+  .setRange(0,1)
+  .setNumberOfTickMarks(15)
+  .setValue(shapeHeight);
+
+  cp5.addSlider("sinStart")
+    .setPosition(200,40)
+    .setRange(0, 1)
+    .setNumberOfTickMarks(20)
+    .setValue(sinStart);
+  
+  cp5.addSlider("sinEnd")
+    .setPosition(200,75)
+    .setRange(0, 1)
+    .setNumberOfTickMarks(20)
+    .setValue(sinEnd);
+
+  //cp5.setAutoDraw(false);
 
   minRadius = 64;
   maxRadius = width;
@@ -83,36 +113,37 @@ void draw() {
   /*
   translate(width/2, height/2, -height/2);
   */
-  translate(width/2, height, -height/2.5);
+  translate(width/2, height*0.75, -height/2.5);
   rotateX(QUARTER_PI);
+
   float angleStep = TWO_PI/ellipseNum;
 
   for( int i = 0; i < ellipseNum; i++ ) {
     
     ellipses[i] -= step;
 
-    float radiusIndex = map( ellipses[i], minRadius*4, maxRadius/8, 0, 1);
+    float radiusIndex = map( ellipses[i], minRadius * sinStart, maxRadius * sinEnd, -1, 1);
 
-    float depth = map(sin(TWO_PI/radiusIndex), -1, 1, 0, maxRadius);
+    float depth = map( sin(radiusIndex), -1, 1, 0, maxRadius * shapeHeight);
     
     for( float p = 0; p <= TWO_PI; p+= dotsMargin ) {
       
       PVector point = new PVector(
         ellipses[i] * cos(p),
         ellipses[i] * sin(p),
-        depth
+        depth 
       );
 
       float noiseIntensity = noise(
         point.x / noiseScale, 
         point.y / noiseScale, 
-        depth + phase
+        zoff
       )* fieldIntensity;
 
       point(
-        point.x + noiseScale * cos(noiseIntensity),
-        point.y + noiseScale * sin(noiseIntensity),
-        point.z + noiseScale * tan(noiseIntensity)
+        point.x + noiseRadius * cos(noiseIntensity),
+        point.y + noiseRadius * sin(noiseIntensity),
+        point.z + noiseRadius * cos(noiseIntensity)
       );
       
     }
@@ -122,22 +153,16 @@ void draw() {
     }
   }
   popMatrix();
-  phase += 0.03;
   zoff += 0.001;
 
-  gui();
+  //gui();
 }
-
+/*
 void gui() {
   hint(DISABLE_DEPTH_TEST);
   camera.beginHUD();
   cp5.draw();
   camera.endHUD();
   hint(ENABLE_DEPTH_TEST);
-}
-
-/*
-void mousePressed() {
-  exit();
 }
 */
