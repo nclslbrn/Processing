@@ -3,14 +3,14 @@ import controlP5.*;
 ControlP5 cp5;
 
 int ellipseNum = 62,
-  arcNum       = 12,
+  sphereNum    = 12,
   animFrame    = 256,
   noiseScale   = 216,
   noiseRadius  = 6;
 
 float[] ellipses;
-int[] arcsEllipseID;
-float[][] arcsDegrees;
+int[]   sphereEllipseID;
+float[] sphereAngle;
 
 float dotsMargin = radians(2),
   step           = 1,
@@ -44,13 +44,8 @@ float ease(float p, float g) {
     return 1 - 0.5 * pow(2*(1 - p), g);
 }
 
-float[] randomAngle() {
-  float[] newAngle;
-  newAngle = new float[2];
-  newAngle[0] = random(1) * TWO_PI;
-  newAngle[1] = newAngle[0] + random(1) * QUARTER_PI;
-
-  return newAngle;
+float randomAngle() {
+  return random(1) * TWO_PI;
 }
 
 float radiusIndex(int i) {
@@ -59,6 +54,10 @@ float radiusIndex(int i) {
 
 float depth(float radiusIndex) {
   return map(sin(radiusIndex), -1, 1, 0, maxRadius * shapeHeight);
+}
+
+int randomEllipse() {
+  return (int) random(ellipseNum-1);
 }
 
 float noiseIntensity(PVector point, float t, int noiseScale) {
@@ -80,27 +79,28 @@ void setup() {
 
   size(800, 800, P3D);
   //pixelDensity(2);
+  controls();
+  sphereDetail(2);
   strokeWeight(1.5);
   noFill();
-  control();
   
   minRadius = 64;
   maxRadius = width*1.5;
 
   ellipses = new float[ellipseNum];
 
-  for (int i = 0; i <= ellipseNum; i++) {
+  for (int i = 0; i < ellipseNum; i++) {
 
     ellipses[i] = map(i, 0, ellipseNum - 1, minRadius, maxRadius);
 
   }
 
-  arcsEllipseID = new int[arcNum];
-  arcsDegrees  = new float[arcNum][2];
+  sphereEllipseID = new int[sphereNum];
+  sphereAngle     = new float[sphereNum];
 
-  for( int a = 0; a < arcNum; a++ ) {
-    arcsDegrees[a] = randomAngle();
-    arcsEllipseID[a] = (int) random(ellipseNum-1);
+  for( int a = 0; a < sphereNum; a++ ) {
+    sphereAngle[a] = randomAngle();
+    sphereEllipseID[a] = randomEllipse();
   }
 }
 
@@ -140,11 +140,9 @@ void draw() {
 
   float angleStep = TWO_PI / ellipseNum;
 
-  for (int i = 0; i <= ellipseNum; i++) {
+  for (int i = 0; i < ellipseNum; i++) {
 
     ellipses[i] -= ellipseStep;
-
-    float depth = depth(radiusIndex(i));
 
     stroke(dotColor(i));
 
@@ -153,7 +151,7 @@ void draw() {
       PVector point = new PVector(
         ellipses[i] * cos(p),
         ellipses[i] * sin(p),
-        depth 
+        depth(radiusIndex(i))
       );
 
       float noiseIntensity = noiseIntensity( point, t, noiseScale);
@@ -168,55 +166,29 @@ void draw() {
 
     if (ellipses[i] - step < minRadius) {
       ellipses[i] = maxRadius;
-      
     }
   }
-  strokeWeight(2);
+  strokeWeight(0.5);
 
-  for( int a = 0; a < arcNum; a++ ) {
+  for( int a = 0; a < sphereNum; a++ ) {
       
-    float depth = depth(radiusIndex(arcsEllipseID[a]));
-
-    PVector arc[] = new PVector[2];
-
-    arc[0] = new PVector(
-      ellipses[arcsEllipseID[a]] * cos( arcsDegrees[a][0] ),
-      ellipses[arcsEllipseID[a]] * sin( arcsDegrees[a][0] ),
-      depth
+    PVector sphere = new PVector(
+      ellipses[sphereEllipseID[a]] * cos( sphereAngle[a] ),
+      ellipses[sphereEllipseID[a]] * sin( sphereAngle[a] ),    
+      depth(radiusIndex(sphereEllipseID[a]))
     );
 
-    arc[1] = new PVector(
-      ellipses[arcsEllipseID[a]] * cos( arcsDegrees[a][1] ),
-      ellipses[arcsEllipseID[a]] * sin( arcsDegrees[a][1] ),
-      depth
-    );
-    stroke(dotColor(arcsEllipseID[a]), 0, 0);
-
-    float angleToDraw = arcsDegrees[a][1] - arcsDegrees[a][0];
+    stroke(dotColor(sphereEllipseID[a]), 0, 0);
+    pushMatrix();
+    translate(sphere.x, sphere.y, sphere.z);
+    sphere(10);
+    popMatrix();    
     
-    beginShape();
     
-    for( float angle = arcsDegrees[a][0]; angle <= arcsDegrees[a][1]; angle+= dotsMargin/2 ) {
-      
-      PVector point = new PVector(
-        ellipses[arcsEllipseID[a]] * cos(angle),
-        ellipses[arcsEllipseID[a]] * sin(angle),
-        depth
-      );
-
-      float noiseIntensity = noiseIntensity( point, t, noiseScale );
-
-      vertex(
-        point.x + noiseRadius * cos(noiseIntensity),
-        point.y + noiseRadius * sin(noiseIntensity),
-        point.z + noiseRadius * cos(noiseIntensity)
-      );
+    if ( ellipses[sphereEllipseID[a]] - step*2 < minRadius ) {
+      sphereAngle[a] = randomAngle();
     }
-    endShape();
-
-    if (ellipses[arcsEllipseID[a]] - step*2 < minRadius) {
-      arcsDegrees[a] = randomAngle();
-    }
+    
   }
 
   popMatrix();
@@ -241,7 +213,7 @@ void draw() {
   }
 }
 
-void control() {
+void controls() {
   cp5 = new ControlP5(this);
 
   cp5.addSlider("noiseScale")
