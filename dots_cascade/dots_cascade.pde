@@ -4,7 +4,7 @@ ControlP5 cp5;
 
 int ellipseNum = 62,
   arcNum       = 12,
-  animFrame    = 75,
+  animFrame    = 256,
   noiseScale   = 216,
   noiseRadius  = 6;
 
@@ -29,6 +29,7 @@ Slider noiseRadiusSlider;
 
 boolean close     = false,
         recording = false,
+        loops     = false,
         capture   = false;
 
 
@@ -61,10 +62,13 @@ float depth(float radiusIndex) {
 }
 
 float noiseIntensity(PVector point, float t, int noiseScale) {
+
+  float zOffstet = loops ? t : zoff;
+
   return noise(
         point.x  / noiseScale,
         point.y  / noiseScale,
-        t / noiseScale
+        zOffstet
       ) * fieldIntensity;
 }
 
@@ -85,7 +89,7 @@ void setup() {
 
   ellipses = new float[ellipseNum];
 
-  for (int i = 0; i < ellipseNum; i++) {
+  for (int i = 0; i <= ellipseNum; i++) {
 
     ellipses[i] = map(i, 0, ellipseNum - 1, minRadius, maxRadius);
 
@@ -102,12 +106,29 @@ void setup() {
 
 void draw() {
 
-  float t;
+  float t, ellipseStep;
 
   if (frameCount < animFrame) {
-    t = map(frameCount, 0, animFrame, 0.0, 1.0);
+  
+    if( frameCount < animFrame/2 ) {
+      t = map(frameCount, 0, animFrame, 0.0, 5);
+    } else {
+      t = map( frameCount, 0, animFrame, 5, 0);
+    }
+  
   } else {
-    t = map(frameCount % animFrame, 0, animFrame, 0.0, 1.0);
+
+    if( frameCount % animFrame < animFrame/2) {
+      t = map(frameCount % animFrame, 0, animFrame, 0.0, 5);
+    } else {
+      t = map(frameCount % animFrame, 0, animFrame, 5, 0.0);
+    }
+  }
+
+  if( loops ) {
+    ellipseStep = (maxRadius - minRadius) / animFrame;
+  } else {
+    ellipseStep = step;
   }
 
   background(0);
@@ -119,9 +140,9 @@ void draw() {
 
   float angleStep = TWO_PI / ellipseNum;
 
-  for (int i = 0; i < ellipseNum; i++) {
+  for (int i = 0; i <= ellipseNum; i++) {
 
-    ellipses[i] -= step;
+    ellipses[i] -= ellipseStep;
 
     float depth = depth(radiusIndex(i));
 
@@ -132,7 +153,7 @@ void draw() {
       PVector point = new PVector(
         ellipses[i] * cos(p),
         ellipses[i] * sin(p),
-        depth
+        depth 
       );
 
       float noiseIntensity = noiseIntensity( point, t, noiseScale);
@@ -225,17 +246,17 @@ void control() {
 
   cp5.addSlider("noiseScale")
     .setPosition(5, 5)
-    .setRange(8, 800)
+    .setRange(16, 1440)
     .setNumberOfTickMarks(20)
     .setValue(noiseScale);
   cp5.addSlider("noiseRadius")
     .setPosition(5, 40)
-    .setRange(1, 16)
+    .setRange(1, 36)
     .setNumberOfTickMarks(20)
     .setValue(noiseRadius);
   cp5.addSlider("fieldIntensity")
     .setPosition(5, 75)
-    .setRange(0.1, 64)
+    .setRange(0.1, 180)
     .setNumberOfTickMarks(20)
     .setValue(fieldIntensity);
 
@@ -264,11 +285,15 @@ void control() {
     .setRange(0.1, 2)
     .setValue(cameraZoom);
 
-  cp5.addToggle("capture")
+  cp5.addToggle("loops")
      .setPosition(590, 5)
-     .setSize(50,50);
+     .setSize(50,30);
+
+  cp5.addToggle("capture")
+     .setPosition(590, 60)
+     .setSize(50,30);
 
   cp5.addToggle("close")
      .setPosition(660, 5)
-     .setSize(50,50);
+     .setSize(50,30);
 }
