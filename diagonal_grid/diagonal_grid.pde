@@ -3,7 +3,6 @@ int animFrame = 256,
 float cols, rows, halfCellSize;
 float _x, _y;
 float zoom = 1.5;
-
 boolean recording = false;
 
 float ease(float p) {
@@ -36,10 +35,10 @@ void setup() {
   halfCellSize = cellSize / 2;
   cols = (width * zoom) / cellSize;
   rows = (height * zoom) / cellSize;
+  background(0);
 }
 
 void draw() {
-  background(0);
 
   float t, t1, t2;
 
@@ -64,12 +63,12 @@ void draw() {
 
   for( int x = 0; x <= cols; x++ ) {
     
-    float cellWidth = width/cols;
+    float cellWidth = (width/cols) * ease(t);
     _x = x * cellSize;
-
+    
     for( int y = 0; y <= rows; y++ ) {
   
-      float cellHeight = height/rows;
+      float cellHeight = (height/rows) * ease(t1);
       _y = y * cellSize;
       
       float _halfCellSize = halfCellSize;
@@ -79,7 +78,7 @@ void draw() {
       float x2 = _x - (cellWidth/2);
       float y2 = _y - (cellHeight/2);
 
-      fill(0);
+      fill(255, 0, 0);
       beginShape(QUADS);
       vertex(x1, y1-(cellHeight/2));
       vertex(x1+(cellWidth/2), y1);
@@ -87,7 +86,7 @@ void draw() {
       vertex(x1-(cellWidth/2), y1);
       endShape(CLOSE);
 
-      fill(255);
+      fill(0, 0, 255);
       beginShape(QUADS);
       vertex(x2, y2-(cellHeight/2));
       vertex(x2+(cellWidth/2), y2);

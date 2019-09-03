@@ -1,67 +1,58 @@
-ArrayList<PVector> points = new ArrayList<PVector>();
+int noiseScale  = 260,
+    noiseRadius = 8,
+    pointNum    = 8,
+    animFrame   = 260;
 
-float n_range = 1;
-int step = 2;
-float threshold = .9;
+float threshold = .9,
+      fieldIntensity = 5,
+      zOffstet  = 0;
+
+PVector[] points;
+
+float noiseIntensity( PVector point, float zOffstet ) {
+
+  return noise(
+        point.x  / noiseScale,
+        point.y  / noiseScale,
+        zOffstet
+      ) * fieldIntensity;
+}
 
 void setup() {
 
     size(800, 800);
-    //frameRate(12);
     strokeWeight(1);
-    stroke(150);
-    getNoise();
-}
-void getNoise() {
-    
-    background(255, 255, 255, 0.25);
-    points = new ArrayList<PVector>();
-
-    for( int x = 0; x < width; x+= step ) {
-
-        for( int y = 0; y < height; y+= step ) {
-
-            float n_x = map( x, 0, width, 0, n_range );
-            float n_y = map( y, 0, height, 0, n_range );
-
-            float n_value = noise( n_x, n_y ) * 255;
-
-            if( n_value < 100 && random(1) > threshold ) {
-                
-                stroke( n_value );
-                line( x, y, x+step, y+step );
-                /*
-                points.add( 
-                    new PVector(
-                        x + random(-10, 10),
-                        y + random(-10, 10)
-                    )
-                );
-                */
-            }
-        }
-    }
-    n_range = n_range + 0.1;
-    println("n_range: "+n_range);
-    saveFrame("records/frame-###.jpg"); 
+    stroke(255);
+    noFill();
 
 }
-
 void draw() {
-
-    getNoise();
-/*
-    for( int v = 0; v < points.size() - 2; v+= 2 ) {
-
-        PVector first = points.get(v);
-        PVector last = points.get(v+1);
-        float distance = PVector.dist( first, last );
     
-        if( distance < width / 6 ) {
+    background(0);
     
-            line( first.x, first.y, last.x, last.y );
+    float t;
 
-        }
+    if (frameCount < animFrame) {
+        t = map(frameCount, 0, animFrame, 0.0, 1);
+    } else {
+        t = map(frameCount % animFrame, 0, animFrame, 0.0, 1);
     }
-*/
+
+    float _a = t * TWO_PI;
+    pushMatrix();
+    translate(width/2, height/2);
+         
+    beginShape();
+    for (float a = 0; a < TWO_PI; a += radians(5)) {
+
+        float xoff = map(cos(a + _a), -1, 1, 0, noiseScale);
+        float yoff = map(sin(a + _a), -1, 1, 0, noiseScale);
+        float r = map(noise(xoff, yoff, t), 0, 1, 100, height / 4);
+        float x = r * cos(a);
+        float y = r * sin(a);
+        vertex(x, y);
+    }
+    endShape(CLOSE);
+    popMatrix();
+    zOffstet += 0.001;
 }
