@@ -7,7 +7,12 @@ class FlatCube {
     color(0, 255, 0),
     color(0, 0, 255)
   };
+  
   float angle = 27;
+  PVector a = new PVector(0,0);
+  PVector b = new PVector(0,0);
+  PVector c = new PVector(0,0);
+  float   h = width/2;
 
   FlatCube(
     PVector center,
@@ -20,16 +25,17 @@ class FlatCube {
     this.width  = width;
     this.colors = colors;
     this.angle  = angle;
+    this.h = width / 2;
+    this.a = a;
+    this.b = b;
+    this.c = c;
   }
-
-  void display() {
-    
+  void init() {
     PVector center = this.center;
     int width      = this.width;
-    color[] colors = this.colors;
     float angle    = this.angle;
+    float h        = this.h;
 
-    float h = width / 2;
     float _h = sqrt( sq(width/2) + sq(h/2) );
 
     PVector a = new PVector(
@@ -45,6 +51,23 @@ class FlatCube {
       center.x - _h * cos(TWO_PI - angle),
       center.y - _h * sin(TWO_PI - angle)
     );
+
+    this.a = a;
+    this.b = b;
+    this.c = c;
+    this.h = h;
+  }
+
+  void display() {
+    
+    PVector center = this.center;
+    int width      = this.width;
+    color[] colors = this.colors;
+    float angle    = this.angle;
+    float h        = this.h;
+    PVector a      = this.a;
+    PVector b      = this.b;
+    PVector c      = this.c;
 
     fill(colors[0]);
     beginShape();
