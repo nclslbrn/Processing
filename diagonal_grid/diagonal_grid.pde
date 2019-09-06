@@ -68,7 +68,7 @@ void draw() {
 
 //////////////////////////////////////////////////////////////////////////////
 int samplesPerFrame = 6;
-int numFrames = 124;        
+int numFrames = 54;        
 float shutterAngle = .6;
 
 
