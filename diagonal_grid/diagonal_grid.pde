@@ -1,9 +1,15 @@
-int animFrame = 256,
-    cellSize;
+int samplesPerFrame = 24;
+int numFrames = 125;        
+float shutterAngle = .6;
+int cellSize;
 float cols, rows, halfCellSize;
 float _x, _y;
-float zoom = 1.5;
-boolean recording = false;
+float zoom = 2;
+boolean recording = true,
+        preview = true;
+
+int[][] result;
+float t, c;
 
 float ease(float p) {
   return 3*p*p - 2*p*p*p;
@@ -16,59 +22,96 @@ float ease(float p, float g) {
     return 1 - 0.5 * pow(2*(1 - p), g);
 }
 
-float softplus(float q,float p){
-  float qq = q+p;
-  if(qq<=0){
-    return 0;
-  }
-  if(qq>=2*p){
-    return qq-p;
-  }
-  return 1/(4*p)*qq*qq;
+float mn = .5*sqrt(3), ia = atan(sqrt(.5));
+
+void push() {
+  pushMatrix();
+  pushStyle();
+}
+
+void pop() {
+  popStyle();
+  popMatrix();
+}
+
+float c01(float g) {
+  return constrain(g, 0, 1);
 }
 
 
 void setup() {
-  size(800, 800);
-  noStroke();
-  cellSize =(int) (width * zoom) / 5;
+  size(600, 600);
+
+  cellSize =(int) (width * zoom) / 4;
   halfCellSize = cellSize / 2;
   cols = (width * zoom) / cellSize;
   rows = (height * zoom) / cellSize;
-  background(0);
 }
 
+
 void draw() {
+  if (recording) {
+    result = new int[width*height][3];
+    for (int i=0; i<width*height; i++)
+      for (int a=0; a<3; a++)
+        result[i][a] = 0;
 
-  float t, t1, t2;
+    c = 0;
+    for (int sa=0; sa<samplesPerFrame; sa++) {
+      t = map(frameCount-1 + sa*shutterAngle/samplesPerFrame, 0, numFrames, 0, 1);
+      draw_();
+      loadPixels();
+      for (int i=0; i<pixels.length; i++) {
+        result[i][0] += pixels[i] >> 16 & 0xff;
+        result[i][1] += pixels[i] >> 8 & 0xff;
+        result[i][2] += pixels[i] & 0xff;
+      }
+    }
 
-  if( frameCount < animFrame/2 ) {
-    t = map(frameCount, 0, animFrame/2, 0.0, 1.0);
-    t1 = ease( map(frameCount, 0, animFrame/2, 0.0, 1.0));
+    loadPixels();
+    for (int i=0; i<pixels.length; i++)
+      pixels[i] = 0xff << 24 | 
+        int(result[i][0]*1.0/samplesPerFrame) << 16 | 
+        int(result[i][1]*1.0/samplesPerFrame) << 8 | 
+        int(result[i][2]*1.0/samplesPerFrame);
+    updatePixels();
+
+    saveFrame("records/frame-###.gif");
+    if (frameCount==numFrames)
+      exit();
+  } else if (preview) {
+    c = mouseY*1.0/height;
+    if (mousePressed)
+      println(c);
+    t = (millis()/(20.0*numFrames))%1;
+    draw_();
   } else {
-    t = map(frameCount%animFrame/2, 0, animFrame/2, 0.0, 1.0);
-    t1 = ease( map(frameCount%animFrame/2, 0, animFrame/2, 0.0, 1.0));
+    t = mouseX*1.0/width;
+    c = mouseY*1.0/height;
+    if (mousePressed)
+      println(c);
+    draw_();
   }
+}
+void draw_() {
 
-  if( frameCount < animFrame ) {
-    t2 = ease( map(frameCount, 0, animFrame, 0.0, 1.0));
-  } else {
-    t2 = ease( map(frameCount%animFrame, 0, animFrame, 0.0, 1.0));
-  }
+  background(0);
+  fill(0);
+  stroke(255);
 
   pushMatrix();
   translate(width/2, height/2);
-  rotate(TWO_PI * t2);
-  translate(-width/2, -height/2);
-
+  rotate(PI * t);
+  translate((width*zoom)/-2, (height*zoom)/-2);
+  
   for( int x = 0; x <= cols; x++ ) {
     
-    float cellWidth = (width/cols) * ease(t);
+    float cellWidth = (width*zoom/cols);
     _x = x * cellSize;
     
     for( int y = 0; y <= rows; y++ ) {
   
-      float cellHeight = (height/rows) * ease(t1);
+      float cellHeight = (height*zoom/rows);
       _y = y * cellSize;
       
       float _halfCellSize = halfCellSize;
@@ -76,28 +119,36 @@ void draw() {
       float x1 = _x - cellWidth;
       float y1 = _y - cellHeight;
       float x2 = _x - (cellWidth/2);
-      float y2 = _y - (cellHeight/2);
+      float y2 = _y - (cellHeight/2);   
 
-      fill(255, 0, 0);
-      beginShape(QUADS);
-      vertex(x1, y1-(cellHeight/2));
-      vertex(x1+(cellWidth/2), y1);
-      vertex(x1, y1+(cellHeight/2));
-      vertex(x1-(cellWidth/2), y1);
-      endShape(CLOSE);
 
-      fill(0, 0, 255);
-      beginShape(QUADS);
-      vertex(x2, y2-(cellHeight/2));
-      vertex(x2+(cellWidth/2), y2);
-      vertex(x2, y2+(cellHeight/2));
-      vertex(x2-(cellWidth/2), y2);
-      endShape(CLOSE);
+      pushMatrix();
+        translate(x1, y1);
+        translate(width/2, height/2);
+        rotate(TWO_PI- (PI*t));
 
+        beginShape(QUADS);
+        vertex(0, -cellHeight/2);
+        vertex(cellWidth/2, 0);
+        vertex(0, cellHeight/2);
+        vertex(-cellWidth/2, 0);
+        endShape(CLOSE);
+      popMatrix();
+      
+      pushMatrix();
+        translate(x2, y2);
+        translate(width/2, height/2);
+        rotate(TWO_PI*t);
+        
+        beginShape(QUADS);
+        vertex(0, -cellHeight/2);
+        vertex(cellWidth/2, 0);
+        vertex(0, cellHeight/2);
+        vertex(-cellWidth/2, 0);
+        endShape(CLOSE);
+      popMatrix();
     }
   }
   popMatrix();
-  if( recording && frameCount >= animFrame && frameCount < animFrame*2) {
-    saveFrame("records/frame-###.jpg");
-  }
+  
 }
