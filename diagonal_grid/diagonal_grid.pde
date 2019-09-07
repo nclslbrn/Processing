@@ -11,16 +11,6 @@ float ease(float p, float g) {
     return 1 - 0.5 * pow(2*(1 - p), g);
 }
 
-void push() {
-  pushMatrix();
-  pushStyle();
-}
-
-void pop() {
-  popStyle();
-  popMatrix();
-}
-
 void draw() {
   if (recording) {
     result = new int[width*height][3];
@@ -67,9 +57,9 @@ void draw() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-int samplesPerFrame = 6;
-int numFrames = 54;        
-float shutterAngle = .6;
+int samplesPerFrame = 24;
+int numFrames = 75;        
+float shutterAngle = .4;
 
 
 int cellSize;
@@ -77,12 +67,12 @@ float cols, rows, halfCellSize;
 float _x, _y, xx, yy;
 float zoom = 2;
 boolean recording = true,
-        preview = false;
+        preview = true;
 
 int[][] result;
 
 void setup() {
-  size(600, 600);
+  size(800, 800);
   rectMode(CENTER);
   cellSize = (int) (width * zoom) / 8;
   halfCellSize = cellSize / 2;
@@ -95,33 +85,39 @@ void draw_() {
 
   background(0);
   noStroke();
-
   pushMatrix();
   translate(width/2, height/2);
-  rotate(TWO_PI * ease(t));
+  rotate(PI * t);
   translate((width*zoom)/-2, (height*zoom)/-2);
-  
+  float tt = map(
+    t, 
+    0,
+    1,
+    (t < 0.5 ? 0   : 1),
+    (t < 0.5 ? 1   : 0)
+  );
+
   for( int x = 0; x <= cols; x++ ) {
 
     _x = x * cellSize;
-    xx = map(
+    xx = ease( map(
       x, 
       (x < cols/2 ? 0 : cols/2), 
       (x < cols/2 ? cols/2 : cols),
-      0.33,
-      0.66
-    );
+      0.2,
+      0.65
+    ), tt);
 
     for( int y = 0; y <= rows; y++ ) {
       
       _y = y * cellSize;
-      yy = map(
+      yy = ease( map(
         y, 
         (y < rows/2 ? 0 : rows/2), 
         (y < rows/2 ? rows/2 : rows),
-        0.33,
-        0.66
-      );
+        0.2,
+        0.65
+      ), tt);
 
       fill(255);
       pushMatrix();
