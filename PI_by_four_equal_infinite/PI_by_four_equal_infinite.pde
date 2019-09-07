@@ -106,7 +106,7 @@ void draw() {
     translate(infinitePoints[newPointId].x, infinitePoints[newPointId].y);
     rotateX(cos(infiniteAngle[p]));
     rotateY(sin(infiniteAngle[p]));
-    rotateZ( ease(p/pointCount) * PI);
+    rotateZ(ease(p/pointCount)*PI);
     box(cubeSize);
     
     popMatrix();

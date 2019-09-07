@@ -11,7 +11,7 @@
 A repository to sync a Processing (personal) sketchbook between multiple computers and back-up them.
 Initially the repo is located on the sketchbook folder, with examples, modes, libraries, templates, and tools folders but you can clone it anywhere on your computer, if you have Processing IDE installed and for specifics sketches, some libraries installed like Minim, these sketches should works. 
 
-## Use different editor than Processing IDE 
+## Using differents editors than Processing IDE 
 
 - Use [Atom](https://atom.io/) with the [processing package](https://github.com/bleikamp/processing) to build and run sketches.
 
@@ -20,6 +20,6 @@ Initially the repo is located on the sketchbook folder, with examples, modes, li
 
 Both editors require to install processing-java path from Processing UI.
 
-<img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-nd.eu.png" alt="Creative Commons Logo" width="148" height="49">
+--------
 
-These sketches are under [Creative Commons License V3](https://creativecommons.org/licenses/by/3.0/)
+<img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-nd.eu.png" alt="Creative Commons Logo" width="100" height="35"> These sketches/programs are under [Creative Commons License V3](https://creativecommons.org/licenses/by/3.0/)
