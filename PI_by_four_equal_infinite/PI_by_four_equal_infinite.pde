@@ -1,8 +1,10 @@
 
 PVector[] circleCenter, infinitePoints;
+float[] infiniteAngle;
 
 int   pointSpeed = 64,
       animCount  = 256,
+      cubeSize   = 48,
       pointPerCircle,
       totalPoint,
       animPointSum;
@@ -26,19 +28,19 @@ float ease(float p, float g) {
 void setup() {
 
   size(800, 800, P3D);
-  fill(255);
-  noStroke();
+  stroke(0);
   ellipseMode(CENTER);
 
   mainCircleRadius = width/6;
   cellSize = width/16;
-  pointPerCircle = (int) (2 * PI * mainCircleRadius);
+  pointPerCircle = ceil((2 * PI * mainCircleRadius) / cubeSize);
   circleCenter = new PVector[2];
   circleCenter[0] = new PVector(width*0.333333333, height/2);
   circleCenter[1] = new PVector(width*0.666666666, height/2);
 
-  totalPoint = (pointPerCircle * circleCenter.length)-1;
+  totalPoint = (pointPerCircle * circleCenter.length) - 2;
   infinitePoints = new PVector[totalPoint];
+  infiniteAngle = new float[totalPoint];
 
   float circleAngleStep = TWO_PI/(pointPerCircle-1);
   int pointNum = 0;
@@ -49,6 +51,7 @@ void setup() {
       circleCenter[0].y + mainCircleRadius * sin(angle)
     );
     infinitePoints[pointNum] = new PVector(start.x, start.y);
+    infiniteAngle[pointNum] = angle;
     pointNum++;
   }
 
@@ -58,13 +61,15 @@ void setup() {
       circleCenter[1].y + mainCircleRadius * sin(angle)
     );
     infinitePoints[pointNum] = new PVector(start.x, start.y);
+    infiniteAngle[pointNum] = angle;
     pointNum++;
   }
 }
 
 void draw() {
   background(0);
-  fill(255);
+  lights();
+  ambientLight(255,255,255);
   
   float speed = frameCount <= pointSpeed ? 
     1.0*(frameCount-1)/pointSpeed
@@ -78,13 +83,13 @@ void draw() {
 
   int pointId = (int) map(speed, 0, 1, 0, totalPoint );
 
-  int pointCount;
-
-  if( lenght <= 0.5) {
-    pointCount = (int) map( lenght, 0, 0.5, infinitePoints.length/32, infinitePoints.length-1 );
-  } else {
-    pointCount = (int) map( lenght, 0.5, 1, infinitePoints.length-1, infinitePoints.length/32 );
-  }
+  int pointCount = (int) map(
+    lenght,
+    (lenght < 0.5 ? 0   : 0.5),
+    (lenght < 0.5 ? 0.5 : 1),
+    (lenght < 0.5 ? infinitePoints.length/32 : infinitePoints.length-1),
+    (lenght < 0.5 ? infinitePoints.length-1 : infinitePoints.length/32)
+  );
 
   for( int p = 0; p <= pointCount; p++ ) {
     
@@ -95,12 +100,17 @@ void draw() {
     }
     
     fill( 46, fill, 113 );
-    ellipse(
-      infinitePoints[newPointId].x,
-      infinitePoints[newPointId].y,
-      32,
-      32
-    );
+    
+    pushMatrix();
+    
+    translate(infinitePoints[newPointId].x, infinitePoints[newPointId].y);
+    rotateX(cos(infiniteAngle[p]));
+    rotateY(sin(infiniteAngle[p]));
+    rotateZ( ease(p/pointCount) * PI);
+    box(cubeSize);
+    
+    popMatrix();
+    
     if( p == pointCount ) saveFrame("records/frame-###.jpg");
   }
   
