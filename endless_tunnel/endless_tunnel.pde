@@ -20,7 +20,7 @@ float // radius of circle
       tunnelSize;
 
 int // inverted factor of zoom / move forward
-    travellingSpeed = 20,
+    travellingSpeed = 5,
     // minimum pointPerCircle: 4->square 5->pentagone ... 
     minPoint = 4,
     // maximum pointPerCircle size
@@ -35,9 +35,6 @@ int // inverted factor of zoom / move forward
     pointPerCircle,
     // number of tunnel section (depends of sentence length)
     nb;
-
-boolean recording = false,
-        debug     = false;
 
 PVector[] circles;
 PVector[] circlesLeft;
@@ -55,17 +52,6 @@ char[] text;
 
 // default axis 
 char randomAxe = 'd';
-
-// ease function for radius & color computation
-float ease(float p) {
-  return 3*p*p - 2*p*p*p;
-}
-float ease(float p, float g) {
-  if (p < 0.5) 
-    return 0.5 * pow(2*p, g);
-  else
-    return 1 - 0.5 * pow(2*(1 - p), g);
-}
 
 PVector[] newCircle( char randomAxe ) {
   
@@ -97,10 +83,9 @@ int newPointPerCircle(int minPoint, int maxPoint) {
   return (int) random(minPoint, maxPoint);
 }
 void setup() {
-  size(1920, 1080, P3D);
+  size(1920, 1080, OPENGL);
   noCursor();
   //fullScreen(P3D);
-  smooth(3);
   textAlign(CENTER, CENTER);
   
   font = loadFont("Novecentosanswide-Bold-99.vlw");
@@ -133,15 +118,17 @@ void setup() {
   for (int i = 0; i < nb; i++) {
 
     float z     = map(i, 0, nb-1, zmax, zmin);
-    float angle = map(i, 0, nb-1, 0, rotationAngle);
-    
-    float scale;
+    float middle = (nb-1) / 2;
 
-    if( i < (nb-1) / 2 ) {
-      scale = map(i, 0, (nb-1)/2, 0, radius);
-    } else {
-      scale = map(i, (nb-1)/2, nb-1, radius, 0);
-    }
+    float angle = map(i, 0, (nb-1), 0, rotationAngle);
+    float scale = map(
+      i,
+      (i < middle ? 0        : middle),
+      (i < middle ? middle   : nb-1),
+      (i < middle ? 0        : radius),
+      (i < middle ? radius   : 0)
+    );
+
 
     text[i] = sentence.charAt(i);
     currentPointPerCircle[i] = pointPerCircle;
@@ -188,14 +175,14 @@ void draw() {
     
     float angle = TWO_PI / currentPointPerCircle[i];
 
-    float ease = map( currentCircle[i].z, zmin, zmax, 0, 1);
+    float zfactor = map( currentCircle[i].z, zmin, zmax, 0, 1);
 
-    float r = ease(ease, 0.75) * radius;
+    float r = zfactor * radius;
     float arcSize = (PI * (2 * r) / currentPointPerCircle[i])* 0.85;
     float medianSize = sqrt( (sq(r) - sq(arcSize/2)) );
     float middleZ = arcWidth /2;
 
-    float stroke = ease(ease, 0.9) * 255;
+    float stroke = zfactor * 255;
 
     float ellipeSize = r / pointSize;
 
@@ -267,11 +254,10 @@ void draw() {
             randomAxe = 'd';
             futureCircle = newCircle( randomAxe );
           }
-          if( debug ) println("New section: "+ randomAxe );
         }
 
         // when the first circle is passed for the second time
-        if( rotate_count == 2 ) {
+        if( rotate_count == 1 ) {
           rotate_count = 0;
           global_count++;
         } else {
@@ -281,7 +267,7 @@ void draw() {
       }
 
       // replace every circle when they go outside
-      if( rotate_count > 1 ) {
+      if( rotate_count > 0 ) {
         currentCircle[i] = futureCircle[i];
         currentPointPerCircle[i] = pointPerCircle;
       }
@@ -301,11 +287,7 @@ void draw() {
   if( global_count > 0 && global_count == 1 ) {
     pointPerCircle = newPointPerCircle(minPoint, maxPoint);
     global_count = 0;
-    if( debug ) println("Shape will have " + pointPerCircle + " points");
   }
-
-  // record if needed
-  if( recording ) saveFrame("records/frame-###.jpg");
 
   // used for application
   if( mousePressed == true ) {
