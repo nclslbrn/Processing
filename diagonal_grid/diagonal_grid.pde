@@ -57,9 +57,9 @@ void draw() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-int samplesPerFrame = 24;
+int samplesPerFrame = 6;
 int numFrames = 75;        
-float shutterAngle = .4;
+float shutterAngle = .6;
 
 
 int cellSize;
@@ -72,9 +72,9 @@ boolean recording = true,
 int[][] result;
 
 void setup() {
-  size(800, 800);
+  size(520, 520);
   rectMode(CENTER);
-  cellSize = (int) (width * zoom) / 8;
+  cellSize = (int) (width * zoom) / 6;
   halfCellSize = cellSize / 2;
   cols = (width * zoom) / cellSize;
   rows = (height * zoom) / cellSize;
@@ -104,7 +104,7 @@ void draw_() {
       x, 
       (x < cols/2 ? 0 : cols/2), 
       (x < cols/2 ? cols/2 : cols),
-      0.2,
+      0.15,
       0.65
     ), tt);
 
@@ -115,7 +115,7 @@ void draw_() {
         y, 
         (y < rows/2 ? 0 : rows/2), 
         (y < rows/2 ? rows/2 : rows),
-        0.2,
+        0.15,
         0.65
       ), tt);
 
@@ -123,7 +123,7 @@ void draw_() {
       pushMatrix();
         translate(_x - cellSize, _y - cellSize);
         translate(width/2, height/2);
-        rotate(TWO_PI- (TWO_PI*ease(t)));
+        rotate(PI- (PI*ease(t)));
         rect(0, 0, cellSize * xx, cellSize * yy); //ease(t)* cellSize );
       popMatrix();
 
@@ -131,7 +131,7 @@ void draw_() {
       pushMatrix();
         translate(_x - (cellSize/2), _y - (cellSize/2));
         translate(width/2, height/2);
-        rotate(TWO_PI*ease(t));
+        rotate(PI*ease(t));
         rect(0, 0, cellSize * xx, cellSize * yy); //ease(yy, t)* cellSize );
 
       popMatrix();

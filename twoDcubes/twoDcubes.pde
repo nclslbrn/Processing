@@ -78,7 +78,7 @@ void setup() {
     }
 
   }
-  println(cols + " * " + rows + " = " + numCubes);
+  println(cols + " * " + rows + " = " + ((rows*2) * cols) + " != " + numCubes);
 }
 
 void draw() {
@@ -116,5 +116,7 @@ void draw() {
 
     }
   }
-  
+  if( mousePressed == true) {
+     exit(); 
+  }
 }
