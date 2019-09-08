@@ -64,6 +64,7 @@ class FlatCube {
     int width      = this.width;
     color[] colors = this.colors;
     float angle    = this.angle;
+    
     float h        = this.h;
     PVector a      = this.a;
     PVector b      = this.b;
