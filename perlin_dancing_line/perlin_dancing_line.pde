@@ -1,13 +1,16 @@
-int noiseScale  = 260,
-    noiseRadius = 8,
-    pointNum    = 8,
-    animFrame   = 260;
+int noiseScale  = 512,
+    noiseRadius = 256,
+    animFrame   = 260,
+    pointNum    = 16;
 
 float threshold = .9,
-      fieldIntensity = 5,
-      zOffstet  = 0;
+      fieldIntensity = 1,
+      zOffstet  = 0,
+      precision = 2,
+      currentNoiseValue  = 0,
+      angleStep = TWO_PI / 32;
 
-PVector[] points;
+ArrayList<PVector> points = new ArrayList<PVector>();
 
 float noiseIntensity( PVector point, float zOffstet ) {
 
@@ -17,42 +20,57 @@ float noiseIntensity( PVector point, float zOffstet ) {
         zOffstet
       ) * fieldIntensity;
 }
+float ease(float p) {
+  return 3*p*p - 2*p*p*p;
+}
 
+float ease(float p, float g) {
+  if (p < 0.5) 
+    return 0.5 * pow(2*p, g);
+  else
+    return 1 - 0.5 * pow(2*(1 - p), g);
+}
 void setup() {
 
     size(800, 800);
     strokeWeight(1);
+    colorMode(HSB, pointNum);
     stroke(255);
     noFill();
 
+    for( int p = 0; p <= pointNum; p++ ) {
+        
+        PVector pos = new PVector( random(1)*width, random(1)*height );
+        points.add(pos);
+
+    }   
+    
 }
 void draw() {
     
-    background(0);
-    
-    float t;
+    background(0);    
 
-    if (frameCount < animFrame) {
-        t = map(frameCount, 0, animFrame, 0.0, 1);
-    } else {
-        t = map(frameCount % animFrame, 0, animFrame, 0.0, 1);
+    for( int p = 0; p <= pointNum; p++ ) {
+        
+        PVector startPos = points.get(p);
+        fill(p, 100, 100); 
+        beginShape();
+
+        for( float angle = 0; angle < TWO_PI; angle += angleStep ) {
+            
+            PVector pos = new PVector(
+                startPos.x + noiseRadius * cos(angle),
+                startPos.y + noiseRadius * sin(angle)
+            );
+            
+            float noiseValue = ease( noiseIntensity(pos, zOffstet) );
+            vertex( 
+                startPos.x + ((noiseRadius * noiseValue) * cos(angle)),
+                startPos.y + ((noiseRadius * noiseValue) * sin(angle))
+            );
+
+        }
+        endShape(CLOSE);
     }
-
-    float _a = t * TWO_PI;
-    pushMatrix();
-    translate(width/2, height/2);
-         
-    beginShape();
-    for (float a = 0; a < TWO_PI; a += radians(5)) {
-
-        float xoff = map(cos(a + _a), -1, 1, 0, noiseScale);
-        float yoff = map(sin(a + _a), -1, 1, 0, noiseScale);
-        float r = map(noise(xoff, yoff, t), 0, 1, 100, height / 4);
-        float x = r * cos(a);
-        float y = r * sin(a);
-        vertex(x, y);
-    }
-    endShape(CLOSE);
-    popMatrix();
-    zOffstet += 0.001;
+    zOffstet += 0.003;
 }
