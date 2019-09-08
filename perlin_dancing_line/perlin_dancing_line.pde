@@ -1,25 +1,22 @@
-int noiseScale  = 512,
-    noiseRadius = 256,
-    animFrame   = 260,
-    pointNum    = 16;
+int noiseScale  = 200,
+  noiseRadius = 300,
+  animFrame   = 260,
+  pointNum    = 16;
 
-float threshold = .9,
-      fieldIntensity = 1,
-      zOffstet  = 0,
-      precision = 2,
-      currentNoiseValue  = 0,
-      angleStep = TWO_PI / 32;
+float fieldIntensity = 1,
+  zOffstet  = 0,
+  angleStep = TWO_PI / 32;
 
 ArrayList<PVector> points = new ArrayList<PVector>();
 
 float noiseIntensity( PVector point, float zOffstet ) {
-
   return noise(
-        point.x  / noiseScale,
-        point.y  / noiseScale,
-        zOffstet
-      ) * fieldIntensity;
+      point.x  / noiseScale,
+      point.y  / noiseScale,
+      zOffstet
+    ) * fieldIntensity;
 }
+
 float ease(float p) {
   return 3*p*p - 2*p*p*p;
 }
@@ -30,47 +27,52 @@ float ease(float p, float g) {
   else
     return 1 - 0.5 * pow(2*(1 - p), g);
 }
+
 void setup() {
 
-    size(800, 800);
-    strokeWeight(1);
-    colorMode(HSB, pointNum);
-    stroke(255);
-    noFill();
+  size(800, 800);
+  strokeWeight(1);
+  stroke(255);
+  noFill();
 
-    for( int p = 0; p <= pointNum; p++ ) {
-        
-        PVector pos = new PVector( random(1)*width, random(1)*height );
-        points.add(pos);
-
-    }   
+  for( int p = 0; p <= pointNum; p++ ) {
     
+    PVector pos = new PVector( random(1)*width, random(1)*height );
+    points.add(pos);
+
+  }   
+  
 }
+
 void draw() {
+
+  background(0);
+  for( int p = 0; p <= pointNum; p++ ) {
+
+    fill( p % 2 == 0 ? 255 : 0);
     
-    background(0);    
+    PVector startPos = points.get(p);
+    beginShape();
 
-    for( int p = 0; p <= pointNum; p++ ) {
+    for( float angle = 0; angle < TWO_PI; angle += angleStep ) {
         
-        PVector startPos = points.get(p);
-        fill(p, 100, 100); 
-        beginShape();
+      PVector pos = new PVector(
+        startPos.x + noiseRadius * cos(angle),
+        startPos.y + noiseRadius * sin(angle)
+      );
+      
+      float noiseValue = ease( noiseIntensity(pos, zOffstet) );
+      vertex( 
+        startPos.x + ((noiseRadius * noiseValue) * cos(angle + noiseValue)),
+        startPos.y + ((noiseRadius * noiseValue) * sin(angle + noiseValue))
+      );
 
-        for( float angle = 0; angle < TWO_PI; angle += angleStep ) {
-            
-            PVector pos = new PVector(
-                startPos.x + noiseRadius * cos(angle),
-                startPos.y + noiseRadius * sin(angle)
-            );
-            
-            float noiseValue = ease( noiseIntensity(pos, zOffstet) );
-            vertex( 
-                startPos.x + ((noiseRadius * noiseValue) * cos(angle)),
-                startPos.y + ((noiseRadius * noiseValue) * sin(angle))
-            );
-
-        }
-        endShape(CLOSE);
     }
-    zOffstet += 0.003;
+    endShape(CLOSE);
+  }
+  zOffstet += 0.01;
+
+  if( mousePressed == true ) {
+    saveFrame("records/frame-###.jpg");
+  }
 }
