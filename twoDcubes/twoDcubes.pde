@@ -70,12 +70,12 @@ void draw() {
 
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
-int samplesPerFrame = 4,
-    numFrames       = 30;     
+int samplesPerFrame = 10,
+    numFrames       = 20;     
 
 float shutterAngle = .12;
 
-boolean recording = true,
+boolean recording = false,
         preview = true;
 
 float angle, cubeSize, h;
@@ -93,65 +93,88 @@ void setup() {
   center   = new PVector(width/2, height/2);
   h        = sqrt(sq(cubeSize/2) + sq(cubeSize/4));
   
-  points = new PVector[7];
-
+  points = new PVector[12];
+  // right side
   points[0] = new PVector(
+    center.x, 
+    center.y
+  );
+  points[1] = new PVector(
     center.x, 
     center.y + cubeSize/2
   );
-  points[1] = new PVector(
-    center.x + h * cos(angle),
-    center.y + h * sin(angle)
-  );
   points[2] = new PVector(
-    points[1].x, 
-    points[1].y-h
+    center.x + h * cos(angle),
+    center.y + h * sin(angle) 
   );
   points[3] = new PVector(
+    center.x + h * cos(angle),
+    (center.y- cubeSize/2) + h * sin(angle) 
+  );
+  // upper side
+  points[4] = new PVector(
+    center.x + h * cos(angle) ,
+    (center.y - cubeSize/2) + h * sin(angle)
+  );
+  points[5] = new PVector(
     center.x, 
     center.y - cubeSize/2
   );
-  points[4] = new PVector(
+  points[6] = new PVector(
     center.x - h * cos(TWO_PI - angle),
-    (center.y - h * sin(TWO_PI - angle)) - cubeSize/2
+    (center.y - cubeSize/2) - h * sin(TWO_PI - angle)
   );
-  points[5] = new PVector(
+  points[7] = new PVector(
+    center.x, 
+    center.y
+  );
+  //left side
+  points[8] = new PVector(
+    center.x - h * cos(TWO_PI - angle),
+    (center.y - cubeSize/2) - h * sin(TWO_PI - angle)
+  );
+  points[9] = new PVector(
     center.x - h * cos(TWO_PI - angle),
     center.y - h * sin(TWO_PI - angle)
   );
-  points[6] = new PVector(
+  points[10] = new PVector(
     center.x, 
-    center.y + cubeSize/2
+    center.y + cubeSize /2
+  );
+  points[11] = new PVector(
+    center.x, 
+    center.y
   );
 }
 
 void draw_() {
   background(0);
 
+
   fill(0, 200, 0);
   beginShape();
-  vertex(center.x, center.y);
   vertex(points[0].x, points[0].y);
   vertex(points[1].x, points[1].y);
   vertex(points[2].x, points[2].y);
+  vertex(points[3].x, points[3].y);
   endShape(CLOSE);
 
   fill(0, 0, 200); 
   beginShape();
-  vertex(center.x, center.y);
-  vertex(points[2].x, points[2].y);
-  vertex(points[3].x, points[3].y);
   vertex(points[4].x, points[4].y);
+  vertex(points[5].x, points[5].y);
+  vertex(points[6].x, points[6].y);
+  vertex(points[7].x, points[7].y);
   endShape(CLOSE);
 
   fill(200, 0, 0);
   beginShape();
-  vertex(center.x, center.y);
-  vertex(points[4].x, points[4].y);
-  vertex(points[5].x, points[5].y);
-  vertex(points[6].x, points[6].y);
+  vertex(points[8].x, points[8].y);
+  vertex(points[9].x, points[9].y);
+  vertex(points[10].x, points[10].y);
+  vertex(points[11].x, points[11].y);
   endShape(CLOSE);
-   
+
 
   float _t = 0;
   int n = 0;
@@ -159,37 +182,26 @@ void draw_() {
 
   if( t <= 0.33 ) {
     n = 0;
-    _n = 2;
+    _n = 4;
     _t = ease( map(t, 0, 0.33, 0, 1));
   }
   if( t <= 0.66 && t > 0.33) {
-    n = 2;
-    _n = 4;
+    n = 4;
+    _n = 8;
     _t = ease( map(t, 0.33, 0.66, 0, 1));
   }
   if( t > 0.66 ) {
-    n = 4;
+    n = 8;
     _n = 0;
     _t = ease( map(t, 0.66, 1, 0, 1));
   }
-
-  PVector p1 = PVector.lerp(points[n],   points[_n],   ease(_t, 1));
-  PVector p2 = PVector.lerp(points[n+1], points[_n+1], ease(_t, 0.75));
-  PVector p3 = PVector.lerp(points[n+2], points[_n+2], ease(_t, 0.5));
-
-  fill(0);
+  
+  fill(255);
   beginShape();
-  vertex(center.x, center.y);
-  vertex(p1.x, p1.y);
-  vertex(p2.x, p2.y);
-  vertex(p3.x, p3.y);
+  for(int p = 0; p < 4; p++) {
+    PVector moove = PVector.lerp(points[n+p], points[_n+p], _t);
+    vertex( moove.x, moove.y);
+  }
   endShape(CLOSE);
   
-  fill(0);
-  beginShape();
-  vertex(center.x, center.y);
-  vertex(points[n].x, points[n].y);
-  vertex(points[n+1].x, points[n+1].y);
-  vertex(points[n+2].x, points[n+2].y);
-  endShape(CLOSE);
 }
