@@ -68,66 +68,72 @@ void draw() {
 
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
-int samplesPerFrame = 4,
-    numFrames       = 50;     
+int samplesPerFrame = 6,
+    numFrames       = 75;     
 
-float shutterAngle = .6;
+float shutterAngle = .4;
 
-boolean recording = false,
+boolean recording = true,
         preview = true;
 
-float angle = 0;
 PVector center;
 int cubeSize;
-float halfSize = cubeSize/2;
+float halfSize;
 
-PVector[] initPos;
-float[][] initAngle;
 
 void setup() {
-  size(520, 520, P3D);
+  size(600, 600, P3D);
   ortho();
-  strokeWeight(1.5);
-  stroke(0);
-
+  noStroke();
   cubeSize = height/4;
+  halfSize = cubeSize/2;
   center = new PVector(width/2, height/2, height/2);
 }
 
 
 void draw_() {
-
   background(0);
   lights();
+  spotLight(255,255,255, 0, center.y, height, 1, 1, -1, HALF_PI, 0.03);
 
-  pushMatrix();
-  translate(width/2, height/2);
+  float t1 = ease( map(t, 0, 0.33, 0, 1));
+  float t2 = ease( map(t, 0.33, 0.66, 0, 1));
+  float t3 = ease( map(t, 0.66, 1, 0, 1));
+
+  push();
+  translate(width*0.5, height*0.5);
   rotateX(-QUARTER_PI);
   rotateZ(QUARTER_PI);
+  fill(25);
+  box(cubeSize);
+
   
   fill(255);
-  box(cubeSize);
+  if( t < 0.33 ) {
+    push();
+    translate(-halfSize, -halfSize, halfSize);
+    rotateX(PI*1.5*t1);
+    rect(0, 0, cubeSize, cubeSize);
+    pop();
+  }
+  if( t > 0.33 && t < 0.66 ) {
+    push();
+    translate(-halfSize, -halfSize, -halfSize);
+    rotateZ(PI*1.5*-t2);
+    rotateX(HALF_PI);
+    rect(0, 0, cubeSize, cubeSize);
+    pop();
+  }
+  if( t > 0.66 && t < 1 ) {
+    push();
+    translate(-halfSize, -halfSize, halfSize);
+    rotateY(PI*0.5 + PI*1.5*t3);
+    rect(0, 0, cubeSize, cubeSize);
+    pop();
+  }
   
-  fill(0,0,255);
-  pushMatrix();
-  translate(-cubeSize/2, -cubeSize/2, cubeSize/2);
-  rect(0, 0, cubeSize, cubeSize);
-  popMatrix();
+  
 
-  fill(255, 0, 0);
-  pushMatrix();
-  translate(-cubeSize/2, -cubeSize/2, -cubeSize/2);
-  rotateY(-HALF_PI);
-  rect(0, 0, cubeSize, cubeSize);
-  popMatrix();
-
-  fill(0, 255, 0);
-  pushMatrix();
-  translate(-cubeSize/2, -cubeSize/2, -cubeSize/2);
-  rotateX(HALF_PI);
-  rect(0, 0, cubeSize, cubeSize);
-  popMatrix();
-
-  popMatrix();
+  pop();
 
 }
