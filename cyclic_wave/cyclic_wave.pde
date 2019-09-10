@@ -4,14 +4,14 @@ PVector center; //  center of circle
 
 int   margin         = 8,   // margin between circle
       numFrames      = 65, // animation loop duration (in frame)
-      noiseScale     = 8,  
-      noiseRadius    = 3,
+      noiseScale     = 4,  
+      noiseRadius    = 2,
       noiseStrength  = 4,
-      lineSize       = 8;
+      lineSize       = 4;
       
 
 float t              = 0,      // time of the current frame in the loop (percent)
-      speed          = 2,      // the value wich increments circle's radiuses
+      speed          = 1,      // the value wich increments circle's radiuses
       maxRadius;               // Limit the size of the arc circle
 
 boolean recording = true;
@@ -27,6 +27,7 @@ float getNoiseIntensity(float x, float y, float t ) {
 void setup() {
   //fullScreen(P3D);
   size(800, 800, P3D);
+  smooth(20);
 
   noise = new OpenSimplexNoise();
   center = new PVector( width/2, height/2 );

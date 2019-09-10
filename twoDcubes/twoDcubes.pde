@@ -78,7 +78,7 @@ float shutterAngle = .12;
 boolean recording = false,
         preview = true;
 
-float angle, cubeSize, h;
+float angle, cubeSize, h, tt;
 
 PVector center;
 PVector[] points;
@@ -153,6 +153,7 @@ void draw_() {
   float _t = 0;
   int n = 0;
   int _n = 0;
+  int sec; //second movement
 
   if( t <= 0.33 ) {
     n = 0;
@@ -186,7 +187,7 @@ void draw_() {
   fill(0,0,0);
   beginShape();
   for(int p = 0; p < 4; p++) {
-    PVector moove = PVector.lerp(points[n+p], points[_n+p], _t);
+    PVector moove = PVector.lerp(points[n+p], points[_n+p], tt);
     vertex( moove.x, moove.y);
   }
   endShape(CLOSE);
