@@ -68,13 +68,13 @@ void draw() {
 
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
-int samplesPerFrame = 4,
-    numFrames       = 50;     
+int samplesPerFrame = 2,
+    numFrames       = 75;     
 
-float shutterAngle = .6;
+float shutterAngle = .8;
 
 boolean recording = true,
-        preview = true;
+        preview = false;
 
 float angle = 0;
 
@@ -86,12 +86,11 @@ PVector[] initPos;
 float[][] initAngle;
 
 void setup() {
-  size(520, 520, P3D);
+  size(800, 800, P3D);
   colorMode(HSB, cubeCount/2, 100, 100);
   ortho();
   strokeWeight(1.5);
   stroke(0);
-  //smooth(3);
 
   initPos = new PVector[cubeCount];
   initAngle = new float[cubeCount][3];
@@ -104,9 +103,9 @@ void computePos() {
 
   for( int c = 0; c < cubeCount; c++ ) {
     initPos[c] = new PVector( 
-      random(width/2)-(width/4), 
-      random(height/2)-(height/4), 
-      random(height/2)-(height/4)
+      random(width)-(width/2), 
+      random(height)-(height/2), 
+      random(height)-(height/2)
     );
     for( int a = 0; a < 3; a++ ) {
       initAngle[c][a] = random(1) * TWO_PI;
@@ -133,7 +132,6 @@ void draw_() {
     2
   ));
 
-
   for(int x = 0; x < cubePerAxes; x++ ) {
     for( int y = 0; y < cubePerAxes; y++ ) {
       for( int z = 0; z < cubePerAxes; z++ ) {
@@ -149,8 +147,8 @@ void draw_() {
         float yRot = initAngle[id][1] * ease(1-tt); 
         float zRot = initAngle[id][2] * ease(1-tt); 
         
-        stroke(x+y+z, 100, 50);
-        fill(x+y+z, 70, 100);
+        stroke(x+y+z, 100, 25);
+        fill(x+y+z, 70, 70);
         
         pushMatrix();  
         
