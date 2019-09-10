@@ -87,7 +87,7 @@ void setup() {
 
   size(600, 600);
   noStroke();
-
+  colorMode(HSB, 3);
   cubeSize = width/3;
   angle    = atan(0.5);
   center   = new PVector(width/2, height/2);
@@ -150,32 +150,6 @@ void setup() {
 void draw_() {
   background(0);
 
-
-  fill(0, 200, 0);
-  beginShape();
-  vertex(points[0].x, points[0].y);
-  vertex(points[1].x, points[1].y);
-  vertex(points[2].x, points[2].y);
-  vertex(points[3].x, points[3].y);
-  endShape(CLOSE);
-
-  fill(0, 0, 200); 
-  beginShape();
-  vertex(points[4].x, points[4].y);
-  vertex(points[5].x, points[5].y);
-  vertex(points[6].x, points[6].y);
-  vertex(points[7].x, points[7].y);
-  endShape(CLOSE);
-
-  fill(200, 0, 0);
-  beginShape();
-  vertex(points[8].x, points[8].y);
-  vertex(points[9].x, points[9].y);
-  vertex(points[10].x, points[10].y);
-  vertex(points[11].x, points[11].y);
-  endShape(CLOSE);
-
-
   float _t = 0;
   int n = 0;
   int _n = 0;
@@ -183,20 +157,33 @@ void draw_() {
   if( t <= 0.33 ) {
     n = 0;
     _n = 4;
-    _t = ease( map(t, 0, 0.33, 0, 1));
+    _t = map(t, 0, 0.33, 0, 1);
   }
   if( t <= 0.66 && t > 0.33) {
     n = 4;
     _n = 8;
-    _t = ease( map(t, 0.33, 0.66, 0, 1));
+    _t = map(t, 0.33, 0.66, 0, 1);
   }
   if( t > 0.66 ) {
     n = 8;
     _n = 0;
-    _t = ease( map(t, 0.66, 1, 0, 1));
+    _t = map(t, 0.66, 1, 0, 1);
   }
   
-  fill(255);
+  for( int face = 0; face < 3; face++ ) {
+    
+    int p = face * 4;
+
+    fill( face, 100, 100 );
+    beginShape();
+    vertex(points[p].x, points[p].y);
+    vertex(points[p+1].x, points[p+1].y);
+    vertex(points[p+2].x, points[p+2].y);
+    vertex(points[p+3].x, points[p+3].y);
+    endShape(CLOSE);
+  }
+
+  fill(0,0,0);
   beginShape();
   for(int p = 0; p < 4; p++) {
     PVector moove = PVector.lerp(points[n+p], points[_n+p], _t);
