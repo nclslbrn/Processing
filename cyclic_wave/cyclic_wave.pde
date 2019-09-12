@@ -59,12 +59,12 @@ void draw() {
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
 
-int samplesPerFrame = 6,
-    numFrames = 512; // animation loop duration (in frame)   
+int samplesPerFrame = 1,
+    numFrames = 75; // animation loop duration (in frame)   
 
-float shutterAngle = .6;
+float shutterAngle = .1;
 
-boolean recording = false,
+boolean recording = true,
         preview = false;
 
 
@@ -72,14 +72,14 @@ boolean recording = false,
 ArrayList<EllipseSection> arcs = new ArrayList<EllipseSection>(); // Custom arc class
 PVector center; //  center of circle
 
-int   margin         = 8,   // margin between circle
-      noiseScale     = 4,  
-      noiseRadius    = 2,
-      noiseStrength  = 4,
+int   margin         = 4,   // margin between circle
+      noiseScale     = 64,  
+      noiseRadius    = 8,
+      noiseStrength  = 1,
       lineSize       = 4;
       
 
-float speed          = 1,      // the value wich increments circle's radiuses
+float speed,      // the value wich increments circle's radiuses
       maxRadius;               // Limit the size of the arc circle
 
 
@@ -98,7 +98,8 @@ void setup() {
 
   //noise = new OpenSimplexNoise();
   center = new PVector( width/2, height/2 );
-  maxRadius = width/1.5;
+  maxRadius = width/1.25;
+  speed     = maxRadius / numFrames;
 
   for( int c = margin; c <= maxRadius; c += margin ) {
 
@@ -125,7 +126,7 @@ void draw_() {
 
     for( int angleID = 0; angleID < arc.angles.size() - 1; angleID+= 2 ) {
       
-      float stroke = map(arc.radius, 0, maxRadius, 255, 75 );
+      float stroke = map(arc.radius, 0, maxRadius, 255, 0 );
       float weight = map(arc.radius, 0, maxRadius, 0.1, 1.5 );
 
       float start = currentAngle + arc.angles.get( angleID );
@@ -169,13 +170,14 @@ void draw_() {
       currentAngle = end;
     }
 
-    arc.radius += margin;
+    arc.radius += speed;
 
     if( arc.radius >= maxRadius ) {
 
       if( arcID != 1 ) {
 
         arc.radius = margin;
+
       }
       
     } 
