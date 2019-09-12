@@ -89,8 +89,8 @@ void setup() {
   size(800, 800, P3D);
   colorMode(HSB, cubeCount/2, 100, 100);
   ortho();
-  strokeWeight(1.5);
-  stroke(0);
+  //strokeWeight(1.5);
+  noStroke();
 
   initPos = new PVector[cubeCount];
   initAngle = new float[cubeCount][3];
@@ -147,8 +147,8 @@ void draw_() {
         float yRot = initAngle[id][1] * ease(1-tt); 
         float zRot = initAngle[id][2] * ease(1-tt); 
         
-        stroke(x+y+z, 100, 25);
-        fill(x+y+z, 70, 70);
+        //stroke(x+y+z, 100, 0);
+        fill(x+y+z, 75, 50);
         
         pushMatrix();  
         

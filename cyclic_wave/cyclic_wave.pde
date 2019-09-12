@@ -1,24 +1,91 @@
-OpenSimplexNoise noise;
+float t, c;
+
+float ease(float p) {
+  return 3*p*p - 2*p*p*p;
+}
+
+float ease(float p, float g) {
+  if (p < 0.5) 
+    return 0.5 * pow(2*p, g);
+  else
+    return 1 - 0.5 * pow(2*(1 - p), g);
+}
+
+void draw() {
+  if (recording) {
+    result = new int[width*height][3];
+    for (int i=0; i<width*height; i++)
+      for (int a=0; a<3; a++)
+        result[i][a] = 0;
+
+    c = 0;
+    for (int sa=0; sa<samplesPerFrame; sa++) {
+      t = map(frameCount-1 + sa*shutterAngle/samplesPerFrame, 0, numFrames, 0, 1);
+      draw_();
+      loadPixels();
+      for (int i=0; i<pixels.length; i++) {
+        result[i][0] += pixels[i] >> 16 & 0xff;
+        result[i][1] += pixels[i] >> 8 & 0xff;
+        result[i][2] += pixels[i] & 0xff;
+      }
+    }
+
+    loadPixels();
+    for (int i=0; i<pixels.length; i++)
+      pixels[i] = 0xff << 24 | 
+        int(result[i][0]*1.0/samplesPerFrame) << 16 | 
+        int(result[i][1]*1.0/samplesPerFrame) << 8 | 
+        int(result[i][2]*1.0/samplesPerFrame);
+    updatePixels();
+
+    saveFrame("records/frame-###.gif");
+    if (frameCount==numFrames)
+      exit();
+  } else if (preview) {
+    c = mouseY*1.0/height;
+    if (mousePressed)
+      println(c);
+    t = (millis()/(20.0*numFrames))%1;
+    draw_();
+  } else {
+    t = mouseX*1.0/width;
+    c = mouseY*1.0/height;
+    if (mousePressed)
+      println(c);
+    draw_();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+int[][] result;
+
+int samplesPerFrame = 6,
+    numFrames = 512; // animation loop duration (in frame)   
+
+float shutterAngle = .6;
+
+boolean recording = false,
+        preview = false;
+
+
+//OpenSimplexNoise noise;
 ArrayList<EllipseSection> arcs = new ArrayList<EllipseSection>(); // Custom arc class
 PVector center; //  center of circle
 
 int   margin         = 8,   // margin between circle
-      numFrames      = 65, // animation loop duration (in frame)
       noiseScale     = 4,  
       noiseRadius    = 2,
       noiseStrength  = 4,
       lineSize       = 4;
       
 
-float t              = 0,      // time of the current frame in the loop (percent)
-      speed          = 1,      // the value wich increments circle's radiuses
+float speed          = 1,      // the value wich increments circle's radiuses
       maxRadius;               // Limit the size of the arc circle
 
-boolean recording = true;
 
 float getNoiseIntensity(float x, float y, float t ) {
   
-  return (float) noise.eval(
+  return noise(
     noiseRadius * cos( TWO_PI * t),
     noiseRadius * sin( TWO_PI * t)
   ) * noiseStrength;
@@ -29,7 +96,7 @@ void setup() {
   size(800, 800, P3D);
   smooth(20);
 
-  noise = new OpenSimplexNoise();
+  //noise = new OpenSimplexNoise();
   center = new PVector( width/2, height/2 );
   maxRadius = width/1.5;
 
@@ -43,10 +110,9 @@ void setup() {
 
 }
 
-void draw() {
+void draw_() {
 
   background(0);
-  float t = frameCount-1 / numFrames;
   
   pushMatrix();
   translate(center.x, center.y, -height/2);
@@ -107,16 +173,12 @@ void draw() {
 
     if( arc.radius >= maxRadius ) {
 
-      if( arcID == 1 ) {
+      if( arcID != 1 ) {
 
-        exit();
-      
-      } else {
-        
         arc.radius = margin;
       }
+      
     } 
   }
   popMatrix();
-  if( recording ) saveFrame("records/frame-###.jpg");
 }

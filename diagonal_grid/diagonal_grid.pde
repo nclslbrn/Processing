@@ -72,7 +72,7 @@ boolean recording = true,
 int[][] result;
 
 void setup() {
-  size(520, 520);
+  size(800, 800);
   rectMode(CENTER);
   cellSize = (int) (width * zoom) / 6;
   halfCellSize = cellSize / 2;

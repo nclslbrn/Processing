@@ -79,12 +79,13 @@ boolean recording = true,
 PVector center;
 int cubeSize;
 float halfSize;
-
+color cubeColor = color(50);
 
 void setup() {
-  size(600, 600, P3D);
+  size(800, 800, P3D);
   ortho();
   noStroke();
+  colorMode(HSB, 3, 100, 100);
   cubeSize = height/4;
   halfSize = cubeSize/2;
   center = new PVector(width/2, height/2, height/2);
@@ -94,7 +95,7 @@ void setup() {
 void draw_() {
   background(0);
   lights();
-  spotLight(255,255,255, 0, center.y, height, 1, 1, -1, HALF_PI, 0.03);
+  spotLight(1,2,3, 0, center.y, height, 1, 1, -1, HALF_PI, 0.03);
 
   float t1 = ease( map(t, 0, 0.33, 0, 1));
   float t2 = ease( map(t, 0.33, 0.66, 0, 1));
@@ -104,11 +105,12 @@ void draw_() {
   translate(width*0.5, height*0.5);
   rotateX(-QUARTER_PI);
   rotateZ(QUARTER_PI);
-  fill(25);
+  fill(cubeColor);
   box(cubeSize);
 
   
-  fill(255);
+  fill(t*3, 100, 50);
+
   if( t < 0.33 ) {
     push();
     translate(-halfSize, -halfSize, halfSize);

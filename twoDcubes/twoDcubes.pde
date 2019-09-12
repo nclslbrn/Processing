@@ -184,11 +184,12 @@ void draw_() {
     endShape(CLOSE);
   }
 
-  fill(0,0,0);
+  fill(255);
   beginShape();
-  for(int p = 0; p < 4; p++) {
-    PVector moove = PVector.lerp(points[n+p], points[_n+p], tt);
-    vertex( moove.x, moove.y);
+  for(int p = 0; p < 3; p++) {
+
+    PVector moove = PVector.lerp(points[n+p], points[_n+p], _t);
+    vertex( moove.x, moove.y );
   }
   endShape(CLOSE);
   
