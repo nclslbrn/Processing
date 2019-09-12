@@ -73,7 +73,7 @@ int samplesPerFrame = 6,
 
 float shutterAngle = .4;
 
-boolean recording = true,
+boolean recording = false,
         preview = true;
 
 PVector center;
@@ -105,11 +105,12 @@ void draw_() {
   translate(width*0.5, height*0.5);
   rotateX(-QUARTER_PI);
   rotateZ(QUARTER_PI);
-  fill(cubeColor);
+  noFill();
+  stroke(cubeColor);
   box(cubeSize);
 
   
-  fill(t*3, 100, 50);
+  fill(ease(t)*3, 100, 50);
 
   if( t < 0.33 ) {
     push();
