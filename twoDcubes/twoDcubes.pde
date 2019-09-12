@@ -78,7 +78,7 @@ float shutterAngle = .12;
 boolean recording = false,
         preview = true;
 
-float angle, cubeSize, h, tt;
+float angle, cubeSize, h;
 
 PVector center;
 PVector[] points;
@@ -87,7 +87,6 @@ void setup() {
 
   size(600, 600);
   noStroke();
-  colorMode(HSB, 3);
   cubeSize = width/3;
   angle    = atan(0.5);
   center   = new PVector(width/2, height/2);
@@ -149,48 +148,46 @@ void setup() {
 
 void draw_() {
   background(0);
-
-  float _t = 0;
-  int n = 0;
-  int _n = 0;
-  int sec; //second movement
-
-  if( t <= 0.33 ) {
-    n = 0;
-    _n = 4;
-    _t = map(t, 0, 0.33, 0, 1);
-  }
-  if( t <= 0.66 && t > 0.33) {
-    n = 4;
-    _n = 8;
-    _t = map(t, 0.33, 0.66, 0, 1);
-  }
-  if( t > 0.66 ) {
-    n = 8;
-    _n = 0;
-    _t = map(t, 0.66, 1, 0, 1);
-  }
-  
+  /*
   for( int face = 0; face < 3; face++ ) {
     
-    int p = face * 4;
+    int index = face * 4;
 
     fill( face, 100, 100 );
     beginShape();
-    vertex(points[p].x, points[p].y);
-    vertex(points[p+1].x, points[p+1].y);
-    vertex(points[p+2].x, points[p+2].y);
-    vertex(points[p+3].x, points[p+3].y);
+
+    for( int p = 0; p < 4; p++ ) {
+      vertex(points[index + p].x, points[index + p].y);
+    }
     endShape(CLOSE);
+
   }
+  */
+  int face = floor( t * 3 );
+ 
+  float _t = t/3;
 
   fill(255);
+    
   beginShape();
-  for(int p = 0; p < 3; p++) {
+  for(int p = 0; p < 4; p++) {
 
-    PVector moove = PVector.lerp(points[n+p], points[_n+p], _t);
-    vertex( moove.x, moove.y );
+    int index = face*4;
+    vertex( points[index+p].x, points[index+p].y );
   }
+
+  endShape(CLOSE);
+
+  fill(75);
+  beginShape();
+  for(int p = 0; p < 4; p++) {
+
+    int index = face*4;
+    int _n = index < 8 ? index + 4 : 0;
+    
+    vertex( points[_n+p].x, points[_n+p].y );
+  }
+
   endShape(CLOSE);
   
 }
