@@ -1,7 +1,7 @@
 /**
  * Inpired by Daniel Shuffman and Etienne Jacob works
  *
- * Agents from Ianis Lallemand 
+ * Agent classe from Ianis Lallemand 
  * https://github.com/ianisl/workshop-processing-paris-2015/
  */
 
