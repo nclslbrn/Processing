@@ -102,8 +102,6 @@ void mooveAgents() {
 
       PVector randomPos = getRandomPointFromCircle(circlePoints);
 
-      float noiseIntensity = getNoiseIntensity( randomPos, t);
-
       a.position.x = randomPos.x + random(radius) * cos(a.angle);
       a.position.y = randomPos.y + random(radius) * sin(a.angle);
       a.brightness = initBrightness;
