@@ -68,7 +68,6 @@ boolean recording = true,
         preview = false;
 
 
-//OpenSimplexNoise noise;
 ArrayList<EllipseSection> arcs = new ArrayList<EllipseSection>(); // Custom arc class
 PVector center; //  center of circle
 
