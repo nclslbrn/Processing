@@ -1,4 +1,8 @@
-float t, c;
+/**
+ * Hyperbolic and julia from @generateme
+ * https://generateme.wordpress.com/2016/04/11/folds/  
+ */
+ float t, c;
 
 float ease(float p) {
   return 3*p*p - 2*p*p*p;
@@ -9,16 +13,6 @@ float ease(float p, float g) {
     return 0.5 * pow(2*p, g);
   else
     return 1 - 0.5 * pow(2*(1 - p), g);
-}
-
-void push() {
-  pushMatrix();
-  pushStyle();
-}
-
-void pop() {
-  popStyle();
-  popMatrix();
 }
 
 void draw() {
@@ -48,7 +42,7 @@ void draw() {
         int(result[i][2]*1.0/samplesPerFrame);
     updatePixels();
 
-    saveFrame("records/frame-###.jpg");
+    saveFrame("records/frame-###.gif");
     if (frameCount==numFrames)
       exit();
   } else if (preview) {
@@ -68,75 +62,67 @@ void draw() {
 
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
-int samplesPerFrame = 6,
-    numFrames       = 75;     
 
-float shutterAngle = .4;
+int samplesPerFrame = 6;
+int numFrames = 75;        
+float shutterAngle = .6;
 
 boolean recording = false,
         preview = true;
 
 PVector center;
-int cubeSize;
-float halfSize;
-color cubeColor = color(50);
+int radius;
+int variationScale;
+int scale = 4;
 
 void setup() {
-  size(800, 800, P3D);
-  ortho();
-  noStroke();
-  colorMode(HSB, 3, 100, 100);
-  cubeSize = height/4;
-  halfSize = cubeSize/2;
-  center = new PVector(width/2, height/2, height/2);
+  size(800, 800);
+  background(250);
+  smooth(8);
+  noFill();
+  stroke(20);
+  strokeWeight(0.9);
+  center = new PVector(width/2, height/2);
+  radius = floor( width/3 );
+  variationScale = floor(radius/numFrames);
+ 
 }
 
-
 void draw_() {
-  background(0);
-  lights();
-  spotLight(1,2,3, 0, center.y, height, 1, 1, -1, HALF_PI, 0.03);
-
-  float t1 = ease( map(t, 0, 0.33, 0, 1));
-  float t2 = ease( map(t, 0.33, 0.66, 0, 1));
-  float t3 = ease( map(t, 0.66, 1, 0, 1));
-
-  push();
-  translate(width*0.5, height*0.5);
-  rotateX(-QUARTER_PI);
-  rotateZ(QUARTER_PI);
-  fill(0);
-  stroke(cubeColor);
-  box(cubeSize);
-
   
-  fill(ease(t)*3, 100, 50);
+  float angle = TWO_PI / t;
 
-  if( t < 0.33 ) {
-    push();
-    translate(-halfSize, -halfSize, halfSize);
-    rotateX(PI*1.5*t1);
-    rect(0, 0, cubeSize, cubeSize);
-    pop();
-  }
-  if( t > 0.33 && t < 0.66 ) {
-    push();
-    translate(-halfSize, -halfSize, -halfSize);
-    rotateZ(PI*1.5*-t2);
-    rotateX(HALF_PI);
-    rect(0, 0, cubeSize, cubeSize);
-    pop();
-  }
-  if( t > 0.66 && t < 1 ) {
-    push();
-    translate(-halfSize, -halfSize, halfSize);
-    rotateY(PI*0.5 + PI*1.5*t3);
-    rect(0, 0, cubeSize, cubeSize);
-    pop();
-  }
+  PVector pointInCircle = new PVector(
+    center.x + radius * cos(angle),
+    center.y + radius * sin(angle)
+  );
+
+  PVector moove  = hyperbolic(pointInCircle, 1);
+  float x = map(moove.x, -30, 30, center.x - scale, center.x + scale * cos(angle));
+  float y = map(moove.y, -30, 30, center.y - scale, center.y + scale * sin(angle));
+
+  line(
+    pointInCircle.x, 
+    pointInCircle.y, 
+    pointInCircle.x * moove.x, 
+    pointInCircle.y * moove.y
+  );
   
+} 
+
+
+PVector hyperbolic(PVector v, float amount) {
   
-
-  pop();
-
+  float r = v.mag() + 1.0e-10;
+  float theta = atan2(v.x, v.y);
+  float x = amount * sin(theta) / r;
+  float y = amount * cos(theta) * r;
+  return new PVector(x, y);
+}
+PVector julia(PVector v, float amount) {
+  float r = amount * sqrt(v.mag());
+  float theta = 0.5 * atan2(v.x, v.y) + (int)(2.0 * random(0, 1)) * PI;
+  float x = r * cos(theta);
+  float y = r * sin(theta);
+  return new PVector(x, y);
 }

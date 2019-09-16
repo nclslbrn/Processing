@@ -148,12 +148,15 @@ void setup() {
 
 void draw_() {
   background(0);
-  /*
-  for( int face = 0; face < 3; face++ ) {
+  int face = floor( t * 3 );
+ 
+  float _t = t/3;
+ /* 
+  for( int f = 0; f < 3; f++ ) {
     
-    int index = face * 4;
+    int index = f * 4;
 
-    fill( face, 100, 100 );
+    fill( f, 100, 100 );
     beginShape();
 
     for( int p = 0; p < 4; p++ ) {
@@ -162,10 +165,7 @@ void draw_() {
     endShape(CLOSE);
 
   }
-  */
-  int face = floor( t * 3 );
- 
-  float _t = t/3;
+  
 
   fill(255);
     
@@ -189,5 +189,30 @@ void draw_() {
   }
 
   endShape(CLOSE);
-  
+*/
+  stroke(255);
+  float distance = h * _t;
+  for( int _d = 0; _d < distance; _d++ ) {
+
+    if( t < 0.33 ) {
+      line(
+        center.x,
+        center.y + cubeSize/2 - _d,
+        center.x + h * cos(angle),
+        center.y + h * sin(angle) - _d
+      );
+    }
+    if( t >= 0.33 && t < 0.66) {
+      line(
+        center.x - _d * cos(TWO_PI - angle),
+        center.y - (h * sin(angle)) - _d  * sin(angle),
+        center.x + (h+_d) * cos(angle),
+        center.y - (h * sin(angle)) - (_d  * sin(angle))
+      );
+    }
+    if( t >= 0.66 ) {
+
+    }
+  }
+
 }

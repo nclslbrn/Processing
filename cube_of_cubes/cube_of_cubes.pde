@@ -72,9 +72,9 @@ int samplesPerFrame = 2,
     numFrames       = 75;     
 
 float shutterAngle = .8;
-
-boolean recording = true,
-        preview = false;
+color subtle_white = color(250, 236, 236);
+boolean recording = false,
+        preview = true;
 
 float angle = 0;
 
@@ -103,9 +103,9 @@ void computePos() {
 
   for( int c = 0; c < cubeCount; c++ ) {
     initPos[c] = new PVector( 
-      random(width)-(width/2), 
-      random(height)-(height/2), 
-      random(height)-(height/2)
+      random(width/3)-(width/6), 
+      random(height/3)-(height/6), 
+      random(height/3)-(height/6)
     );
     for( int a = 0; a < 3; a++ ) {
       initAngle[c][a] = random(1) * TWO_PI;
@@ -115,7 +115,7 @@ void computePos() {
 
 void draw_() {
 
-  background(0);
+  background(subtle_white);
   lights();
   ambientLight(255,255,255);
   pushMatrix();
@@ -148,7 +148,7 @@ void draw_() {
         float zRot = initAngle[id][2] * ease(1-tt); 
         
         //stroke(x+y+z, 100, 0);
-        fill(x+y+z, 75, 50);
+        fill(x+y+z, 250, 50);
         
         pushMatrix();  
         
