@@ -1,3 +1,9 @@
+import ddf.minim.*;
+import ddf.minim.effects.*;
+
+Minim minim;
+AudioPlayer sample;
+
 PFont      font;
 //  Set language here (fr, en, sp, de)
 String     language = "fr"; 
@@ -20,7 +26,7 @@ float // radius of circle
       tunnelSize;
 
 int // inverted factor of zoom / move forward
-    travellingSpeed = 5,
+    travellingSpeed = 17,
     // minimum pointPerCircle: 4->square 5->pentagone ... 
     minPoint = 4,
     // maximum pointPerCircle size
@@ -88,6 +94,8 @@ void setup() {
   //fullScreen(P3D);
   textAlign(CENTER, CENTER);
   
+  minim = new Minim(this);
+  sample = minim.loadFile("jusquicitoutvabien.mp3", 2048);
   font = loadFont("Novecentosanswide-Bold-99.vlw");
 
   sentences = new StringDict();
@@ -96,7 +104,9 @@ void setup() {
   sentences.set("sp", "hasta ahora todo bien, ");
   sentences.set("de", "so weit, so gut, ");
 
-  sentence = sentences.get(language); 
+  sentence = sentences.get(language);
+  sample.loop();
+
   pointPerCircle = newPointPerCircle(minPoint, maxPoint);
   // depth of the tunnel 
   zmin = width*-0.75;
@@ -168,7 +178,7 @@ void setup() {
 void draw() {
 
   background(5);
-   
+
   for (int i = 0; i < nb; i++) {
 
     currentCircle[i].z += zstep;
