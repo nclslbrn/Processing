@@ -110,7 +110,7 @@ void draw_() {
   box(cubeSize);
 
   
-  fill(ease(t)*3, 100, 50);
+  fill( ceil(t*3), 100, 100);
 
   if( t < 0.33 ) {
     push();
