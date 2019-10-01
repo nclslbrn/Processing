@@ -71,7 +71,7 @@ void draw() {
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
 int samplesPerFrame = 10,
-    numFrames       = 20;     
+    numFrames       = 75;     
 
 float shutterAngle = .12;
 
@@ -86,133 +86,59 @@ PVector[] points;
 void setup() {
 
   size(600, 600);
+  colorMode(HSB, 3, 100, 100);
   noStroke();
   cubeSize = width/3;
   angle    = atan(0.5);
   center   = new PVector(width/2, height/2);
   h        = sqrt(sq(cubeSize/2) + sq(cubeSize/4));
-  
-  points = new PVector[12];
-  // right side
-  points[0] = new PVector(
-    center.x, 
-    center.y
-  );
-  points[1] = new PVector(
-    center.x, 
-    center.y + cubeSize/2
-  );
-  points[2] = new PVector(
-    center.x + h * cos(angle),
-    center.y + h * sin(angle) 
-  );
-  points[3] = new PVector(
-    center.x + h * cos(angle),
-    (center.y- cubeSize/2) + h * sin(angle) 
-  );
-  // upper side
-  points[4] = new PVector(
-    center.x + h * cos(angle) ,
-    (center.y - cubeSize/2) + h * sin(angle)
-  );
-  points[5] = new PVector(
-    center.x, 
-    center.y - cubeSize/2
-  );
-  points[6] = new PVector(
-    center.x - h * cos(TWO_PI - angle),
-    (center.y - cubeSize/2) - h * sin(TWO_PI - angle)
-  );
-  points[7] = new PVector(
-    center.x, 
-    center.y
-  );
-  //left side
-  points[8] = new PVector(
-    center.x - h * cos(TWO_PI - angle),
-    (center.y - cubeSize/2) - h * sin(TWO_PI - angle)
-  );
-  points[9] = new PVector(
-    center.x - h * cos(TWO_PI - angle),
-    center.y - h * sin(TWO_PI - angle)
-  );
-  points[10] = new PVector(
-    center.x, 
-    center.y + cubeSize /2
-  );
-  points[11] = new PVector(
-    center.x, 
-    center.y
-  );
 }
 
 void draw_() {
+  
   background(0);
+  
   int face = floor( t * 3 );
  
-  float _t = t/3;
- /* 
-  for( int f = 0; f < 3; f++ ) {
-    
-    int index = f * 4;
-
-    fill( f, 100, 100 );
-    beginShape();
-
-    for( int p = 0; p < 4; p++ ) {
-      vertex(points[index + p].x, points[index + p].y);
-    }
-    endShape(CLOSE);
-
+  float _t = 0;
+  if( t < 0.33 ) {
+    _t = map(t, 0, 0.33, 0, 1);
+  }
+  else if( t < 0.66 && t > 0.33 ) {
+    _t = map(t, 0.33, 0.66, 0, 1);
+  }
+  else if( t > 0.66 ) {
+    _t = map(t, 0.66, 1, 0, 1);
   }
   
-
-  fill(255);
-    
-  beginShape();
-  for(int p = 0; p < 4; p++) {
-
-    int index = face*4;
-    vertex( points[index+p].x, points[index+p].y );
-  }
-
-  endShape(CLOSE);
-
-  fill(75);
-  beginShape();
-  for(int p = 0; p < 4; p++) {
-
-    int index = face*4;
-    int _n = index < 8 ? index + 4 : 0;
-    
-    vertex( points[_n+p].x, points[_n+p].y );
-  }
-
-  endShape(CLOSE);
-*/
-  stroke(255);
+  stroke(t*3, 100, 100);
   float distance = h * _t;
   for( int _d = 0; _d < distance; _d++ ) {
 
     if( t < 0.33 ) {
       line(
         center.x,
-        center.y + cubeSize/2 - _d,
+        center.y + (cubeSize/2) - _d,
         center.x + h * cos(angle),
         center.y + h * sin(angle) - _d
       );
     }
     if( t >= 0.33 && t < 0.66) {
       line(
-        center.x - _d * cos(TWO_PI - angle),
-        center.y - (h * sin(angle)) - _d  * sin(angle),
-        center.x + (h+_d) * cos(angle),
-        center.y - (h * sin(angle)) - (_d  * sin(angle))
+        center.x - (_d * cos(angle)),
+        center.y - (_d * sin(angle)),
+        (center.x + cubeSize/2) - (_d * cos(angle)),
+        (center.y - h/2) - (_d * sin(angle))
       );
     }
     if( t >= 0.66 ) {
-
+      line( 
+        center.x - h * cos(angle),
+        center.y - h * sin(angle) + _d,
+        center.x,
+        center.y + _d
+      );
     }
   }
-
+  
 }
