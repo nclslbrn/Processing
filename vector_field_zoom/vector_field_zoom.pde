@@ -5,7 +5,7 @@
 
 // dynamic list with our points, PVector holds position
 ArrayList<PVector> points = new ArrayList<PVector>();
-int numFrame = 10;
+int numFrame = 25;
 float seed = 1;
 
 // colors used for points
@@ -71,7 +71,7 @@ void draw() {
  
     // select color from palette (index based on noise)
     int cn = (int)(100*pal.length*noise(point_idx))%pal.length;
-    stroke(pal[cn], (1-t)*50 );
+    stroke(pal[cn], (1-t)*100 );
     //point(xx, yy); //draw
 
     line(xx, yy, p.x + xx, p.y + yy);
@@ -93,7 +93,7 @@ void draw() {
     // go to the next point
     point_idx++;
   }
-  saveFrame("records/frame-###.jpg");
+  //saveFrame("records/frame-###.jpg");
 }
 PVector circle(float n) { // polar to cartesian coordinates
   return new PVector(cos(n), sin(n));
