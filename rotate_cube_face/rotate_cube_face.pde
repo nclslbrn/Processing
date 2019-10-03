@@ -79,7 +79,7 @@ boolean recording = false,
 PVector center;
 int cubeSize;
 float halfSize;
-color cubeColor = color(50);
+color cubeColor = color(75);
 
 void setup() {
   size(800, 800, P3D);
@@ -110,9 +110,11 @@ void draw_() {
   box(cubeSize);
 
   
-  fill( ceil(t*3), 100, 100);
+  noStroke();
 
   if( t < 0.33 ) {
+    fill( 1, 75, 75);
+
     push();
     translate(-halfSize, -halfSize, halfSize);
     rotateX(PI*1.5*t1);
@@ -120,6 +122,8 @@ void draw_() {
     pop();
   }
   if( t > 0.33 && t < 0.66 ) {
+    fill( 2, 75, 75);
+
     push();
     translate(-halfSize, -halfSize, -halfSize);
     rotateZ(PI*1.5*-t2);
@@ -128,6 +132,8 @@ void draw_() {
     pop();
   }
   if( t > 0.66 && t < 1 ) {
+    fill( 3, 75, 75);
+
     push();
     translate(-halfSize, -halfSize, halfSize);
     rotateY(PI*0.5 + PI*1.5*t3);
