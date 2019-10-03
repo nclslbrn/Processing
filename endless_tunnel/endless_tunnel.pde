@@ -13,7 +13,7 @@ String     sentence;
 float // radius of circle
       radius              = 220,
       // percent of probability that the tunnel will turn
-      rotationProbability = 0.35,
+      rotationProbability = 0.5,
       // angle of x and y rotation
       rotationAngle       = HALF_PI,
       // speed of every rotation
