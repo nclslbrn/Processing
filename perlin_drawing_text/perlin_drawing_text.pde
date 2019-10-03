@@ -12,11 +12,11 @@ float getNoiseIntensity(PVector position, float t ) {
     ) * config.get("fieldForce");
 }
 
-color colorInterpolation(int agentID, int agentsCount) {
+color colorInterpolation(int agentID) {
 
   color a = #3498db;
   color b = #e74c3c;
-  println( agentID / agentsCount);
+  println( agentID / agents.size());
 
   return lerpColor( a, b, agentID / agentsCount );
 }
@@ -104,7 +104,7 @@ void initAgents() {
 
 void drawAgents() {
  
-  int currentAgentID = 0;
+  int currentAgentID = 1;
 
   for (Agent a : agents) {
     
@@ -132,7 +132,7 @@ void drawAgents() {
       a.angle = getNoiseIntensity(a.position, noiseZ);
       
     }
-    color c = colorInterpolation(currentAgentID, agents.size());
+    color c = colorInterpolation( currentAgentID );
     stroke(red(c), green(c), blue(c), a.brightness);
     line(a.previousPosition.x, a.previousPosition.y, a.position.x, a.position.y);
 
