@@ -77,10 +77,10 @@ int scale = 4;
 
 void setup() {
   size(800, 800);
-  background(250);
+  background(0);
   smooth(8);
   noFill();
-  stroke(20);
+  stroke(255, 120);
   strokeWeight(0.9);
   center = new PVector(width/2, height/2);
   radius = floor( width/3 );
@@ -89,26 +89,25 @@ void setup() {
 }
 
 void draw_() {
+  background(0);
   
   float angle = TWO_PI / t;
 
-  PVector pointInCircle = new PVector(
-    center.x + radius * cos(angle),
-    center.y + radius * sin(angle)
-  );
+  for( float x = -3; x <= 3; x+= 0.05 ) {
+    for( float y = -3; y <= 3; y+= 0.05 ) {
+      
+      PVector moove = hyperbolic( new PVector(x,y), t);
+      moove.mult(1);
+      //println(moove);
 
-  PVector moove  = hyperbolic(pointInCircle, 1);
-  float x = map(moove.x, -30, 30, center.x - scale, center.x + scale * cos(angle));
-  float y = map(moove.y, -30, 30, center.y - scale, center.y + scale * sin(angle));
+      float _x = map(moove.x, -2, 2, 0, width);
+      float _y = map(moove.y, -2, 2, 0, height);
 
-  line(
-    pointInCircle.x, 
-    pointInCircle.y, 
-    pointInCircle.x * moove.x, 
-    pointInCircle.y * moove.y
-  );
-  
-} 
+      point(_x, _y);
+   
+    }
+  }
+}
 
 
 PVector hyperbolic(PVector v, float amount) {
@@ -125,4 +124,27 @@ PVector julia(PVector v, float amount) {
   float x = r * cos(theta);
   float y = r * sin(theta);
   return new PVector(x, y);
+}
+
+PVector vexp(PVector p, float weight) {
+  float r = weight * exp(p.x);
+  return new PVector(r * cos(p.y), r * sin(p.y));
+}
+ 
+
+PVector power(PVector p, float weight) {
+  float theta = atan2(p.y, p.x);
+  float sinr = sin(theta);
+  float cosr = cos(theta);
+  float pow = weight * pow(p.mag(), sinr);
+  return new PVector(pow * cosr, pow * sinr);
+}
+
+float pdj_a = 0.1;
+float pdj_b = 1.9;
+float pdj_c = -0.8;
+float pdj_d = -1.2;
+PVector pdj(PVector v, float amount) {
+  return new PVector( amount * (sin(pdj_a * v.y) - cos(pdj_b * v.x)),
+  amount * (sin(pdj_c * v.x) - cos(pdj_d * v.y)));
 }

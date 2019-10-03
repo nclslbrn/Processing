@@ -1,11 +1,11 @@
 int noiseScale  = 200,
-  noiseRadius = 300,
+  noiseRadius = 460,
   animFrame   = 260,
-  pointNum    = 16;
+  pointNum    = 6;
 
 float fieldIntensity = 1,
   zOffstet  = 0,
-  angleStep = TWO_PI / 32;
+  angleStep = TWO_PI / 84;
 
 ArrayList<PVector> points = new ArrayList<PVector>();
 
@@ -31,13 +31,16 @@ float ease(float p, float g) {
 void setup() {
 
   size(800, 800);
-  strokeWeight(1);
-  stroke(255);
-  noFill();
+  noStroke();
+  colorMode(HSB, pointNum);
+  
 
   for( int p = 0; p <= pointNum; p++ ) {
     
-    PVector pos = new PVector( random(1)*width, random(1)*height );
+    PVector pos = new PVector( 
+      random(1)*width, 
+      random(1)*height
+    );
     points.add(pos);
 
   }   
@@ -49,8 +52,9 @@ void draw() {
   background(0);
   for( int p = 0; p <= pointNum; p++ ) {
 
-    fill( p % 2 == 0 ? 255 : 0);
-    
+    //fill( p % 2 == 0 ? 255 : 0);
+    fill(p, 100, 100);
+
     PVector startPos = points.get(p);
     beginShape();
 
