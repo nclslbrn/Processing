@@ -46,9 +46,9 @@ void setup() {
   config = new FloatDict();
   config.set("zoom",            120);
   config.set("noiseSpeed",      0.05);
-  config.set("fieldForce",      10);
+  config.set("fieldForce",      14);
   config.set("agentSpeed",      4);
-  config.set("alphaBackground", 10);
+  config.set("alphaBackground", 4);
   config.set("agentMinAlpha",   50);
   config.set("agentMaxAlpha",   120);
   config.set("agentMinWeight",  0.25);
@@ -98,9 +98,9 @@ void getImagePosition() {
   pg.loadPixels();
 
   for( int coord = 0; coord < width * height -1; coord++ ) {
-    if( pg.pixels[coord] < color(60) ) {     
+    if( pg.pixels[coord] > color(200) ) {     
       textPixels.append(coord);
-      bg.pixels[coord] = color(0,0,0,0);
+      bg.pixels[coord] = color(0,32,31,0);
     }
     else {
       bg.pixels[coord] = color(0,0,0, config.get("alphaBackground"));
@@ -155,7 +155,7 @@ void drawAgents() {
 
       a.angle = random(1) * TWO_PI;
 
-      textPixels.remove( textPixels.index(coord) );
+      //textPixels.remove( textPixels.index(coord) );
 
     } else {
 
