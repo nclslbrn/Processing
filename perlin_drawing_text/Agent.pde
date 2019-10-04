@@ -3,17 +3,21 @@ class Agent {
     PVector position;
     PVector previousPosition;
     float   stepSize;
+    float   strokeWeight;
+    color   strokeColor;
     float   angle;
     int     brightness;
     boolean isPositionResetWhenOutside;
 
     Agent() {
-        position = new PVector(random(width), random(height));
-        previousPosition = position.get(); 
-        angle = random(1) * TWO_PI;
-        stepSize = 1;
+        position                   = new PVector(random(width), random(height));
+        previousPosition           = position.get(); 
+        angle                      = random(1) * TWO_PI;
+        strokeWeight               = 1;
+        strokeColor                = color(255, 255, 255);
+        stepSize                   = 1;
         isPositionResetWhenOutside = true;
-        brightness = 150;
+        brightness                 = 150;
     }
 
     Agent(PVector position) {
@@ -28,9 +32,11 @@ class Agent {
         position.y += sin(angle) * stepSize;
 
         if (isPositionResetWhenOutside && isOutsideSketch() > 0) {
-
+            // opposite side solution
+            
             if( position.x < 0 ) {
                 previousPosition.x = position.x = width;
+                
             } else if( position.x > width ) {
                 previousPosition.x = position.x = 0;
             } else if( position.y < 0 ) {
@@ -38,8 +44,13 @@ class Agent {
             } else if( position.y > height ) {
                 previousPosition.y = position.y = 0;
             }
-            //position = new PVector(random(width), random(height));
-            //previousPosition = position.get();
+            /*
+            // random solution 
+            if( position.x < 0 || position.x > width || position.y < 0 || position.y > height ) {
+                position = previousPosition = new PVector(random(width), random(height));
+            }
+            */
+
         }
     }
 
