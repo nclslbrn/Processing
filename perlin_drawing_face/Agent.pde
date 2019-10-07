@@ -17,7 +17,7 @@ class Agent {
         strokeColor                = color(255, 255, 255);
         stepSize                   = 1;
         isPositionResetWhenOutside = true;
-        brightness                 = 150;
+        brightness                 = floor( random(50, 200));
     }
 
     Agent(PVector position) {
@@ -33,7 +33,8 @@ class Agent {
 
         if (isPositionResetWhenOutside && isOutsideSketch() > 0) {
             // opposite side solution
-            
+            brightness = floor( random(50, 200));
+            /*
             if( position.x < 0 ) {
                 previousPosition.x = position.x = width;
                 
@@ -44,12 +45,12 @@ class Agent {
             } else if( position.y > height ) {
                 previousPosition.y = position.y = 0;
             }
-            /*
+            */
             // random solution 
             if( position.x < 0 || position.x > width || position.y < 0 || position.y > height ) {
                 position = previousPosition = new PVector(random(width), random(height));
             }
-            */
+            
 
         }
     }
