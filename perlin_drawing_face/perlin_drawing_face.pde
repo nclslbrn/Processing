@@ -22,8 +22,9 @@ color colorInterpolation(color c, int alpha) {
 
 }
 
-int   size   = 8,
-      agentsCount;
+int size   = 8,
+    paintedPeopleIndex = 0,
+    agentsCount;
 
 float noiseZ,
       phase,
@@ -40,7 +41,6 @@ color[] lineColors = {
 IntList   selectedFacePixels;
 FloatDict config;
 PFont     font;
-int paintedPeopleIndex = 0;
 
 String[] people =  { 
   "Jair-Bolsonaro",
@@ -51,43 +51,22 @@ String[] people =  {
 
 void setup() {
   size(800, 800);
-  agentsCount = floor( width * height / 300 );
+  agentsCount = floor( width * height / 400 );
   noiseZ = 0;
   selectedFacePixels = new IntList();
 
   config = new FloatDict();
   config.set("zoom",            142);
-  config.set("noiseSpeed",      0.05);
-  config.set("fieldForce",      14);
-  config.set("agentSpeed",      4);
-  config.set("alphaBackground", 4);
+  config.set("noiseSpeed",      0.08);
+  config.set("fieldForce",      18);
+  config.set("agentSpeed",      2);
   config.set("agentMinAlpha",   40);
-  config.set("agentMaxAlpha",   100);
+  config.set("agentMaxAlpha",   255);
   config.set("agentMinWeight",  0.25);
   config.set("agentMaxWeight",  0.75);
   
   reset();
 }
-
-
-void getImagePosition() {
-  PImage    pg;
-  pg = loadImage(people[paintedPeopleIndex] + ".jpg");
-  pg.loadPixels();
-
-  for( int coord = 0; coord < width * height -1; coord++ ) {
-    if( pg.pixels[coord] > color(200) ) {     
-      selectedFacePixels.append(coord);
-    }
-  }
-}
-
-void reset() {
-  initAgents();
-  background(0);
-  getImagePosition();
-}
-
 
 void initAgents() {
 
@@ -106,7 +85,7 @@ void initAgents() {
 void drawAgents() {
  
   int currentAgentID = 1;
-  colorMode(HSB, agentsCount*2, 100, 100);
+  colorMode(HSB, agentsCount*3, 100, 100);
 
   for (Agent a : agents) {
     
@@ -126,11 +105,11 @@ void drawAgents() {
         a.brightness += 20;
       }
 
-      a.position.x += (random(1) - 0.5) * 8;
-      a.position.y += (random(1) - 0.5) * 8;
+      a.position.x += (random(1) - 0.5) * 6;
+      a.position.y += (random(1) - 0.5) * 6;
       a.stepSize = 0.25;
       //a.strokeColor = lerpColor(lineColors[0], lineColors[1], centerIndex);
-      a.strokeColor = color(agentsCount + currentAgentID);
+      a.strokeColor = color(agentsCount*2 + currentAgentID);
       a.angle = random(1) * TWO_PI;
       //selectedFacePixels.remove( selectedFacePixels.index(coord) );
 
@@ -153,29 +132,58 @@ void drawAgents() {
 
     currentAgentID++;
   }
-
+  colorMode(RGB, 255, 255, 255);
 }
+
+void getSelectedPixels() {
+  PImage    pg;
+  pg = loadImage(people[paintedPeopleIndex-1] + ".jpg");
+  pg.loadPixels();
+  if( selectedFacePixels.size() > 0 ) {
+    selectedFacePixels.clear();
+  }
+  for( int coord = 0; coord < width * height -1; coord++ ) {
+    if( pg.pixels[coord] > color(230) ) {     
+      selectedFacePixels.append(coord);
+    }
+  }
+}
+
+void reset() {
+  initAgents();
+  background(0);
+  paintedPeopleIndex++;
+  println("Painting " + people[paintedPeopleIndex-1]);
+  getSelectedPixels();
+}
+
+
 void draw() {
   
   noiseZ += config.get("noiseSpeed");
-  //image(bg, 0, 0);
   drawAgents();
 
-  phase += 0.01;
-  seed  += 0.003;
-   if( mousePressed == true && (mouseButton == RIGHT) ) {
-    saveFrame("records/" + people[paintedPeopleIndex] + "-###.jpg");
+  phase += 0.1;
+  seed  += 0.005;
+  
+  if( mousePressed == true && (mouseButton == RIGHT) ) {
+    saveFrame("records/" + people[paintedPeopleIndex-1] + "-###.jpg");
   }
   if( mousePressed == true && (mouseButton == LEFT) ) {
     exit(); 
   }
-  if( frameCount % 1024 == 0) {
-    saveFrame("records/" + people[paintedPeopleIndex] + "-a-###.jpg");
-    if( paintedPeopleIndex < people.length-1) {
-      paintedPeopleIndex++;
+  if( frameCount % (1200*paintedPeopleIndex) == 0) {
+    
+    saveFrame("records/" + people[paintedPeopleIndex-1] + "-a-###.jpg");
+    
+    if( people.length > paintedPeopleIndex ) {
+      
       reset(); 
+    
     } else {
+    
       exit();
+    
     }
   }
 }
