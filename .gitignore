@@ -7,6 +7,8 @@ tools
 libraries
 applet
 examples
+perlin_drawing_face/data/hd
+perlin_drawing_face/data/ld
 out
 build
 application.linux32

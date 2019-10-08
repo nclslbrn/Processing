@@ -6,9 +6,9 @@
 float getNoiseIntensity(PVector position, float t ) {
   
     return (float) noise(
-      (position.x + phase) / config.get("zoom"),
-      (position.y + phase) / config.get("zoom"),
-      seed
+      position.x / config.get("zoom"),
+      position.y / config.get("zoom"),
+      noiseZ
     ) * config.get("fieldForce");
 }
 
@@ -19,16 +19,13 @@ color colorInterpolation(color c, int alpha) {
   float blue  = blue(c);
 
   return color(red, green, blue, alpha);
-
 }
 
 int size   = 8,
     paintedPeopleIndex = 0,
     agentsCount;
 
-float noiseZ,
-      phase,
-      seed;
+float noiseZ;
 
 ArrayList<Agent> agents;
 color[] lineColors = {
@@ -41,30 +38,54 @@ color[] lineColors = {
 IntList   selectedFacePixels;
 FloatDict config;
 PFont     font;
+boolean is_hd_painting = true;
 
 String[] people =  { 
-  "Jair-Bolsonaro",
-  "Recep-Tayyip-Erdogan",
-  "Vladimir-Poutine",  
-  "Donald-Trump"
+  "_0001_Xi-Jinping",
+  "_0002_Vladimir-Poutine",
+  "_0003_Recep-Tayyip-Erdogan",
+  "_0004_Nicolas-Maduro",
+  "_0005_Kim-Jong-Un",
+  "_0006_Jair-Bolsonaro",
+  "_0007_Bashar-Al-Assad",
+  "_0008_Donald-Trump"
 };
 
+public void settings() {
+  if( is_hd_painting ) {
+    size(1455, 1971);
+  } else {
+    size(591, 800);
+  }
+}
 void setup() {
-  size(800, 800);
-  agentsCount = floor( width * height / 400 );
+  
+  
+  config = new FloatDict();
+
+  if( is_hd_painting ) {
+    config.set("zoom",            284);
+    config.set("agentMaxWeight",  2);
+    config.set("agentSpeed",      4);
+    config.set("particleFactor",  300);
+  } else {
+    config.set("zoom",            142);
+    config.set("agentMaxWeight",  0.75);
+    config.set("agentSpeed",      2);
+    config.set("particleFactor",  300);
+  }
+  config.set("contrastThreshold", 150);
+  config.set("noiseSpeed",        0.008);
+  config.set("fieldForce",        18);
+  config.set("agentMinAlpha",     10);
+  config.set("agentMaxAlpha",     255);
+  config.set("agentMinWeight",    0.25);
+  
+  
+  agentsCount = floor( width * height / config.get("particleFactor")  );
   noiseZ = 0;
   selectedFacePixels = new IntList();
 
-  config = new FloatDict();
-  config.set("zoom",            142);
-  config.set("noiseSpeed",      0.08);
-  config.set("fieldForce",      18);
-  config.set("agentSpeed",      2);
-  config.set("agentMinAlpha",   40);
-  config.set("agentMaxAlpha",   255);
-  config.set("agentMinWeight",  0.25);
-  config.set("agentMaxWeight",  0.75);
-  
   reset();
 }
 
@@ -105,8 +126,8 @@ void drawAgents() {
         a.brightness += 20;
       }
 
-      a.position.x += (random(1) - 0.5) * 6;
-      a.position.y += (random(1) - 0.5) * 6;
+      a.position.x += (random(1) - 0.5) * ( is_hd_painting ? 12 : 6);
+      a.position.y += (random(1) - 0.5) * ( is_hd_painting ? 12 : 6);
       a.stepSize = 0.25;
       //a.strokeColor = lerpColor(lineColors[0], lineColors[1], centerIndex);
       a.strokeColor = color(agentsCount*2 + currentAgentID);
@@ -137,13 +158,18 @@ void drawAgents() {
 
 void getSelectedPixels() {
   PImage    pg;
-  pg = loadImage(people[paintedPeopleIndex-1] + ".jpg");
+  pg = loadImage( 
+    (is_hd_painting ? "hd/" : "ld/" ) + 
+    people[paintedPeopleIndex-1] + 
+    ".jpg"
+  );
+
   pg.loadPixels();
   if( selectedFacePixels.size() > 0 ) {
     selectedFacePixels.clear();
   }
   for( int coord = 0; coord < width * height -1; coord++ ) {
-    if( pg.pixels[coord] > color(230) ) {     
+    if( pg.pixels[coord] > color( config.get("contrastThreshold") ) ) {     
       selectedFacePixels.append(coord);
     }
   }
@@ -162,9 +188,6 @@ void draw() {
   
   noiseZ += config.get("noiseSpeed");
   drawAgents();
-
-  phase += 0.1;
-  seed  += 0.005;
   
   if( mousePressed == true && (mouseButton == RIGHT) ) {
     saveFrame("records/" + people[paintedPeopleIndex-1] + "-###.jpg");
@@ -172,9 +195,14 @@ void draw() {
   if( mousePressed == true && (mouseButton == LEFT) ) {
     exit(); 
   }
-  if( frameCount % (1200*paintedPeopleIndex) == 0) {
+  if( frameCount % ((is_hd_painting ? 800 : 1600) * paintedPeopleIndex) == 0) {
     
-    saveFrame("records/" + people[paintedPeopleIndex-1] + "-a-###.jpg");
+    saveFrame(
+      "records/" + 
+      people[paintedPeopleIndex-1] + 
+      (is_hd_painting ? "-hd" : "-ld" ) + 
+      "-###.jpg"
+    );
     
     if( people.length > paintedPeopleIndex ) {
       
