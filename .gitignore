@@ -7,8 +7,8 @@ tools
 libraries
 applet
 examples
-perlin_drawing_face/data/hd
-perlin_drawing_face/data/ld
+thanks_for_the_decoration/data/hd
+thanks_for_the_decoration/data/ld
 out
 build
 application.linux32
