@@ -43,6 +43,8 @@ void draw() {
   
   record.endDraw();
 
+  image(record, 0, 0);
+
 
   if( mousePressed == true ) {
     record.save( "records/frame-###.jpg" );  
