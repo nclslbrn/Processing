@@ -8,7 +8,8 @@ import toxi.util.*;
 import toxi.util.datatypes.*;
 import toxi.processing.*;
 
-
+//color[] ducci_x = {#dd614a, #f5cedb, #1a1e4f};
+color[] urban_scheme = {#A9C2C2, #1D1A11, #82B1B9, #A39A88, #2C3D25, #D53F18, #D7D8D0, #1F5D52, #738480, #596242,#48453D, #24A8BA};
 ToxiclibsSupport gfx;
 Voronoi voronoi = new Voronoi();
 PolygonClipper2D clip;
@@ -27,18 +28,37 @@ void setup() {
   );
 
   gfx = new ToxiclibsSupport(this, record = createGraphics(width, height));
+  
+
 }
 
 void draw() {
   
   record.beginDraw();
+  //record.noStroke();
 
-  record.fill(0);
-  record.rect(-1, -1, width+1, height+1);
-  record.stroke(255);
+  int poly_id = 0;
 
   for (Polygon2D poly : voronoi.getRegions()) {  
-    gfx.polygon2D(clip.clipPolygon(poly));
+
+    int color_id;
+  
+    if( poly_id < urban_scheme.length-1 ) {
+      color_id = poly_id;
+    } else{
+      color_id = poly_id % urban_scheme.length;
+    }
+
+    record.fill( urban_scheme[color_id] );
+    record.beginShape();
+
+    for (int p = 0; p < poly.vertices.size(); p++) {
+      
+      Vec2D v = poly.vertices.get(p);
+      record.vertex( v.x, v.y);
+    }
+    record.endShape(CLOSE);
+    poly_id++;
   }
   
   record.endDraw();
