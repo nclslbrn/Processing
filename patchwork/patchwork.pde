@@ -9,7 +9,8 @@ import toxi.util.datatypes.*;
 import toxi.processing.*;
 
 //color[] ducci_x = {#dd614a, #f5cedb, #1a1e4f};
-color[] urban_scheme = {#A9C2C2, #1D1A11, #82B1B9, #A39A88, #2C3D25, #D53F18, #D7D8D0, #1F5D52, #738480, #596242,#48453D, #24A8BA};
+//color[] urban_scheme = {#A9C2C2, #1D1A11, #82B1B9, #A39A88, #2C3D25, #D53F18, #D7D8D0, #1F5D52, #738480, #596242,#48453D, #24A8BA};
+
 ToxiclibsSupport gfx;
 Voronoi voronoi = new Voronoi();
 PolygonClipper2D clip;
@@ -40,7 +41,7 @@ void draw() {
   int poly_id = 0;
 
   for (Polygon2D poly : voronoi.getRegions()) {  
-
+/*
     int color_id;
   
     if( poly_id < urban_scheme.length-1 ) {
@@ -48,8 +49,9 @@ void draw() {
     } else{
       color_id = poly_id % urban_scheme.length;
     }
-
-    record.fill( urban_scheme[color_id] );
+*/
+    strokeWeight(random(.25, 6) );
+//    record.fill( urban_scheme[color_id] );
     record.beginShape();
 
     for (int p = 0; p < poly.vertices.size(); p++) {
