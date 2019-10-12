@@ -2,9 +2,9 @@
 
 import java.util.Map;
 int selected_color_id = 0;
-int num_frame = 6;
+int num_frame = 16;
 int margin = 24;
-int maxPoint = 360;
+int distanceMin = 120;
 color[] selected_color;
 color backgroundColor = color(240, 235, 230);
 ArrayList<PVector> points = new ArrayList<PVector>();
@@ -55,16 +55,11 @@ void setup() {
   noStroke();
   init();
 
-  //selected_color = ducci_x;  
 }
 
 
 void draw() {
 
-  if( points.size() > maxPoint ) {
-    saveFrame( "records/frame-###.jpg" );
-    init();
-  }
   if( frameCount % num_frame == 0 ) {
     updatePoint();
   }
@@ -72,7 +67,7 @@ void draw() {
     if (mouseButton == LEFT) {
       init();
     } else if( mouseButton == RIGHT ) {
-      saveFrame( "records/frame-###.jpg" ); 
+      saveFrame( "records/frame-###.jpg" );
     }
   }
   drawShape();
@@ -84,7 +79,6 @@ void init() {
   
   selected_color_id = int( random(1) * color_scheme_num );
   get_selected_color();
-  println("selected_color_id: "+selected_color_id);
 
   if( points.size() > 0 ) {
     points.clear();
@@ -95,7 +89,7 @@ void init() {
   points.add( new PVector( width-margin, height-margin ));
   points.add( new PVector( margin, height-margin ));
   
-  for( int p = 0; p <= 64; p++ ) {
+  for( int p = 0; p <= 32; p++ ) {
     points.add( new PVector( random(margin, width-margin), random(margin, height-margin) ));
   }
   
@@ -103,56 +97,49 @@ void init() {
 
 
 void updatePoint() {
-  
-  int randomPoint = int( random(0, points.size() ) );
+  float distanceMax = 0;
+  int firstPoint = 0;
+  int secondPoint = 0;
 
-  int randomNextPoint,
-      oppositeSidePoint,
+  for( int p = 0; p < points.size( )-2; p+=2 ) {
+   
+    float distance = PVector.dist( points.get(p), points.get(p+1) );
+
+    if( distanceMax < distance ) {
+      distanceMax = distance;
+      firstPoint = p;
+      secondPoint = p+1;
+    }
+    if( distanceMax < distanceMin ) {
+      saveFrame( "records/frame-###.jpg" );
+      println("new drawing");
+      init();
+    }
+  }
+
+  int oppositeSidePoint,
       oppositeNextPoint;
 
-  boolean cutFront = randomPoint + 3 < points.size();
+  boolean cutFront = firstPoint + 3 < points.size();
 
   if( cutFront ) {
-    randomNextPoint = randomPoint + 1;
-    oppositeSidePoint = randomPoint + 2;
+    oppositeSidePoint = firstPoint + 2;
     oppositeNextPoint = oppositeSidePoint + 1;
 
   } else {
 
-    randomNextPoint = randomPoint - 1;
-    oppositeSidePoint = randomPoint - 2;
+    oppositeSidePoint = firstPoint - 2;
     oppositeNextPoint = oppositeSidePoint - 1;
   }
 
   float randomLength = random(1);
 
-  PVector randomNewPoint = PVector.lerp( points.get(randomPoint), points.get(randomNextPoint), 0.5);
+  PVector randomNewPoint = PVector.lerp( points.get(firstPoint), points.get(secondPoint), 0.5);
   PVector oppositePoint = PVector.lerp( points.get(oppositeSidePoint), points.get(oppositeNextPoint), 0.5);
   
-  points.add(randomPoint, randomNewPoint);
-  points.add(oppositeSidePoint, oppositePoint);
+  points.set(firstPoint, randomNewPoint);
+  points.set(oppositeSidePoint, oppositePoint);
   
-/*
-  int closestPoint = randomPoint;
-  float minDistance = width;
-
-  for( int p = 0; p < points.size(); p++ ) {
-
-    if( p != randomPoint ) {
-      
-      float distance = PVector.dist( points.get(randomPoint), points.get(p) );
-
-      if( minDistance > distance ) {
-        minDistance = distance;
-        closestPoint = p;
-      }
-    }
-  }
-
-  PVector newPoint = PVector.lerp( points.get(closestPoint), points.get(randomPoint), 0.75 );
-
-  points.add(randomPoint, newPoint);
-  */
 }
 
 
