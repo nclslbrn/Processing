@@ -63,6 +63,9 @@ void draw() {
   if( frameCount % num_frame == 0 ) {
     updatePoint();
   }
+  if( frameCount % num_frame == 1 ) {
+    drawShape();
+  }
   if( mousePressed == true ) {
     if (mouseButton == LEFT) {
       init();
@@ -70,7 +73,6 @@ void draw() {
       saveFrame( "records/frame-###.jpg" );
     }
   }
-  drawShape();
 }
 
 
@@ -148,16 +150,22 @@ void drawShape() {
   background(backgroundColor);
 
   int poly_id = 0;
-
-  for( int p = 0; p < points.size()-3; p += 3 ) {
+  
+  for( int p = 0; p < points.size()-4; p += 4 ) {
 
     int color_id = poly_id < selected_color.length ? poly_id : poly_id % selected_color.length;
+    boolean isCurve = random(1) > 0.75;
 
     fill( selected_color[color_id] );
 
     beginShape();
-    for( int _p = 0; _p <= 3; _p++ ) {
-      vertex( points.get(p + _p).x, points.get(p + _p).y);
+    for( int _p = 0; _p <= 4; _p++ ) {
+
+      if( isCurve ) {
+        curveVertex(points.get(p + _p).x, points.get(p +_p).y);
+      } else {
+        vertex( points.get(p + _p).x, points.get(p + _p).y);
+      }
     }
     endShape(CLOSE);
     poly_id++;
