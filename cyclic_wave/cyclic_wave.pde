@@ -38,7 +38,7 @@ void draw() {
         int(result[i][2]*1.0/samplesPerFrame);
     updatePixels();
 
-    saveFrame("records/frame-###.gif");
+    saveFrame("records/frame-###.jpg");
     if (frameCount==numFrames)
       exit();
   } else if (preview) {
@@ -59,23 +59,23 @@ void draw() {
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
 
-int samplesPerFrame = 1,
-    numFrames = 75; // animation loop duration (in frame)   
+int samplesPerFrame = 3,
+    numFrames = 620; // animation loop duration (in frame)   
 
-float shutterAngle = .1;
+float shutterAngle = .6;
 
 boolean recording = true,
-        preview = false;
+        preview = true;
 
 
 ArrayList<EllipseSection> arcs = new ArrayList<EllipseSection>(); // Custom arc class
 PVector center; //  center of circle
 
-int   margin         = 4,   // margin between circle
-      noiseScale     = 64,  
+int   margin         = 16,   // margin between circle
+      noiseScale     = 86,  
       noiseRadius    = 8,
-      noiseStrength  = 1,
-      lineSize       = 4;
+      noiseStrength  = 8,
+      lineSize       = 16;
       
 
 float speed,      // the value wich increments circle's radiuses
@@ -85,20 +85,21 @@ float speed,      // the value wich increments circle's radiuses
 float getNoiseIntensity(float x, float y, float t ) {
   
   return noise(
-    noiseRadius * cos( TWO_PI * t),
-    noiseRadius * sin( TWO_PI * t)
+    x / noiseScale,
+    y / noiseScale,
+    noiseRadius * t
   ) * noiseStrength;
 }
 
 void setup() {
   //fullScreen(P3D);
-  size(800, 800, P3D);
+  size(1080, 1080, P3D);
   smooth(20);
 
   //noise = new OpenSimplexNoise();
   center = new PVector( width/2, height/2 );
-  maxRadius = width/1.25;
-  speed     = maxRadius / numFrames;
+  maxRadius = width/1.75;
+  speed     = (maxRadius / numFrames) / 2;
 
   for( int c = margin; c <= maxRadius; c += margin ) {
 
@@ -146,7 +147,7 @@ void draw_() {
       
       stroke(stroke);
       strokeWeight( weight );
-
+      beginShape();
       for( float d = 0; d <= distance; d+= lineSize ) {
 
         float ratio = d / distance;
@@ -156,16 +157,14 @@ void draw_() {
         
         float pointNoise = getNoiseIntensity( x, y, t );
 
-        line(
-          currentPoint.x,
-          currentPoint.y,
+        curveVertex(
           x + noiseRadius * cos( pointNoise ),
           y + noiseRadius * sin( pointNoise )
         );
 
 
-        currentPoint = new PVector(x, y);
       }
+      endShape();
       currentAngle = end;
     }
 
