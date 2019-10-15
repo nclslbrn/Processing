@@ -69,11 +69,11 @@ void draw() {
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
 int samplesPerFrame = 6,
-    numFrames       = 75;     
+    numFrames       = 240;     
 
 float shutterAngle = .4;
 
-boolean recording = false,
+boolean recording = true,
         preview = true;
 
 PVector center;
@@ -82,7 +82,7 @@ float halfSize;
 color cubeColor = color(75);
 
 void setup() {
-  size(800, 800, P3D);
+  size(1080, 1080, P3D);
   ortho();
   noStroke();
   colorMode(HSB, 3, 100, 100);
