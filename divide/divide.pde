@@ -3,10 +3,10 @@
 import java.util.Map;
 int selected_color_id = 0;
 int num_frame = 16;
-int margin = 24;
-int distanceMin = 120;
+int margin = 4;
+int distanceMin = 300;
 color[] selected_color;
-color backgroundColor = color(240, 235, 230);
+color backgroundColor = color(255, 250, 284);
 ArrayList<PVector> points = new ArrayList<PVector>();
 
 /**
@@ -66,6 +66,7 @@ void draw() {
   if( frameCount % num_frame == 1 ) {
     drawShape();
   }
+
   if( mousePressed == true ) {
     if (mouseButton == LEFT) {
       init();
@@ -91,7 +92,7 @@ void init() {
   points.add( new PVector( width-margin, height-margin ));
   points.add( new PVector( margin, height-margin ));
   
-  for( int p = 0; p <= 32; p++ ) {
+  for( int p = 0; p <= 16; p++ ) {
     points.add( new PVector( random(margin, width-margin), random(margin, height-margin) ));
   }
   
@@ -103,14 +104,15 @@ void updatePoint() {
   int firstPoint = 0;
   int secondPoint = 0;
 
-  for( int p = 0; p < points.size( )-2; p+=2 ) {
-   
-    float distance = PVector.dist( points.get(p), points.get(p+1) );
+  for( int p = 0; p < points.size(); p++ ) {
+    
+    int nextPoint = p+1 < points.size() ? p+1 : p-1;
+    float distance = PVector.dist( points.get(p), points.get(nextPoint) );
 
     if( distanceMax < distance ) {
       distanceMax = distance;
       firstPoint = p;
-      secondPoint = p+1;
+      secondPoint = nextPoint;
     }
     if( distanceMax < distanceMin ) {
       saveFrame( "records/frame-###.jpg" );
@@ -134,10 +136,9 @@ void updatePoint() {
     oppositeNextPoint = oppositeSidePoint - 1;
   }
 
-  float randomLength = random(1);
 
-  PVector randomNewPoint = PVector.lerp( points.get(firstPoint), points.get(secondPoint), 0.5);
-  PVector oppositePoint = PVector.lerp( points.get(oppositeSidePoint), points.get(oppositeNextPoint), 0.5);
+  PVector randomNewPoint = PVector.lerp( points.get(firstPoint), points.get(secondPoint), random(1));
+  PVector oppositePoint = PVector.lerp( points.get(oppositeSidePoint), points.get(oppositeNextPoint), random(1));
   
   points.set(firstPoint, randomNewPoint);
   points.set(oppositeSidePoint, oppositePoint);
@@ -151,7 +152,7 @@ void drawShape() {
 
   int poly_id = 0;
   
-  for( int p = 0; p < points.size()-4; p += 4 ) {
+  for( int p = 0; p < points.size()-3; p += 3 ) {
 
     int color_id = poly_id < selected_color.length ? poly_id : poly_id % selected_color.length;
     boolean isCurve = random(1) > 0.75;
@@ -159,7 +160,7 @@ void drawShape() {
     fill( selected_color[color_id] );
 
     beginShape();
-    for( int _p = 0; _p <= 4; _p++ ) {
+    for( int _p = 0; _p <= 3; _p++ ) {
 
       if( isCurve ) {
         curveVertex(points.get(p + _p).x, points.get(p +_p).y);
