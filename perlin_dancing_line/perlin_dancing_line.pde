@@ -1,12 +1,14 @@
-int noiseScale  = 200,
-  noiseRadius = 460,
+int noiseScale  = 120,
+  noiseRadius = 64,
   animFrame   = 260,
-  pointNum    = 6;
+  pointNum    = 24;
 
-float fieldIntensity = 1,
+float fieldIntensity = 3,
   zOffstet  = 0,
-  angleStep = TWO_PI / 84;
+  angleStep = TWO_PI / 16;
 
+color[] jud_playground = {#f04924, #fcce09, #408ac9};
+color backgroundColor = #ffffff;
 ArrayList<PVector> points = new ArrayList<PVector>();
 
 float noiseIntensity( PVector point, float zOffstet ) {
@@ -32,14 +34,12 @@ void setup() {
 
   size(800, 800);
   noStroke();
-  colorMode(HSB, pointNum);
-  
 
   for( int p = 0; p <= pointNum; p++ ) {
     
     PVector pos = new PVector( 
-      random(1)*width, 
-      random(1)*height
+      width/2 + random(-0.25, 0.25)*width, 
+      width/2 + random(-0.25, 0.25)*height
     );
     points.add(pos);
 
@@ -49,14 +49,16 @@ void setup() {
 
 void draw() {
 
-  background(0);
+  background(backgroundColor);  
+  
   for( int p = 0; p <= pointNum; p++ ) {
 
-    //fill( p % 2 == 0 ? 255 : 0);
-    fill(p, 100, 100);
+    int color_id = p < jud_playground.length ? p : p % jud_playground.length;
+    
+    fill(jud_playground[color_id]);
 
     PVector startPos = points.get(p);
-    beginShape();
+    beginShape(QUADS);
 
     for( float angle = 0; angle < TWO_PI; angle += angleStep ) {
         
@@ -65,14 +67,14 @@ void draw() {
         startPos.y + noiseRadius * sin(angle)
       );
       
-      float noiseValue = ease( noiseIntensity(pos, zOffstet) );
+      float noiseValue = ease( noiseIntensity(pos, zOffstet*p/pointNum) );
       vertex( 
         startPos.x + ((noiseRadius * noiseValue) * cos(angle + noiseValue)),
         startPos.y + ((noiseRadius * noiseValue) * sin(angle + noiseValue))
       );
 
     }
-    endShape(CLOSE);
+    endShape();
   }
   zOffstet += 0.01;
 
