@@ -21,23 +21,33 @@ void setup(){
 void createtextsPoints(String []texts) {
   
   phrasePoints = new RPoint[texts.length][];
+  points = new RPoint[texts.length][][];
 
   for (int word_id = 0; word_id < texts.length; word_id++) {
 
     RGroup letters = bebas.toGroup(texts[word_id]);
+    points = new RPoint[word_id][texts[word_id].length()][];
+
     letters = letters.toPolygonGroup();
     
-/*
     for( int letter_id = 0; letter_id < texts[word_id].length(); letter_id++ ) {
 
       char current_letter = texts[word_id].charAt(letter_id);
       RPolygon letterPoly = bebas.toPolygon(current_letter);
+      RPoint[] letterPoints = letterPoly.getPoints();
+      println(letterPoints.length);
+      points = new RPoint[word_id][letter_id][letterPoints.length];
+      
+      for( int point_id = 0; point_id < letterPoints.length; point_id++ ) {
+        points[word_id][letter_id][point_id] = RPoint(letterPoints, point_id);
+      }
+/*
       //letterPoly = letterPoly.toPolygonGroup();
       RPoint[] letterPoints = letterPoly.getPoints();
       println( letterPoly.getType() );
       points[word_id][letter_id]= letterPoints;
-    }
 */
+    }
     phrasePoints[word_id] = letters.getPoints();
   
   }
