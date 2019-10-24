@@ -1,55 +1,69 @@
 import geomerative.*;
-String[] words = {"GOOD", "BAD", "UGLY", "NICE" };
-RPoint[][] phrasePoints;
-RPoint[][][] points;
+String[] french_phrase = {
+  "Jure", "Crache", "Dénature", 
+  "Discrédite", "Nie", "Jase",
+  "Doute", "Dénigre", "Sous-estime",
+  "Applaudis"
+};
 
-RShape shapes;
+String[] english_phase = {
+  "Swear", "Spit", "Misrepresent", 
+  "Discredit", "Deny", "Gossip",
+  "Doubt", "Criticize", "Underestimate",
+  "Applause"
+
+};
+
+PVector[][][] wordVectors;
+
 RFont bebas;
 int word_id = 0;
-int num_frame = 75;
+int num_frame = 150;
+int num_letters = 0;
 
 void setup(){
   size(800,800);
-  noStroke();
-  fill(255);
+  noFill();
+  stroke(255);
+  strokeWeight(2);
+  smooth(10);
 
   RG.init(this);
-  bebas = new RFont("BebasNeue Bold.ttf", 460, CENTER);
+  RG.ignoreStyles(false);
+  RG.setPolygonizer(RG.UNIFORMLENGTH);
+
+  bebas = new RFont("BebasNeue Bold.ttf", 260, CENTER);
+  String[] words = french_phrase;
+
   createtextsPoints(words);
 }
 
 void createtextsPoints(String []texts) {
   
-  phrasePoints = new RPoint[texts.length][];
-  points = new RPoint[texts.length][][];
+  int global_letter_index = 0;
+  wordVectors = new PVector[texts.length][][];
 
   for (int word_id = 0; word_id < texts.length; word_id++) {
-
-    RGroup letters = bebas.toGroup(texts[word_id]);
-    points = new RPoint[word_id][texts[word_id].length()][];
-
-    letters = letters.toPolygonGroup();
     
-    for( int letter_id = 0; letter_id < texts[word_id].length(); letter_id++ ) {
-
-      char current_letter = texts[word_id].charAt(letter_id);
-      RPolygon letterPoly = bebas.toPolygon(current_letter);
-      RPoint[] letterPoints = letterPoly.getPoints();
-      println(letterPoints.length);
-      points = new RPoint[word_id][letter_id][letterPoints.length];
+    RGroup letters = bebas.toGroup(texts[word_id]);
+    RShape wordShape = letters.toShape();
+    letters = letters.toPolygonGroup();
+    RPoint[][] wordPoints = wordShape.getPointsInPaths();
+    wordVectors[word_id] = new PVector[wordPoints.length][];
+    
+    for( int group_id = 0; group_id < wordPoints.length; group_id++) {
       
-      for( int point_id = 0; point_id < letterPoints.length; point_id++ ) {
-        points[word_id][letter_id][point_id] = RPoint(letterPoints, point_id);
-      }
-/*
-      //letterPoly = letterPoly.toPolygonGroup();
-      RPoint[] letterPoints = letterPoly.getPoints();
-      println( letterPoly.getType() );
-      points[word_id][letter_id]= letterPoints;
-*/
+      wordVectors[word_id][group_id] = new PVector[wordPoints[group_id].length];
+
+      for( int point_id = 0; point_id < wordPoints[group_id].length; point_id++ ) {
+      
+        wordVectors[word_id][group_id][point_id] = new PVector( 
+          wordPoints[group_id][point_id].x, 
+          wordPoints[group_id][point_id].y 
+        );
+
+      } 
     }
-    phrasePoints[word_id] = letters.getPoints();
-  
   }
 }
 
@@ -58,48 +72,40 @@ void draw() {
 
     background(0);
     translate(width/2, height/1.5);
-    beginShape();
-
 
     if( frameCount != 0 && frameCount % num_frame == 0  ) {
       word_id++;
     }
-    if( word_id >= phrasePoints.length) {      
+    if( word_id >= wordVectors.length) {      
       word_id = 0;
     }
 
-    int nextWord =  word_id < phrasePoints.length-1 ? word_id+1 : 0;
-
-    //println( nextWord + " / " + phrasePoints.length);
-
+    int nextWordId =  word_id < wordVectors.length-1 ? word_id + 1 : 0;
     float t = map(frameCount % num_frame, 0, num_frame, 0, 1);
-
-    for( int point = 0; point < phrasePoints[word_id].length; point++ ) {
-
-      int nextWordPoint = point < phrasePoints[nextWord].length ? point : 0;
-
-      //println( nextWordPoint + " / " + phrasePoints[nextWord].length);
+  
+    for( int group_id = 0; group_id < wordVectors[word_id].length; group_id++ ) {
       
-      PVector lerp_point = PVector.lerp(
-        new PVector(
-          phrasePoints[word_id][point].x, 
-          phrasePoints[word_id][point].y
-        ),
-        new PVector(
-          phrasePoints[nextWord][nextWordPoint].x, 
-          phrasePoints[nextWord][nextWordPoint].y
-        ),
-        t
-      );
+      int nextWordGroupId = group_id < wordVectors[nextWordId].length ? group_id : 0;
 
-      vertex(
-          lerp_point.x, 
-          lerp_point.y
-      );
-      
+      beginShape();
+      for( int point_id = 0; point_id < wordVectors[word_id][group_id].length; point_id++ ) {
+        
+        int nextWordPointId = point_id < wordVectors[nextWordId][nextWordGroupId].length ? point_id : 0;
+        
+        PVector lerp_point = PVector.lerp(
+          wordVectors[word_id][group_id][point_id],
+          wordVectors[nextWordId][nextWordGroupId][nextWordPointId],
+          t
+        );
+
+        vertex(
+            lerp_point.x, 
+            lerp_point.y
+        );
+        
+      }
+      endShape();
     }
-    endShape();
-
     if( mousePressed == true ) {
       exit();
     }
