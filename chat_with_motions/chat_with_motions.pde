@@ -8,6 +8,7 @@
  */
 
 import http.requests.*;
+JSONObject api_key;
 
 ArrayList<Particle> particles = new ArrayList<Particle>();
 
@@ -20,8 +21,9 @@ int animBegin = 0;
 int animTime = 0;
 int textSizeInit = 64;
 int totalQuotes = 0;
-int msPerCharacter = 100;
+int msPerCharacter = 150;
 color bgColor = color(0, 100);
+String chat_api_key = "";
 boolean drawAsPoints = true;
 
 void settings() {
@@ -34,7 +36,8 @@ void setup() {
 	background(50);
 	//smooth();
 	rectMode(CORNER);
-
+	api_key = loadJSONObject("api_key.json");
+  chat_api_key = api_key.getString("chat");
 	getMessage();
 
 }
@@ -54,7 +57,7 @@ PVector generateRandomPos(int x, int y, float mag) {
 
 void getMessage() {
 
-		GetRequest get = new GetRequest("https://chat.artemg.com/data/?chat=query");
+		GetRequest get = new GetRequest("https://chat.artemg.com/data/?chat=" + chat_api_key);
 		get.addHeader("Charset", "UTF-8");
 		get.send();
 

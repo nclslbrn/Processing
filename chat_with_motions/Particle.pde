@@ -6,7 +6,7 @@ class Particle {
   PVector target = new PVector(0, 0);
 
   float closeEnoughTarget = 50;
-  float maxSpeed = 4.0;
+  float maxSpeed = 8.0;
   float maxForce = 0.1;
   float particleSize = 2;
   boolean isKilled = false;
