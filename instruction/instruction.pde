@@ -58,6 +58,21 @@ boolean isGroupHasPointToTrack(int current_group) {
   return in_group;
 }
 
+float c01(float g) {
+  return constrain(g, 0, 1);
+}
+
+float ease(float p) {
+  return 3*p*p - 2*p*p*p;
+}
+
+float ease(float p, float g) {
+  if (p < 0.5) 
+    return 0.5 * pow(2*p, g);
+  else
+    return 1 - 0.5 * pow(2*(1 - p), g);
+}
+
 void setup() {
   size(1080, 1080);
   //fullScreen();
@@ -190,7 +205,7 @@ void draw() {
       PVector lerp_point = PVector.lerp(
         first_point,
         last_point,
-        sq(t)
+        ease(c01(1.1*t-0.1))
       );
 
       if (pointToTrackInGroup && pointToTrack[current_word_id][group_id] == point_id) {
@@ -220,9 +235,8 @@ void draw() {
     saveFrame("records/captures/frame-###.jpg");
   }
   if (isRecording == true) {
-    saveFrame("records/frame-###.jpg");
+    saveFrame("records/video/frame-###.jpg");
   }
-
   if (mousePressed == true) {
     exit();
   }
