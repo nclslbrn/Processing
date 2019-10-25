@@ -1,8 +1,5 @@
 import geomerative.*;
 
-float ease(float p) {
-  return 3 * p * p - 2 * p * p * p;
-}
 boolean isRecording = false;
 String[] english_words = {
   "fall",
@@ -26,12 +23,6 @@ RFont rfont;
 int current_word_id = 0;
 int num_frame = 30;
 
-float ease(float p, float g) {
-  if (p < 0.5) 
-    return 0.5 * pow(2*p, g);
-  else
-    return 1 - 0.5 * pow(2*(1 - p), g);
-}
 
 void setup() {
   size(1080, 1080);
