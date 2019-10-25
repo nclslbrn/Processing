@@ -46,26 +46,26 @@ void setup() {
 
 void getMessage() {
 
-		GetRequest get = new GetRequest("https://api.nytimes.com/svc/news/v3/content/all/all.json?api-key="+nyt_api_key);
-		get.addHeader("Charset", "UTF-8");
-		get.send();
+  GetRequest get = new GetRequest("https://api.nytimes.com/svc/news/v3/content/all/all.json?api-key="+nyt_api_key);
+  get.addHeader("Charset", "UTF-8");
+  get.send();
 
-		JSONObject response = parseJSONObject( get.getContent() );
-		JSONArray results = response.getJSONArray( "results" );
+  JSONObject response = parseJSONObject( get.getContent() );
+  JSONArray results = response.getJSONArray( "results" );
+  
+  newsNum = results.size();
+  titles = new String[ newsNum ];
+
+  for( int i=0; i < newsNum; i++ ) {
+
+    JSONObject data = results.getJSONObject(i);
+    String title = data.getString("title", "UTF-8");
+    String text = data.getString( "abstract", "UTF-8");
     
-		newsNum = results.size();
-		titles = new String[ newsNum ];
+    titles[i] = title + " = " +text + " [...]";
 
-		for( int i=0; i < newsNum; i++ ) {
-
-				JSONObject data = results.getJSONObject(i);
-				String title = data.getString("title", "UTF-8");
-				String text = data.getString( "abstract", "UTF-8");
-				
-				titles[i] = title + " = " +text + " [...]";
-
-		}
-    loadMessage();
+  }
+  loadMessage();
     
 }
 void loadMessage() {
