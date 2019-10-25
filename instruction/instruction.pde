@@ -4,31 +4,54 @@ boolean isRecording = false;
 boolean isCapturing = false;
 
 String[] words = {
-  "find", "fall", "push", "come",
-  "turn", "grow", "stay", "stop",
-  "jump", "move", "hurt", "hold"
-  // "walk", "kill", "watch", 
+  "find",
+  "fall",
+  "push",
+  "come",
+  "turn",
+  "grow",
+  "stay",
+  "stop",
+  "jump",
+  "move",
+  "hurt",
+  "hold",
+  "help",
+  "bring",
+  "meet",
+  "follow",
+  "walk",
+  "watch",
+  "wait",
+  "kill",
+  "keep",
+  "serve",
+  "solve",
+  "stand",
+  "leave",
+  "build",
+  "buy",
 };
 
 PVector[][][] wordsPoints;
 
 int[][] groupToTrack,
-        pointToTrack,
-        trackDirection;
+  pointToTrack,
+  trackDirection;
 
 
 RFont rfont;
 
 int current_word_id = 0,
-    pointsToTracksPerWord = 8,
-    num_frame = 125,
-    fontSize = 480;
+  pointsToTracksPerWord = 8,
+  num_frame = 125,
+  fontSize = 480;
 
 
-boolean isGroupHasPointToTrack( int current_group ) {
+boolean isGroupHasPointToTrack(int current_group) {
   boolean in_group = false;
-  for( int g = 0; g < groupToTrack[current_word_id].length; g++ ) {
-    if( g == current_group ) {
+  for (int g = 0; g < groupToTrack[current_word_id].length; g++) {
+    if (g == current_group) {
       in_group = true;
     }
   }
@@ -58,10 +81,15 @@ void createTextsVectors(String[] texts) {
 
     RShape wordShape = new RShape();
     RShape[] lines = new RShape[2];
-    for( int c = 0; c < texts[word_id].length(); c += 2 ) {
-      lines[c/2] = rfont.toShape(texts[word_id].substring(c, c+2));
-    }
-    lines[1].translate(0, fontSize/1.45);
+
+    int split = ceil(texts[word_id].length() / 2);
+    int remainder = texts[word_id].length() - split;
+    lines[0] = rfont.toShape(texts[word_id].substring(0, split));
+    lines[1] = rfont.toShape(texts[word_id].substring(split, split + remainder));
+
+    println(texts[word_id] + " (" + split + " + " + remainder + " = " + texts[word_id].length() + ")");
+
+    lines[1].translate(0, fontSize / 1.45);
     wordShape.addChild(lines[0]);
     wordShape.addChild(lines[1]);
 
@@ -81,20 +109,20 @@ void createTextsVectors(String[] texts) {
       }
     }
   }
-  
+
   pointToTrack = groupToTrack = trackDirection = new int[wordsPoints.length][pointsToTracksPerWord];
 
-  for( int w = 0; w < wordsPoints.length; w++ ) {
+  for (int w = 0; w < wordsPoints.length; w++) {
 
-    for( int rp = 0; rp < pointsToTracksPerWord; rp++ ) {
+    for (int rp = 0; rp < pointsToTracksPerWord; rp++) {
 
-      int randomGroup = floor( random(1) * wordsPoints[w].length );
-      int randomPoint = floor( random(1) * wordsPoints[w][randomGroup].length ); 
+      int randomGroup = floor(random(1) * wordsPoints[w].length);
+      int randomPoint = floor(random(1) * wordsPoints[w][randomGroup].length);
       int randomDirection = random(1) > 0.5 ? 0 : 1;
 
       groupToTrack[w][rp] = randomGroup;
       pointToTrack[w][rp] = randomPoint;
-      trackDirection[w][rp] = randomDirection; 
+      trackDirection[w][rp] = randomDirection;
     }
   }
 } // createTextsVectors()
@@ -102,7 +130,7 @@ void createTextsVectors(String[] texts) {
 
 void draw() {
   background(0);
-  translate(width / 2, height/ 2);
+  translate(width / 2, height / 2);
 
   if (frameCount != 0 && frameCount % num_frame == 0) {
     current_word_id++;
@@ -116,49 +144,49 @@ void draw() {
 
   float t = map(frameCount % num_frame, 0, num_frame, 0, 1);
 
-  int maxGroup = max( wordsPoints[current_word_id].length, wordsPoints[nextWordId].length );
+  int maxGroup = max(wordsPoints[current_word_id].length, wordsPoints[nextWordId].length);
 
   for (int group_id = 0; group_id < maxGroup; group_id++) {
-    
-    boolean pointToTrackInGroup = isGroupHasPointToTrack( group_id );
+
+    boolean pointToTrackInGroup = isGroupHasPointToTrack(group_id);
     boolean currentWordGroupExist = group_id < wordsPoints[current_word_id].length;
     boolean nextWordGroupExist = group_id < wordsPoints[nextWordId].length;
 
-    int maxPoint = max( 
-      currentWordGroupExist ? wordsPoints[current_word_id][group_id].length : wordsPoints[current_word_id][wordsPoints[current_word_id].length-1].length, 
-      nextWordGroupExist ? wordsPoints[nextWordId][group_id].length : wordsPoints[nextWordId][wordsPoints[nextWordId].length-1].length
+    int maxPoint = max(
+      currentWordGroupExist ? wordsPoints[current_word_id][group_id].length : wordsPoints[current_word_id][wordsPoints[current_word_id].length - 1].length,
+      nextWordGroupExist ? wordsPoints[nextWordId][group_id].length : wordsPoints[nextWordId][wordsPoints[nextWordId].length - 1].length
     );
-    
+
     PVector[] interpolate_points = new PVector[maxPoint];
-    stroke(44,62,80);
+    stroke(44, 62, 80);
 
     for (int point_id = 0; point_id < maxPoint; point_id++) {
 
       PVector first_point;
       PVector last_point;
 
-      if( currentWordGroupExist ) {
+      if (currentWordGroupExist) {
 
-        first_point = point_id < wordsPoints[current_word_id][group_id].length-1 ? 
-            wordsPoints[current_word_id][group_id][point_id] : 
-            wordsPoints[current_word_id][group_id][ wordsPoints[current_word_id][group_id].length-1 ];
+        first_point = point_id < wordsPoints[current_word_id][group_id].length - 1 ?
+          wordsPoints[current_word_id][group_id][point_id] :
+          wordsPoints[current_word_id][group_id][wordsPoints[current_word_id][group_id].length - 1];
 
       } else {
 
-        int lastGroupId = wordsPoints[current_word_id].length-1;
-        first_point = wordsPoints[current_word_id][lastGroupId][ wordsPoints[current_word_id][lastGroupId].length-1 ];
+        int lastGroupId = wordsPoints[current_word_id].length - 1;
+        first_point = wordsPoints[current_word_id][lastGroupId][wordsPoints[current_word_id][lastGroupId].length - 1];
       }
-      
-      if( nextWordGroupExist ) {
 
-        last_point = point_id < wordsPoints[nextWordId][group_id].length-1 ? 
-            wordsPoints[nextWordId][group_id][point_id] : 
-            wordsPoints[nextWordId][group_id][ wordsPoints[nextWordId][group_id].length-1 ];
+      if (nextWordGroupExist) {
+
+        last_point = point_id < wordsPoints[nextWordId][group_id].length - 1 ?
+          wordsPoints[nextWordId][group_id][point_id] :
+          wordsPoints[nextWordId][group_id][wordsPoints[nextWordId][group_id].length - 1];
 
       } else {
 
-        int lastGroupId = wordsPoints[nextWordId].length-1;
-        last_point = wordsPoints[nextWordId][lastGroupId][ wordsPoints[nextWordId][lastGroupId].length-1 ];
+        int lastGroupId = wordsPoints[nextWordId].length - 1;
+        last_point = wordsPoints[nextWordId][lastGroupId][wordsPoints[nextWordId][lastGroupId].length - 1];
       }
 
 
@@ -168,11 +196,11 @@ void draw() {
         sq(t)
       );
 
-      if( pointToTrackInGroup && pointToTrack[current_word_id][group_id] == point_id ) {
-        if( trackDirection[current_word_id][group_id] == 0 ) {
-          line( lerp_point.x, -height/2, lerp_point.x, height/2);
+      if (pointToTrackInGroup && pointToTrack[current_word_id][group_id] == point_id) {
+        if (trackDirection[current_word_id][group_id] == 0) {
+          line(lerp_point.x, -height / 2, lerp_point.x, height / 2);
         } else {
-          line( -width/2, lerp_point.y, width/2, lerp_point.y);
+          line(-width / 2, lerp_point.y, width / 2, lerp_point.y);
         }
       }
       interpolate_points[point_id] = lerp_point;
@@ -180,8 +208,8 @@ void draw() {
     pushMatrix();
     noStroke();
     beginShape();
-    
-    for( int l = 0; l < interpolate_points.length; l++ ) {
+
+    for (int l = 0; l < interpolate_points.length; l++) {
       vertex(
         interpolate_points[l].x,
         interpolate_points[l].y
@@ -190,7 +218,7 @@ void draw() {
     endShape();
     popMatrix();
   }
- 
+
   if (isCapturing == true && t > 0.495 && t < 0.51) {
     saveFrame("records/captures/frame-###.jpg");
   }
