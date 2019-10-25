@@ -37,13 +37,14 @@ PVector[][][] wordsPoints;
 
 int[][] groupToTrack,
   pointToTrack,
-  trackDirection;
+  trackDirection,
+  trackShapeSize;
 
 
 RFont rfont;
 
 int current_word_id = 0,
-  pointsToTracksPerWord = 4,
+  pointsToTracksPerWord = 34,
   num_frame = 125,
   fontSize = 480;
 
@@ -122,19 +123,21 @@ void createTextsVectors(String[] texts) {
     }
   }
 
-  pointToTrack = groupToTrack = trackDirection = new int[wordsPoints.length][pointsToTracksPerWord];
+  
+  pointToTrack = groupToTrack = trackDirection = trackShapeSize = new int[wordsPoints.length][pointsToTracksPerWord];
 
   for (int w = 0; w < wordsPoints.length; w++) {
-
+    
     for (int rp = 0; rp < pointsToTracksPerWord; rp++) {
 
-      int randomGroup = floor(random(1) * wordsPoints[w].length);
-      int randomPoint = floor(random(1) * wordsPoints[w][randomGroup].length);
+      int randomGroup = int(random(1) * wordsPoints[w].length);
+      int randomPoint = int(random(1) * wordsPoints[w][randomGroup].length);
       int randomDirection = random(1) > 0.5 ? 0 : 1;
 
       groupToTrack[w][rp] = randomGroup;
       pointToTrack[w][rp] = randomPoint;
       trackDirection[w][rp] = randomDirection;
+      trackShapeSize[w][rp] = int(random(0, 5)) * 100;
     }
   }
 } // createTextsVectors()
@@ -165,8 +168,14 @@ void draw() {
     boolean nextWordGroupExist = group_id < wordsPoints[nextWordId].length;
 
     int maxPoint = max(
-      currentWordGroupExist ? wordsPoints[current_word_id][group_id].length : wordsPoints[current_word_id][wordsPoints[current_word_id].length - 1].length,
-      nextWordGroupExist ? wordsPoints[nextWordId][group_id].length : wordsPoints[nextWordId][wordsPoints[nextWordId].length - 1].length
+
+      currentWordGroupExist ?
+        wordsPoints[current_word_id][group_id].length : 
+        wordsPoints[current_word_id][wordsPoints[current_word_id].length - 1].length,
+
+      nextWordGroupExist ?
+        wordsPoints[nextWordId][group_id].length : 
+        wordsPoints[nextWordId][wordsPoints[nextWordId].length - 1].length
     );
 
     PVector[] interpolate_points = new PVector[maxPoint];
@@ -214,10 +223,18 @@ void draw() {
         } else {
           line(-width / 2, lerp_point.y, width / 2, lerp_point.y);
         }
+        noFill();
+        ellipse(
+          lerp_point.x,
+          lerp_point.y,
+          trackShapeSize[current_word_id][group_id],
+          trackShapeSize[current_word_id][group_id]
+        );
       }
       interpolate_points[point_id] = lerp_point;
     }
     pushMatrix();
+    fill(255);
     noStroke();
     beginShape();
 
