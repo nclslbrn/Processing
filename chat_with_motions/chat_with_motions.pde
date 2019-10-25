@@ -28,7 +28,7 @@ boolean drawAsPoints = true;
 
 void settings() {
 	//fullScreen(FX2D);
-	size(800, 800, FX2D);
+	size(800, 800);
 
 }
 void setup() {
