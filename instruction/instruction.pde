@@ -4,6 +4,9 @@ boolean isRecording = false;
 boolean isCapturing = false;
 
 String[] words = {
+  "follow",
+  "watch",
+  "buy",
   "find",
   "fall",
   "push",
@@ -19,9 +22,7 @@ String[] words = {
   "help",
   "bring",
   "meet",
-  "follow",
   "walk",
-  "watch",
   "wait",
   "kill",
   "keep",
@@ -29,8 +30,7 @@ String[] words = {
   "solve",
   "stand",
   "leave",
-  "build",
-  "buy",
+  "build"
 };
 
 PVector[][][] wordsPoints;
@@ -43,7 +43,7 @@ int[][] groupToTrack,
 RFont rfont;
 
 int current_word_id = 0,
-  pointsToTracksPerWord = 8,
+  pointsToTracksPerWord = 4,
   num_frame = 125,
   fontSize = 480;
 
@@ -84,11 +84,8 @@ void createTextsVectors(String[] texts) {
 
     int split = ceil(texts[word_id].length() / 2);
     int remainder = texts[word_id].length() - split;
-    lines[0] = rfont.toShape(texts[word_id].substring(0, split));
-    lines[1] = rfont.toShape(texts[word_id].substring(split, split + remainder));
-
-    println(texts[word_id] + " (" + split + " + " + remainder + " = " + texts[word_id].length() + ")");
-
+    lines[0] = rfont.toShape(texts[word_id].substring(0, remainder));
+    lines[1] = rfont.toShape(texts[word_id].substring(remainder, split + remainder));
     lines[1].translate(0, fontSize / 1.45);
     wordShape.addChild(lines[0]);
     wordShape.addChild(lines[1]);
