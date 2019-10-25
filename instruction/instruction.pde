@@ -35,7 +35,6 @@ float ease(float p, float g) {
 
 void setup() {
   size(1080, 1080);
-
   //fullScreen();
   smooth(50);
   noStroke();
@@ -50,12 +49,11 @@ void setup() {
 
   colorMode(HSB, words.length, 100, 100);
   println( words.length);
-  createtextsPoints(words);
+  createTextsVectors(words);
 }
 
-void createtextsPoints(String[] texts) {
+void createTextsVectors(String[] texts) {
 
-  int global_letter_index = 0;
   wordVectors = new PVector[texts.length][][];
 
   for (int word_id = 0; word_id < texts.length; word_id++) {
@@ -74,7 +72,6 @@ void createtextsPoints(String[] texts) {
           wordPoints[group_id][point_id].x,
           wordPoints[group_id][point_id].y
         );
-
       }
     }
   }
