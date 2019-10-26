@@ -1,26 +1,5 @@
 import geomerative.*;
 
-boolean isRecording = false;
-boolean isCapturing = false;
-
-String[] words;
-JSONArray data;
-PVector[][][] wordsPoints;
-
-int[][] groupToTrack,
-  pointToTrack,
-  trackDirection,
-  trackShapeSize;
-
-
-RFont rfont;
-
-int current_word_id = 0,
-  pointsToTracksPerWord = 32,
-  num_frame = 125,
-  fontSize = 480;
-
-
 boolean isGroupHasPointToTrack(int current_group) {
   boolean in_group = false;
   for (int g = 0; g < groupToTrack[current_word_id].length; g++) {
@@ -45,6 +24,27 @@ float ease(float p, float g) {
   else
     return 1 - 0.5 * pow(2*(1 - p), g);
 }
+/////////////////////////////////////////////////////////////
+
+boolean isRecording = false;
+boolean isCapturing = false;
+
+String[] words;
+JSONArray data;
+PVector[][][] wordsPoints;
+RFont rfont;
+
+int current_word_id = 0,
+  pointsToTracksPerWord = 126,
+  num_frame = 125,
+  fontSize = 480;
+
+int[][] groupToTrack,
+  pointToTrack,
+  trackDirection,
+  trackShapeSize;
+
+color strokeColor = color(75);
 
 void setup() {
   size(1080, 1080);
@@ -60,6 +60,7 @@ void setup() {
   RG.ignoreStyles(false);
   rfont = new RFont("postnobillscolombo-semibold.ttf", fontSize, CENTER);
   createTextsVectors(words);
+  colorMode(HSB, words.length, 100, 100);
 }
 
 void createTextsVectors(String[] texts) {
@@ -111,13 +112,14 @@ void createTextsVectors(String[] texts) {
       pointToTrack[w][rp] = randomPoint;
       trackDirection[w][rp] = randomDirection;
       trackShapeSize[w][rp] = int(random(0, 7)) * 100;
+
     }
   }
 } // createTextsVectors()
 
 
 void draw() {
-  background(0);
+  background(0,0,0,.5);
   translate(width / 2, height / 2);
 
   if (frameCount != 0 && frameCount % num_frame == 0) {
@@ -137,8 +139,8 @@ void draw() {
   PVector[][] interpolate_points;
   interpolate_points = new PVector[maxGroup][];
   pushStyle();
-  noFill();
-  stroke(44, 62, 80);
+  fill(strokeColor, 100);
+  stroke(strokeColor);
   strokeWeight(1.5);
 
   for (int group_id = 0; group_id < maxGroup; group_id++) {
@@ -197,14 +199,41 @@ void draw() {
       );
 
       if (pointToTrackInGroup && pointToTrack[current_word_id][group_id] == point_id) {
-
+               
         if (trackDirection[current_word_id][group_id] == 0) {
-        
-          line(lerp_point.x, -height / 2, lerp_point.x, height / 2);
+          
+          line(
+            lerp_point.x,
+            -height / 2,
+            lerp_point.x,
+            height / 2
+          );
+
+          polygon(
+            0,
+            lerp_point.y,
+            trackShapeSize[current_word_id][group_id],
+            6,
+            ease(t)
+          );
         
         } else {
         
-          line(-width / 2, lerp_point.y, width / 2, lerp_point.y);
+          line(
+            -width / 2,
+            lerp_point.y,
+            width / 2,
+            lerp_point.y
+          );
+
+          polygon(
+            lerp_point.x,
+            0,
+            trackShapeSize[current_word_id][group_id],
+            6,
+            ease(t)
+          );
+
         }
         
         ellipse(
@@ -220,10 +249,21 @@ void draw() {
   popStyle();
   /**
    * Draw letters
-   */
+  */
+  
   pushMatrix();
   for( int g = 0; g < interpolate_points.length; g++ ) {
+
+    float light = map(
+      g,
+      0,
+      wordsPoints[current_word_id].length,
+      current_word_id % 2 == 0 ? 100 : 0,
+      current_word_id % 2 == 0 ? 0 : 100
+    );
+    fill(current_word_id, light, 125);
     beginShape();
+
     for (int l = 0; l < interpolate_points[g].length; l++) {
       vertex(
         interpolate_points[g][l].x,
@@ -243,4 +283,16 @@ void draw() {
   if (mousePressed == true) {
     exit();
   }
+}
+
+void polygon( float x, float y, int radius, int npoints, float rotation ) {
+  float angle = TWO_PI / npoints;
+  float rotAngle = PI * rotation;
+  beginShape();
+  for (float a = 0; a < TWO_PI; a += angle) {
+    float sx = x + cos(a+rotAngle) * radius;
+    float sy = y + sin(a+rotAngle) * radius;
+    vertex(sx, sy);
+  }
+  endShape(CLOSE);
 }
