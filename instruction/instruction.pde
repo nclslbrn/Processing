@@ -3,36 +3,8 @@ import geomerative.*;
 boolean isRecording = false;
 boolean isCapturing = false;
 
-String[] words = {
-  "follow",
-  "watch",
-  "buy",
-  "find",
-  "fall",
-  "push",
-  "come",
-  "turn",
-  "grow",
-  "stay",
-  "stop",
-  "jump",
-  "move",
-  "hurt",
-  "hold",
-  "help",
-  "bring",
-  "meet",
-  "walk",
-  "wait",
-  "kill",
-  "keep",
-  "serve",
-  "solve",
-  "stand",
-  "leave",
-  "build"
-};
-
+String[] words;
+JSONArray data;
 PVector[][][] wordsPoints;
 
 int[][] groupToTrack,
@@ -44,7 +16,7 @@ int[][] groupToTrack,
 RFont rfont;
 
 int current_word_id = 0,
-  pointsToTracksPerWord = 34,
+  pointsToTracksPerWord = 32,
   num_frame = 125,
   fontSize = 480;
 
@@ -78,13 +50,14 @@ void setup() {
   size(1080, 1080);
   //fullScreen();
   smooth(50);
+  noStroke();
   fill(255);
-  strokeWeight(2);
+  
+  data = loadJSONArray("words.json");
+  words = data.getStringArray();
 
   RG.init(this);
   RG.ignoreStyles(false);
-  RG.setPolygonizer(RG.ADAPTATIVE);
-  RG.setPolygonizerAngle(0.065);
   rfont = new RFont("postnobillscolombo-semibold.ttf", fontSize, CENTER);
   createTextsVectors(words);
 }
@@ -137,7 +110,7 @@ void createTextsVectors(String[] texts) {
       groupToTrack[w][rp] = randomGroup;
       pointToTrack[w][rp] = randomPoint;
       trackDirection[w][rp] = randomDirection;
-      trackShapeSize[w][rp] = int(random(0, 5)) * 100;
+      trackShapeSize[w][rp] = int(random(0, 7)) * 100;
     }
   }
 } // createTextsVectors()
@@ -161,6 +134,13 @@ void draw() {
 
   int maxGroup = max(wordsPoints[current_word_id].length, wordsPoints[nextWordId].length);
 
+  PVector[][] interpolate_points;
+  interpolate_points = new PVector[maxGroup][];
+  pushStyle();
+  noFill();
+  stroke(44, 62, 80);
+  strokeWeight(1.5);
+
   for (int group_id = 0; group_id < maxGroup; group_id++) {
 
     boolean pointToTrackInGroup = isGroupHasPointToTrack(group_id);
@@ -178,8 +158,7 @@ void draw() {
         wordsPoints[nextWordId][wordsPoints[nextWordId].length - 1].length
     );
 
-    PVector[] interpolate_points = new PVector[maxPoint];
-    stroke(44, 62, 80);
+    interpolate_points[group_id] = new PVector[maxPoint];
 
     for (int point_id = 0; point_id < maxPoint; point_id++) {
 
@@ -218,12 +197,16 @@ void draw() {
       );
 
       if (pointToTrackInGroup && pointToTrack[current_word_id][group_id] == point_id) {
+
         if (trackDirection[current_word_id][group_id] == 0) {
+        
           line(lerp_point.x, -height / 2, lerp_point.x, height / 2);
+        
         } else {
+        
           line(-width / 2, lerp_point.y, width / 2, lerp_point.y);
         }
-        noFill();
+        
         ellipse(
           lerp_point.x,
           lerp_point.y,
@@ -231,22 +214,25 @@ void draw() {
           trackShapeSize[current_word_id][group_id]
         );
       }
-      interpolate_points[point_id] = lerp_point;
+      interpolate_points[group_id][point_id] = lerp_point;
     }
-    pushMatrix();
-    fill(255);
-    noStroke();
+  }
+  popStyle();
+  /**
+   * Draw letters
+   */
+  pushMatrix();
+  for( int g = 0; g < interpolate_points.length; g++ ) {
     beginShape();
-
-    for (int l = 0; l < interpolate_points.length; l++) {
+    for (int l = 0; l < interpolate_points[g].length; l++) {
       vertex(
-        interpolate_points[l].x,
-        interpolate_points[l].y
+        interpolate_points[g][l].x,
+        interpolate_points[g][l].y
       );
     }
     endShape();
-    popMatrix();
   }
+  popMatrix();
 
   if (isCapturing == true && t > 0.495 && t < 0.51) {
     saveFrame("records/captures/frame-###.jpg");
