@@ -28,6 +28,7 @@ float ease(float p, float g) {
 
 boolean isRecording = false;
 boolean isCapturing = false;
+boolean isMultiline = false;
 
 String[] words;
 JSONArray data;
@@ -37,7 +38,7 @@ RFont rfont;
 int current_word_id = 0,
   pointsToTracksPerWord = 126,
   num_frame = 125,
-  fontSize = 480;
+  fontSize = 320;
 
 int[][] groupToTrack,
   pointToTrack,
@@ -70,15 +71,27 @@ void createTextsVectors(String[] texts) {
   for (int word_id = 0; word_id < texts.length; word_id++) {
 
     RShape wordShape = new RShape();
-    RShape[] lines = new RShape[2];
+    
+    if( ! isMultiline ) {
 
-    int split = ceil(texts[word_id].length() / 2);
-    int remainder = texts[word_id].length() - split;
-    lines[0] = rfont.toShape(texts[word_id].substring(0, remainder));
-    lines[1] = rfont.toShape(texts[word_id].substring(remainder, split + remainder));
-    lines[1].translate(0, fontSize / 1.45);
-    wordShape.addChild(lines[0]);
-    wordShape.addChild(lines[1]);
+      wordShape = rfont.toShape(texts[word_id]);
+      wordShape.translate(0, fontSize*0.25);
+
+    } else {
+
+      RShape[] lines = new RShape[2];
+      int split = ceil(texts[word_id].length() / 2);
+      int remainder = texts[word_id].length() - split;
+      lines[0] = rfont.toShape(texts[word_id].substring(0, remainder));
+      lines[1] = rfont.toShape(texts[word_id].substring(remainder, split + remainder));
+      lines[1].translate(0, fontSize / 1.45);
+      wordShape.addChild(lines[0]);
+      wordShape.addChild(lines[1]);
+    }
+    /* multiple line
+    RShape wordShape = new RShape();
+    
+    */
 
     RPoint[][] points = wordShape.getPointsInPaths();
     wordsPoints[word_id] = new PVector[points.length][];
