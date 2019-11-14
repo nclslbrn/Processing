@@ -1,3 +1,11 @@
+/**
+ * RShape to RMesh
+ * https://forum.processing.org/one/topic/3d-text-extrude-type-to-form-a-3d-object-detect-edges.html
+ */
+import wblut.geom.core.*;
+import wblut.hemesh.core.*;
+import wblut.hemesh.creators.*;
+import wblut.core.processing.*;
 import geomerative.*;
 import processing.svg.*;
 Block block;
@@ -10,7 +18,8 @@ PShape[] extrudedBuilding;
 int[] buildingColorsId;
 int maxRoad = 46;
 int maxBuilding = 300;
-
+int roadBuiltCount = 0;
+int buildingBuiltCount = 0;
 
 boolean debug = true;
 
@@ -18,7 +27,7 @@ void setup() {
 
     size(800, 800, P3D);
     lights();
-    //noStroke();
+    noStroke();
     
     offsetSize = sqrt(sq(width) + sq(height));
 
@@ -32,7 +41,6 @@ void setup() {
     extrudedBuilding = new PShape[maxBuilding];
     String filename = (hour() + "-" + minute() + "-" + second());
     export = createGraphics(width, height, SVG, "records/"+filename+".svg");
-    initCity();
 }
 
 PShape twoDShapeToThreeD(RShape shape, int depth, int index) {
@@ -53,79 +61,69 @@ PShape twoDShapeToThreeD(RShape shape, int depth, int index) {
 
 }
 
+void draw() {
 
-void initCity() {
+    if( roadBuiltCount < maxRoad ) {
 
-    int roadBuiltCount = 0;
-    int buildingBuiltCount = 0;
-
-    while( roadBuiltCount < maxRoad && buildingBuiltCount < maxBuilding ) {
-
-        if( roadBuiltCount < maxRoad ) {
-
-            Block roadProps = new Block(offsetSize, offsetSize, int(offsetSize/4), int(offsetSize), 2, 8);
-            roads[roadBuiltCount] = RShape.createRectangle(
-                roadProps.position.x, 
-                roadProps.position.y,
-                roadProps.rW, 
-                roadProps.rH
-            );
-            roads[roadBuiltCount].setFill(color(#333333));
-            roadBuiltCount++;
-                
-        } else if( buildingBuiltCount < maxBuilding ) {
-
-            Block buildProps = new Block(offsetSize, offsetSize, 12, 64, 4, 32);        
-            RShape newBuilding = RShape.createRectangle(
-                buildProps.position.x, 
-                buildProps.position.y,
-                buildProps.rW,
-                buildProps.rH
-            );
-
-            boolean isHoverRoad = false,
-                    isHoverBuilding = false;
-
-            for( RShape road : roads ) {
-
-                RPoint[] intersectedPoints = road.getIntersections(newBuilding);
-                if( intersectedPoints != null ) {
-                    isHoverRoad = true;
-                }
-            }
-
-            for( RShape building : buildings ) {
-
-                if( building != null ) {
-
-                    RPoint[] intersectedPoints = building.getIntersections(newBuilding);
-
-                    if( intersectedPoints != null ) {
-                        isHoverBuilding = true;
-                    }
-                }
-            }
+        Block roadProps = new Block(offsetSize, offsetSize, int(offsetSize/4), int(offsetSize), 2, 8);
+        roads[roadBuiltCount] = RShape.createRectangle(
+            roadProps.position.x, 
+            roadProps.position.y,
+            roadProps.rW, 
+            roadProps.rH
+        );
+        roads[roadBuiltCount].setFill(color(#333333));
+        roadBuiltCount++;
             
-            if( ! isHoverRoad && ! isHoverBuilding ) {
+    } else if( buildingBuiltCount < maxBuilding ) {
 
-                int colorId = int( random(1) * buildingColor.length );
-                int buildingHeight = int( random( 2, 15) );
+        Block buildProps = new Block(offsetSize, offsetSize, 12, 64, 4, 32);        
+        RShape newBuilding = RShape.createRectangle(
+            buildProps.position.x, 
+            buildProps.position.y,
+            buildProps.rW,
+            buildProps.rH
+        );
 
-                newBuilding.setFill(color(buildingColor[colorId]));
-                buildings[buildingBuiltCount] = newBuilding;
-                buildingColorsId[buildingBuiltCount] = colorId;
-                PShape threeDBuilding = twoDShapeToThreeD( newBuilding, buildingHeight, buildingBuiltCount);
-                println(threeDBuilding);
-                extrudedBuilding[buildingBuiltCount] = threeDBuilding;
-                buildingBuiltCount++;
+        boolean isHoverRoad = false,
+                isHoverBuilding = false;
+
+        for( RShape road : roads ) {
+
+            RPoint[] intersectedPoints = road.getIntersections(newBuilding);
+            if( intersectedPoints != null ) {
+                isHoverRoad = true;
             }
-            
         }
 
-    }
-}
+        for( RShape building : buildings ) {
 
-void draw() {
+            if( building != null ) {
+
+                RPoint[] intersectedPoints = building.getIntersections(newBuilding);
+
+                if( intersectedPoints != null ) {
+                    isHoverBuilding = true;
+                }
+            }
+        }
+        
+        if( ! isHoverRoad && ! isHoverBuilding ) {
+
+            int colorId = int( random(1) * buildingColor.length );
+            int buildingHeight = int( random( 2, 15) );
+
+            newBuilding.setFill(color(buildingColor[colorId]));
+            buildings[buildingBuiltCount] = newBuilding;
+            buildingColorsId[buildingBuiltCount] = colorId;
+            //PShape threeDBuilding = twoDShapeToThreeD( newBuilding, buildingHeight, buildingBuiltCount);
+            //println(threeDBuilding);
+            //extrudedBuilding[buildingBuiltCount] = threeDBuilding;
+            buildingBuiltCount++;
+        }
+        
+    }
+
 /*
     if( mousePressed == true ) {
         export.beginDraw();
@@ -152,6 +150,14 @@ void draw() {
             road.draw();
         }
     }
+
+    for( RShape building : buildings ) {
+
+        if( building != null ) {
+            building.draw();
+        }
+    }
+/*
     for(int b =  0; b < maxBuilding; b++ ) {
         if( extrudedBuilding[b] != null ) {
 
@@ -159,13 +165,7 @@ void draw() {
             shape(extrudedBuilding[b]);
         }
     }
-    /*
-    for( int b = 0; b < maxBuilding; b++ ) {
 
-        if( extrudedBuilding[b] != null ) {
-            //building.draw();
-            shape(extrudedBuilding[b]);
-        }
-    }
-    */
+*/    
+
 }
