@@ -28,10 +28,10 @@ float ease(float p, float g) {
 
 boolean isRecording = false;
 boolean isCapturing = false;
-boolean isMultiline = false;
+boolean isMultiline = true;
 
-String[] words;
-JSONArray data;
+String[] words = { "vérité",  "relative"};
+//JSONArray data;
 PVector[][][] wordsPoints;
 RFont rfont;
 
@@ -54,8 +54,8 @@ void setup() {
   noStroke();
   fill(255);
   
-  data = loadJSONArray("words.json");
-  words = data.getStringArray();
+ // data = loadJSONArray("words.json");
+  //words = data.getStringArray();
 
   RG.init(this);
   RG.ignoreStyles(false);
