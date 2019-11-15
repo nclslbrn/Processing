@@ -2,10 +2,6 @@
  * RShape to RMesh
  * https://forum.processing.org/one/topic/3d-text-extrude-type-to-form-a-3d-object-detect-edges.html
  */
-import wblut.geom.core.*;
-import wblut.hemesh.core.*;
-import wblut.hemesh.creators.*;
-import wblut.core.processing.*;
 import geomerative.*;
 import processing.svg.*;
 Block block;
@@ -17,7 +13,7 @@ RShape[] roads, buildings;
 PShape[] extrudedBuilding;
 int[] buildingColorsId;
 int maxRoad = 46;
-int maxBuilding = 300;
+int maxBuilding = 2000;
 int roadBuiltCount = 0;
 int buildingBuiltCount = 0;
 
@@ -124,7 +120,7 @@ void draw() {
         
     }
 
-/*
+
     if( mousePressed == true ) {
         export.beginDraw();
         export.background(255);
@@ -139,7 +135,7 @@ void draw() {
         export.dispose();
         export.endDraw();
     }
-*/
+
     background(255);
     translate(width/2, -height/2);
     rotate(QUARTER_PI);

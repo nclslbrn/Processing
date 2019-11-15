@@ -5,7 +5,7 @@
 
 // dynamic list with our points, PVector holds position
 ArrayList<PVector> points = new ArrayList<PVector>();
-int numFrame = 25;
+int numFrame = 50;
 float seed = 1;
 
 // colors used for points
