@@ -1,6 +1,6 @@
 /**
 * Attributed to Cliff Pickover
-* Based on works of Paul Richards
+* Based on works/contribution by Paul Richards
 * http://paulbourke.net/fractals/clifford/
 *
 */
