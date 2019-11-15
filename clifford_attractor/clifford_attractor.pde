@@ -1,5 +1,6 @@
 /**
-* Based on works of Paul Bourke
+* Attributed to Cliff Pickover
+* Based on works of Paul Richards
 * http://paulbourke.net/fractals/clifford/
 *
 */
@@ -24,7 +25,7 @@ void setup() {
   //fullScreen();
   noFill();
   strokeWeight(0.05);
-  stroke(255, 40);
+  stroke(255, 20);
 
   reinit();
 }
@@ -49,7 +50,7 @@ void reinit() {
   nScale = 0.001;
   points.clear();
 
-  for( int i = 0; i < 40000000; i++) {
+  for( int i = 0; i < 35000000; i++) {
     
     float xn = sin(a * y) + c * cos(a * x);
     float yn = sin(b * x) + d * cos(b * y);
@@ -101,7 +102,7 @@ void draw() {
     
     println((p*step)+"/"+points.size());
     saveFrame("records/__a"+a+"__b"+b+"__c"+c+"__d"+d+".jpg");
-    delay(500); // .5sec
+    //delay(500); // .5sec
     //reinit();
     exit();
   }
