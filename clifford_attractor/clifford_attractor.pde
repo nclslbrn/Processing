@@ -4,11 +4,9 @@
 * http://paulbourke.net/fractals/clifford/
 */
 float a, b, c, d;
-float res = 0.005;
 float x = 0;
 float y = 0;
-float dx, dy, nScale;
-int step = int(6 / res);
+int step = 20;
 int p = 0;
 int iters = 5000000; // 35000000
 ArrayList<PVector> points = new ArrayList<PVector>();
@@ -20,7 +18,7 @@ float maxX = 4.0;
 float maxY = maxX * height / width;
 
 void setup() {
-  size(800, 800); // need to be equal
+  size(800, 800);
   //fullScreen();
   noFill();
   strokeWeight(0.05);
@@ -39,7 +37,6 @@ void reinit() {
   x = 0;
   y = 0;
   p = 0;
-  nScale = 0.001;
   points.clear();
 
   for( int i = 0; i < iters; i++) {
