@@ -29,10 +29,10 @@ void setup() {
 
 void reinit() {
   
-  a = random(-1.8, 1.8);
-  b = random(-1.8, 1.8);
-  c = random(-1.8, 1.8);
-  d = random(-1.8, 1.8);
+  a = random(-2, 2);
+  b = random(-2, 2);
+  c = random(-2, 2);
+  d = random(-2, 2);
 
   x = 0;
   y = 0;
