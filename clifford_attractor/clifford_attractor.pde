@@ -23,8 +23,8 @@ float maxX = 4.0;
 float maxY = maxX * height / width;
 
 void setup() {
-  //size(1080, 1080);
-  size(3508, 3508); // A3 width
+  //size(800, 800); --> find new constant
+  size(3508, 3508); // --> export for printing on A3 (width)
   noFill();
   strokeWeight(0.05);
   stroke(255, 25);
@@ -112,6 +112,17 @@ void keyPressed() {
     saveFrame("records/__a"+a+"__b"+b+"__c"+c+"__d"+d+"#####.jpg");
   }
   if( key == 'i' || key == 'I' ) {
-    println((p*step)+"/"+points.size());
+
+    int perCent = int(map(p*step, 0, points.size(), 0, 100));
+    
+    print("[");
+    for( int done = 0; done < perCent/10; done++ ) {
+      print("#");
+    }
+    for( int todo = int(perCent/10); todo < 10; todo++ ) {
+      print(" ");
+    }
+    print("][" + perCent + "%] ");
+    println((p*step)+"/"+points.size() + "points" );
   }
 }
