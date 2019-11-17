@@ -10,8 +10,9 @@ int step = 20;
 int p = 0;
 int iters;
 ArrayList<PVector> points = new ArrayList<PVector>();
+//used to find new constant (false) or to compute HD pict (true)
+boolean preComputed = false;
 
-boolean preComputed = true;
 JSONArray json;
 JSONArray constant;
 int constantNum = 0;
@@ -23,17 +24,23 @@ float maxX = 4.0;
 float maxY = maxX * height / width;
 
 void setup() {
-  //size(800, 800); --> find new constant
-  size(3508, 3508); // --> export for printing on A3 (width)
+  size(800, 800); //--> find new constant
+  //size(3508, 3508); // --> export for printing on A3 (width)
   noFill();
   strokeWeight(0.05);
-  stroke(255, 25);
+  stroke(255, preComputed ? 20 : 150);
   
   iters = width * height; //= 15000000; //5000000;
   if( preComputed ) {
     json = loadJSONArray("constant.json");
   }
-  println("Press \"n\" key to reinit constant,\n \"i\" to get the point draw count and \n \"s\" to save the sketch into image.");
+  println(
+    "KEYBOARDS SHORTCUTS \n"+
+    "\"n\" key to reinit constant \n" +
+    "\"c\" to print a, b, c, and d values \n"+
+    "\"i\" to get percentage progression \n"+
+    "\"s\" to save the sketch into image."
+  );
   reinit();
 }
 
@@ -80,7 +87,6 @@ void reinit() {
   }
 
   background(0);
-  println("{\"a\": \"" + a +"\", \"b\": \"" + b + "\", \"c\": \""+ c + "\", \"d\": \""+ d + "\"},");
 }
 
 void draw() {
@@ -105,24 +111,30 @@ void draw() {
 }
 
 void keyPressed() {
-  if( key == 'n' || key == 'N' ) {
+  
+  if(key == 'n' || key == 'N') {
     reinit();
   }
-  if( key == 's' || key == 'S') {
+  
+  if(key == 's' || key == 'S') {
     saveFrame("records/__a"+a+"__b"+b+"__c"+c+"__d"+d+"#####.jpg");
   }
-  if( key == 'i' || key == 'I' ) {
+  
+  if(key == 'c' || key == 'C') {
+    println("{\"a\": \"" + a +"\", \"b\": \"" + b + "\", \"c\": \""+ c + "\", \"d\": \""+ d + "\"},");
+  }
+
+  if(key == 'i' || key == 'I') {
 
     int perCent = int(map(p*step, 0, points.size(), 0, 100));
     
-    print("[");
-    for( int done = 0; done < perCent/10; done++ ) {
-      print("#");
+    for( int done = 0; done < perCent/5; done++ ) {
+      print("█");
     }
-    for( int todo = int(perCent/10); todo < 10; todo++ ) {
-      print(" ");
+    for( int todo = int(perCent/5); todo < 20; todo++ ) {
+      print("-");
     }
-    print("][" + perCent + "%] ");
-    println((p*step)+"/"+points.size() + "points" );
+    print("[" + perCent + "%] ");
+    println((p*step)+"/"+points.size() + " points" );
   }
 }
