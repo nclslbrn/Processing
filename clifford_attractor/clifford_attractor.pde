@@ -8,7 +8,7 @@ float x = 0;
 float y = 0;
 int step = 20;
 int p = 0;
-int iters = 35000000; //5000000;
+int iters;
 ArrayList<PVector> points = new ArrayList<PVector>();
 
 boolean preComputed = true;
@@ -23,14 +23,17 @@ float maxX = 4.0;
 float maxY = maxX * height / width;
 
 void setup() {
-  size(1080, 1080);
+  //size(1080, 1080);
+  size(3508, 3508); // A3 width
   noFill();
   strokeWeight(0.05);
   stroke(255, 25);
-
+  
+  iters = width * height; //= 15000000; //5000000;
   if( preComputed ) {
     json = loadJSONArray("constant.json");
   }
+  println("Press \"n\" key to reinit constant,\n \"i\" to get the point draw count and \n \"s\" to save the sketch into image.");
   reinit();
 }
 
@@ -95,12 +98,20 @@ void draw() {
   
   } else {
     
-    println((p*step)+"/"+points.size());
     saveFrame("records/__a"+a+"__b"+b+"__c"+c+"__d"+d+".jpg");
     reinit();
   }
+ 
+}
 
-  if( mousePressed == true ) {
+void keyPressed() {
+  if( key == 'n' || key == 'N' ) {
     reinit();
+  }
+  if( key == 's' || key == 'S') {
+    saveFrame("records/__a"+a+"__b"+b+"__c"+c+"__d"+d+"#####.jpg");
+  }
+  if( key == 'i' || key == 'I' ) {
+    println((p*step)+"/"+points.size());
   }
 }
