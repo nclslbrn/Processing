@@ -9,8 +9,10 @@ float y = 0;
 int step = 20;
 int p = 0;
 int iters;
+int devSize = 800;
+int prodSize = 3508;
 //used to find new constant (false) or to compute HD pict (true)
-boolean preComputed = false;
+boolean exporting = false;
 
 JSONArray json;
 JSONArray constant;
@@ -22,29 +24,34 @@ float minY = minX * height / width;
 float maxX = 4.0;
 float maxY = maxX * height / width;
 
+void settings() {
+  if( exporting ) {
+    size(prodSize, prodSize);
+  } else { //--> find new constant
+    size(devSize, devSize);
+  }
+}
 void setup() {
-  size(800, 800); //--> find new constant
-  //size(3508, 3508); // --> export for printing on A3 (width)
   smooth(1);
   strokeWeight(0.5);
-  stroke(255, preComputed ? 255 : 150);
+  stroke(255, exporting ? 255 : 150);
   
-  iters = 5000000;
-  if( preComputed ) {
+  iters = exporting ? 1000000 : 150000;
+  if( exporting ) {
     json = loadJSONArray("constant.json");
   }
   println(
     "KEYBOARDS SHORTCUTS \n"+
     "\"n\" key to reinit constant \n" +
     "\"c\" to print a, b, c, and d values \n"+
-    "\"i\" to get percentage progression \n"+
+    "\"i\" to get percentage progressiopreComputedn \n"+
     "\"s\" to save the sketch into image."
   );
   reinit();
 }
 
 void reinit() {
-  if( ! preComputed ) {
+  if( ! exporting ) {
 
     a = random(-2, 2);
     b = random(-2, 2);
