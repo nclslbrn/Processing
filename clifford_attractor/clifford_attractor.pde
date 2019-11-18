@@ -9,13 +9,12 @@ float y = 0;
 int step = 20;
 int p = 0;
 int iters;
-ArrayList<PVector> points = new ArrayList<PVector>();
 //used to find new constant (false) or to compute HD pict (true)
-boolean preComputed = false;
+boolean preComputed = true;
 
 JSONArray json;
 JSONArray constant;
-int constantNum = 0;
+int constantNum = 3;
 
 float minX = -4.0;
 float minY = minX * height / width;
@@ -24,13 +23,13 @@ float maxX = 4.0;
 float maxY = maxX * height / width;
 
 void setup() {
-  size(800, 800); //--> find new constant
-  //size(3508, 3508); // --> export for printing on A3 (width)
-  noFill();
-  strokeWeight(0.05);
-  stroke(255, preComputed ? 20 : 150);
+  //size(400, 400); //--> find new constant
+  size(3508, 3508); // --> export for printing on A3 (width)
+  smooth(1);
+  strokeWeight(0.5);
+  stroke(255, preComputed ? 255 : 150);
   
-  iters = width * height; //= 15000000; //5000000;
+  iters = 12000000; //= 15000000; //5000000;
   if( preComputed ) {
     json = loadJSONArray("constant.json");
   }
@@ -51,6 +50,7 @@ void reinit() {
     b = random(-2, 2);
     c = random(-2, 2);
     d = random(-2, 2);
+
 
   } else {
     
@@ -73,33 +73,22 @@ void reinit() {
   x = 0;
   y = 0;
   p = 0;
-  points.clear();
-
-  for( int i = 0; i < iters; i++) {
-    
-    float xn = sin(a * y) + c * cos(a * x);
-    float yn = sin(b * x) + d * cos(b * y);
-    float xi = (x - minX) * width / (maxX - minX);
-    float yi = (y - minY) * height / (maxY - minY);
-    points.add(new PVector(xi, yi));
-    x = xn;
-    y = yn;
-  }
-
   background(0);
 }
 
 void draw() {
 
-  if( p < points.size() / step ) { 
+  if( p < iters ) { 
 
-
-    for( int s = 0; s < step; s++ ) {
-
-      int point = p * s;
-      point(points.get(point).x, points.get(point).y);
-      
+    float xn = sin(a * y) + c * cos(a * x);
+    float yn = sin(b * x) + d * cos(b * y);
+    float xi = (x - minX) * width / (maxX - minX);
+    float yi = (y - minY) * height / (maxY - minY);
+    if( p > 10 ) {
+      point(xi, yi);
     }
+    x = xn;
+    y = yn;
     p++;
   
   } else {
@@ -117,7 +106,7 @@ void keyPressed() {
   }
   
   if(key == 's' || key == 'S') {
-    saveFrame("records/__a"+a+"__b"+b+"__c"+c+"__d"+d+"#####.jpg");
+    saveFrame("records/__a"+a+"__b"+b+"__c"+c+"__d"+d+"__#####.jpg");
   }
   
   if(key == 'c' || key == 'C') {
@@ -126,7 +115,7 @@ void keyPressed() {
 
   if(key == 'i' || key == 'I') {
 
-    int perCent = int(map(p*step, 0, points.size(), 0, 100));
+    int perCent = int(map(p, 0, iters, 0, 100));
     
     for( int done = 0; done < perCent/5; done++ ) {
       print("█");
@@ -135,6 +124,6 @@ void keyPressed() {
       print("-");
     }
     print("[" + perCent + "%] ");
-    println((p*step)+"/"+points.size() + " points" );
+    println(p + "/"+ iters + " points" );
   }
 }
