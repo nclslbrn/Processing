@@ -12,11 +12,11 @@ int iters;
 int devSize = 800;
 int prodSize = 3508;
 //used to find new constant (false) or to compute HD pict (true)
-boolean exporting = false;
+boolean exporting = true;
 
 JSONArray json;
 JSONArray constant;
-int constantNum = 3;
+int constantNum = 0;
 
 float minX = -4.0;
 float minY = minX * height / width;
