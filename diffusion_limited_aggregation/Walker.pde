@@ -11,7 +11,7 @@ class Walker {
   float hu;
   
   Walker() {
-    pos = randomPoint();
+    pos = randomfromCircle();
     stuck = false; 
     r = radius;
 }
@@ -77,7 +77,13 @@ PVector randomPoint() {
     return new PVector(width, y);
   }
 }
-
+PVector randomfromCircle() {
+  float tetha = TWO_PI * random(1);
+  float radius = min(width, height) / 3;
+  float x = width/2 + radius * cos(tetha);
+  float y = height/2 + radius * sin(tetha);
+  return new PVector(x, y);
+}
 float distSq(PVector a, PVector b) {
   float dx = b.x - a.x;
   float dy = b.y - a.y;
