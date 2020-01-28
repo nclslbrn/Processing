@@ -8,8 +8,8 @@ libraries
 applet
 examples
 api_key.json
-thanks_for_the_decoration/data/hd
-thanks_for_the_decoration/data/ld
+input/
+sample/
 out
 build
 application.linux32
