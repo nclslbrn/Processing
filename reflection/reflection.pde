@@ -25,9 +25,9 @@ int a = 0;
 PFont console;
 
 public void setup() {
-  //size(1366, 768, OPENGL);
-  size(displayWidth, displayHeight, OPENGL);
-  frameRate(30);
+  size(1366, 768, P3D);
+  //size(displayWidth, displayHeight, OPENGL);
+  //frameRate(30);
   camera(width/2 ,height/2 ,(height/2)/tan(PI*30/180), width/2, height/2, 0, 0, 1, 0);
   video = new Capture(this, 640, 480, 30);
   frames = new PImage[nDelayFrames];

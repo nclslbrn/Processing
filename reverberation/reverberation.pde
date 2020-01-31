@@ -159,7 +159,7 @@ void choisis(){
 }
 
 void samplePlay(){
- String rSample = 'sample/' + sample.get(r) + ext;
+ String rSample = "sample/" + sample.get(r) + ext;
  if( rSample == null){
    println( " null = " + r);
    choisis();
