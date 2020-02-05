@@ -9,14 +9,32 @@ float threshold = 150;
 int Mx = 0;
 int My = 0;
 int ave = 0;
-
+float A, B, C, D;
 int ballX = width/2;
 int ballY = height/2;
 int rsp = 25;
+int numFrames = 620;
+
+float cliffordAttractor(float x, float y)  {
+  // clifford attractor
+  // http://paulbourke.net/fractals/clifford/
+  float scale = 0.005;
+  x = (x - width / 2) * scale;
+  y = (y - height / 2) * scale;
+  float x1 = sin(A * y) + C * cos(A * x);
+  float y1 = sin(B * x) + D * cos(B * y);
+
+  return atan2(y1 - y, x1 - x);
+}
 
 void setup() {
   size(640,480);
   String[] cameras = Capture.list();
+  A = random(1) * 4 -2;
+  B = random(1) * 4 -2;
+  C = random(1) * 4 -2;
+  D = random(1) * 4 -2;
+
   if (cameras == null) {
     println("Failed to retrieve the list of available cameras, will try the default...");
     video = new Capture(this, 640, 480);
@@ -32,8 +50,10 @@ void setup() {
   prevFrame = createImage(video.width,video.height,RGB);
 }
 
+
 void draw() {
   
+  float t = 1.0 * ((frameCount < numFrames) ? frameCount : frameCount % numFrames) / numFrames;
 
   if (video.available()) {
     
@@ -75,8 +95,10 @@ void draw() {
       }
     }
   }
-  fill(255);
+  stroke(0);
+  fill(255, 10);
   rect(0,0, width, height);
+
   if(ave != 0){ 
     Mx = Mx/ave;
     My = My/ave;
@@ -91,11 +113,32 @@ void draw() {
   }else if (My < ballY - rsp/2 && My > 50){
     ballY-= rsp;
   }
+  for( int n = 0; n < 120; n++ ) {
+
+
+    float nx = ballX + (random(1) * 12 - 24);
+    float ny = ballY + (random(1) * 12 - 24);
+    float nx_ = nx;
+    float ny_ = ny;
+
+    if( t < 1 ) {
+
+      float angle = cliffordAttractor(nx, ny);
+      nx_ += cos(angle) * 0.3;
+      ny_ += cos(angle) * 0.3;
+      stroke(0);
+      line(nx, ny, nx_, ny_);
+      
+      nx = nx_;
+      ny = ny_;
+    }
     
-    //updatePixels();
-    noStroke();
-    fill(200,0,0);
-    ellipse(ballX, ballY, 50, 50);
+  }
+  println(t);
+
+  //updatePixels();
+  fill(200,0,0, 100);
+  ellipse(ballX, ballY, 36, 36);
     
   
 }
