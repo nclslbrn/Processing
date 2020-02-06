@@ -100,7 +100,7 @@ void draw() {
     }
   }
   //stroke(0);
-  fill(0, 50);
+  fill(0, 5);
   rect(-5, -5, width+5, height+5);
 
   if(ave != 0){ 
@@ -117,16 +117,16 @@ void draw() {
   }else if (My < ballY - rsp/2 && My > 50){
     ballY-= rsp;
   }
-  addParticle(ballX, ballY);
-  moveParticles();
+  
 
-/* 
   updatePixels();
   fill(200,0,0, 100);
   ellipse(ballX, ballY, 36, 36);
+/* 
 
  */
   //println(particles.size());
-    
+  addParticle(ballX, ballY);
+  moveParticles();
   
 }

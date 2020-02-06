@@ -24,8 +24,9 @@ class Particle {
 
     void updatePosition(float A, float B, float C, float D, float magnitude) {
         // Based on Clifford A. Pickover formula
-        float x = (position.x - width/2) * 0.005;
-        float y = (position.y - height/2) * 0.005;
+        float scale = 0.005;
+        float x = (position.x - width/2) * scale;
+        float y = (position.y - height/2) * scale;
         float x1 = sin(A * y) + C * cos(A * x);
         float y1 = sin(B * x) + D * cos(B * y);
 
