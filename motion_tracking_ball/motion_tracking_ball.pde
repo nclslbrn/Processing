@@ -4,6 +4,7 @@ import processing.video.*;
 Capture video;
 
 PImage prevFrame;
+ArrayList<Particle> particles = new ArrayList<Particle>();
 
 float threshold = 150;
 int Mx = 0;
@@ -14,26 +15,28 @@ int ballX = width/2;
 int ballY = height/2;
 int rsp = 25;
 int numFrames = 620;
+int particelCount = 120;
 
-float cliffordAttractor(float x, float y)  {
-  // clifford attractor
-  // http://paulbourke.net/fractals/clifford/
-  float scale = 0.005;
-  x = (x - width / 2) * scale;
-  y = (y - height / 2) * scale;
-  float x1 = sin(A * y) + C * cos(A * x);
-  float y1 = sin(B * x) + D * cos(B * y);
-
-  return atan2(y1 - y, x1 - x);
+void addParticle(int xPos, int yPos) {
+  particles.add(new Particle(new PVector(xPos, yPos)));
 }
+
+void moveParticles() {
+  for (int i = 0; i < particles.size(); i++) {
+    Particle part = particles.get(i);
+    part.updatePosition(A, B, C, D, 0.3);
+    part.display(color(255, 200));
+  }
+}
+
 
 void setup() {
   size(640,480);
   String[] cameras = Capture.list();
-  A = random(1) * 4 -2;
-  B = random(1) * 4 -2;
-  C = random(1) * 4 -2;
-  D = random(1) * 4 -2;
+  A = (random(1) * 4) -2;
+  B = (random(1) * 4) -2;
+  C = (random(1) * 4) -2;
+  D = (random(1) * 4) -2;
 
   if (cameras == null) {
     println("Failed to retrieve the list of available cameras, will try the default...");
@@ -48,12 +51,14 @@ void setup() {
      video.start();
   }
   prevFrame = createImage(video.width,video.height,RGB);
+  background(0);
+  println("A: " + A + " B: " + B + " C: "+ C+" D: "+ D);
 }
 
 
 void draw() {
   
-  float t = 1.0 * ((frameCount < numFrames) ? frameCount : frameCount % numFrames) / numFrames;
+  //float t = 1.0 * ((frameCount < numFrames) ? frameCount : frameCount % numFrames) / numFrames;
 
   if (video.available()) {
     
@@ -69,7 +74,6 @@ void draw() {
   Mx = 0;
   My = 0;
   ave = 0;
-  
  
   for (int x = 0; x < video.width; x ++ ) {
     for (int y = 0; y < video.height; y ++ ) {
@@ -95,9 +99,9 @@ void draw() {
       }
     }
   }
-  stroke(0);
-  fill(255, 10);
-  rect(0,0, width, height);
+  //stroke(0);
+  fill(0, 50);
+  rect(-5, -5, width+5, height+5);
 
   if(ave != 0){ 
     Mx = Mx/ave;
@@ -113,32 +117,16 @@ void draw() {
   }else if (My < ballY - rsp/2 && My > 50){
     ballY-= rsp;
   }
-  for( int n = 0; n < 120; n++ ) {
+  addParticle(ballX, ballY);
+  moveParticles();
 
-
-    float nx = ballX + (random(1) * 12 - 24);
-    float ny = ballY + (random(1) * 12 - 24);
-    float nx_ = nx;
-    float ny_ = ny;
-
-    if( t < 1 ) {
-
-      float angle = cliffordAttractor(nx, ny);
-      nx_ += cos(angle) * 0.3;
-      ny_ += cos(angle) * 0.3;
-      stroke(0);
-      line(nx, ny, nx_, ny_);
-      
-      nx = nx_;
-      ny = ny_;
-    }
-    
-  }
-  println(t);
-
-  //updatePixels();
+/* 
+  updatePixels();
   fill(200,0,0, 100);
   ellipse(ballX, ballY, 36, 36);
+
+ */
+  //println(particles.size());
     
   
 }
