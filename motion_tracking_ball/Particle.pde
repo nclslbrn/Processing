@@ -2,24 +2,29 @@ class Particle {
     
     PVector position;
     PVector previousPosition;
+    PVector vector;
     float   stepSize;
     int     brightness;
     int     age;
+    color   particleColor;
     boolean isPositionResetWhenOutside;
 
     Particle() {
         position = new PVector(random(width), random(height));
-        previousPosition = position.get(); 
+        previousPosition = position.get();
+        vector = new PVector(0, 0);
+        particleColor = color(0);
         stepSize = 1;
         isPositionResetWhenOutside = true;
         brightness = 150;
         age = 0;
     }
 
-    Particle(PVector position) {
+    Particle(PVector position, color particleColor) {
         this();
         this.position = position;
         previousPosition = position.get();
+        particleColor = particleColor;
     }
 
     void updatePosition(float A, float B, float C, float D, float magnitude) {
@@ -31,10 +36,20 @@ class Particle {
         float y1 = sin(B * x) + D * cos(B * y);
 
         float angle = atan2(y1 - y, x1 - x);
+
+        vector.x += cos(angle) * magnitude;
+        vector.y += sin(angle) * magnitude;
+
+        display();
+        position.x += vector.x;
+        position.y += vector.y;
+
+        vector.x *= 0.99;
+        vector.y *= 0.99;
+        
         previousPosition = position;
 
-        position.x += cos(angle) * magnitude;
-        position.y += sin(angle) * magnitude;
+
         age++;
 
         if (isPositionResetWhenOutside && isOutsideSketch() > 0) {
@@ -43,9 +58,14 @@ class Particle {
         }
     }
 
-    void display(color particleColor) {
+    void display() {
         stroke(particleColor);
-        line(previousPosition.x, previousPosition.y, position.x, position.y);
+        line(
+            previousPosition.x, 
+            previousPosition.y, 
+            position.x, 
+            position.y
+        );
     }
 
     int isOutsideSketch() {
