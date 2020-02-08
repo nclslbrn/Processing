@@ -39,7 +39,6 @@ class Particle {
         vector.x += cos(angle) * magnitude;
         vector.y += sin(angle) * magnitude;
 
-        display();
         position.x += vector.x;
         position.y += vector.y;
 
@@ -47,8 +46,6 @@ class Particle {
         vector.y *= 0.99;
         
         previousPosition = position;
-
-
         age++;
 
         if (isPositionResetWhenOutside && isOutsideSketch() > 0) {
