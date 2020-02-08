@@ -25,16 +25,16 @@ void newConstant() {
   B = (random(1) * 4) -2;
   C = (random(1) * 4) -2;
   D = (random(1) * 4) -2;
+
   // Debug attractor constants
   println("A: " + A + " B: " + B + " C: "+ C+" D: "+ D);
 }
 
 void addParticle(float xPos, float yPos, color particleColor) {
-/*   int r = red(particleColor);
-  int g = green(particleColor);
-  int b = blue(particleColor);
+  int r = (particleColor>>16)&255;
+  int g = (particleColor>>8)&255;
+  int b = particleColor&255;
   color partCol = color(r, g, b);
-  println("rgb("+ r + ", " + g + ", "+ b + ")" ); */
   particles.add(new Particle(new PVector(xPos, yPos), particleColor));
 }
 
@@ -58,8 +58,8 @@ void moveAndRemoveParticles() {
 
 
 void setup() {
-  size(640,480);
-  //size(1280, 720);
+  //size(640,480);
+  size(1280, 720);
   //fullScreen();
   String[] cameras = Capture.list();
   newConstant();
@@ -88,7 +88,7 @@ void setup() {
 
   prevFrame = createImage(video.width,video.height, RGB);
   strokeWeight(1.5);
-  background(255);
+  background(0);
 
 
 }
@@ -121,13 +121,25 @@ void draw() {
       color current = video.pixels[loc];      
       color previous = prevFrame.pixels[loc]; 
       
-     
+    /*  
       float r1 = red(current);
       float g1 = green(current);
       float b1 = blue(current);
+
+ */     
+      int r1 = (current>>16)&255;
+      int g1 = (current>>8)&255;
+      int b1 = current&255;
+
+      int r2 = (previous>>16)&255;
+      int g2 = (previous>>8)&255;
+      int b2 = previous&255;
+/* 
+
       float r2 = red(previous);
       float g2 = green(previous);
       float b2 = blue(previous);
+  */     
       float diff = dist(r1,g1,b1,r2,g2,b2);
       
       
@@ -144,7 +156,7 @@ void draw() {
     }
   }
 
-  fill(255, 10);
+  fill(0, 3);
   rect(-5, -5, width+10, height+10);
  
 
@@ -162,10 +174,11 @@ void draw() {
   } else if (My < ballY - rsp/2 && My > 50){
     ballY-= rsp;
   }
-/*      
+/*    
   tint(255, 50);
   image(video, 0, 0, width, height);
-   */
+
+      */
   //updatePixels();
   //fill(200,0,0, 100);
   //ellipse(ballX*scaleX, ballY*scaleY, 36, 36);
@@ -174,7 +187,7 @@ void draw() {
   addParticle(
     ballX*scaleX, 
     ballY*scaleY, 
-    video.pixels[ballX + ballY*video.width]
+    prevFrame.get(ballX, ballY)
   );
   moveAndRemoveParticles();
   

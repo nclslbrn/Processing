@@ -13,7 +13,6 @@ class Particle {
         position = new PVector(random(width), random(height));
         previousPosition = position.get();
         vector = new PVector(0, 0);
-        particleColor = color(0);
         stepSize = 1;
         isPositionResetWhenOutside = true;
         brightness = 150;
@@ -24,7 +23,7 @@ class Particle {
         this();
         this.position = position;
         previousPosition = position.get();
-        particleColor = particleColor;
+        this.particleColor = particleColor;
     }
 
     void updatePosition(float A, float B, float C, float D, float magnitude) {
