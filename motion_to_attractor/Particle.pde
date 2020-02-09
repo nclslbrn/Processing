@@ -14,19 +14,23 @@ class Particle {
         previousPosition = position.get();
         vector = new PVector(0, 0);
         stepSize = 1;
+        particleColor = color(0,0);
         isPositionResetWhenOutside = true;
         brightness = 150;
         age = 0;
     }
 
-    Particle(PVector position, color particleColor) {
+    Particle(PVector position, color pixelsColor, float size) {
         this();
-        this.position = position;
-        previousPosition = position.get();
-        this.particleColor = particleColor;
+        this.position      = position;
+        previousPosition   = position.get();
+        this.particleColor = pixelsColor;
+        this.age           = 0;
+        this.stepSize      = size;
     }
 
     void updatePosition(float A, float B, float C, float D, float magnitude) {
+
         // Based on Clifford A. Pickover formula
         float scale = 0.005;
         float x = (position.x - width/2) * scale;
@@ -35,6 +39,7 @@ class Particle {
         float y1 = sin(B * x) + D * cos(B * y);
 
         float angle = atan2(y1 - y, x1 - x);
+
 
         vector.x += cos(angle) * magnitude;
         vector.y += sin(angle) * magnitude;
@@ -46,15 +51,18 @@ class Particle {
         vector.y *= 0.99;
         
         previousPosition = position;
-        age++;
+        //age += 1;
 
-        if (isPositionResetWhenOutside && isOutsideSketch() > 0) {
+       /*  
+       if (isPositionResetWhenOutside && isOutsideSketch() > 0) {
             position = new PVector(random(width), random(height));
             previousPosition = position.get();
-        }
+        } 
+        */
     }
 
     void display() {
+        strokeWeight(stepSize);
         stroke(particleColor);
         line(
             previousPosition.x, 

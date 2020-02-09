@@ -2,23 +2,24 @@
 import processing.video.*;
 
 Capture video;
-
 PImage prevFrame;
 ArrayList<Particle> particles = new ArrayList<Particle>();
 
-float threshold = 150;
-int Mx = 0;
-int My = 0;
-int ave = 0;
 float A, B, C, D;
-int ballX = width/2;
-int ballY = height/2;
-int rsp = 25;
-int trackingResolution = 1;
-int particleMaxAge = 620;
+// Min difference in RGB value
+float threshold = 150;
+// Compare pixels betwwen (in pixels)
+int trackingResolution = 8;
+// Maximum age of particles (in moves)
+int particleMaxAge = 1;
+float particleMaxSize = 1;
+// Upscale factor between capture and sketch size
 float scaleX = 1;
 float scaleY = 1;
-int constantMaxFrame = particleMaxAge * 2;
+// How many frames before change constants
+int constantMaxFrame = 320;
+// Print value if you want to debug
+boolean debug = false;
 
 // Init attractor constant
 void newConstant() {
@@ -27,8 +28,10 @@ void newConstant() {
   C = (random(1) * 4) -2;
   D = (random(1) * 4) -2;
 
-  // Debug attractor constants
-  println("A: " + A + " B: " + B + " C: "+ C+" D: "+ D);
+  if(debug) {
+    println("Living particles=" + particles.size());
+    println("A=" + A + " B=" + B + " C=" + C + " D=" + D);
+  }
 }
 
 // Save particle to particles
@@ -36,24 +39,39 @@ void addParticle(float xPos, float yPos, color particleColor) {
   int r = (particleColor>>16)&255;
   int g = (particleColor>>8)&255;
   int b = particleColor&255;
-  color partCol = color(r, g, b);
-  particles.add(new Particle(new PVector(xPos, yPos), particleColor));
+
+  Particle newParticle = new Particle(
+    new PVector(xPos, yPos),   // possition
+    color(r, g, b, 80),        // color
+    random(0.1, particleMaxSize) // size
+  );
+  particles.add(newParticle);
 }
 
 // Move particles and delete oldest
 void moveAndRemoveParticles() {
+
   IntList particlesToRemove = new IntList();
+
   for ( int i = 0; i < particles.size(); i++ ) {
+
     Particle particle = particles.get(i);
     particle.updatePosition(A, B, C, D, 0.05);
     particle.display();
+    particle.age += 1;
 
     if( particle.age >= particleMaxAge || particle.isOutsideSketch() > 0) {
       particlesToRemove.append(i);
     }
   }
-  for( int i = 0; i < particlesToRemove.size(); i++ ) {
-    particles.remove( particlesToRemove.get(i) );
+  if(debug) {
+    println("Delete "+ particlesToRemove.size() + " particles.");
+  }
+  for( int d = 0; d < particlesToRemove.size(); d++ ) {
+    int deleteID = particlesToRemove.get(d);
+    if( particles.contains( deleteID ) ) {
+      particles.remove( deleteID );
+    }
   }
 }
 
@@ -72,20 +90,22 @@ void initCamera() {
     }
     video = new Capture(this, cameras[0]);
     video.start(); 
+    prevFrame = createImage(video.width,video.height, RGB);
   }
 }
 
 void setup() {
   //size(640,480);
-  size(1280, 960);
+  size(1280, 860);
   //fullScreen();
+  //colorMode(RGB, 255, 255, 255, 1);
   newConstant();
   initCamera();
   scaleX = width / video.width;
   scaleY = height / video.height;
-  prevFrame = createImage(video.width,video.height, RGB);
-  strokeWeight(1.5);
-  background(0);
+  particleMaxSize = scaleX+scaleY / 2;
+  fill(0);
+  rect(-5, -5, width+10, height+10);
 }
 
 
@@ -94,40 +114,10 @@ void draw() {
   if( frameCount % constantMaxFrame == 0 ) {
     newConstant();
   }
-  loadPixels();
+  //loadPixels();
   video.loadPixels();
-  prevFrame.loadPixels();  
-  fill(0, 1.5);
-  rect(-5, -5, width+10, height+10);
-/* 
+  prevFrame.loadPixels();
 
-  tint(255, 10);
-  image(video, 0, 0, width, height);
- */  //updatePixels();
-  //fill(200,0,0, 100);
-  //ellipse(ballX*scaleX, ballY*scaleY, 36, 36);
-
-  //println(particles.size());
-  addParticle(
-    ballX*scaleX, 
-    ballY*scaleY, 
-    video.get(ballX, ballY)
-  );
-  moveAndRemoveParticles();
-}
-
-void captureEvent(Capture video) {
-  prevFrame.copy(
-    video,
-    0,0,video.width,video.height,
-    0,0,video.width,video.height
-  ); 
-  prevFrame.updatePixels();
-  video.read();
-  Mx = 0;
-  My = 0;
-  ave = 0;
- 
   for (int x = 0; x < video.width; x += trackingResolution ) {
     for (int y = 0; y < video.height; y += trackingResolution ) {
       
@@ -146,28 +136,30 @@ void captureEvent(Capture video) {
       float diff = dist(r1,g1,b1,r2,g2,b2);
       
       if (diff > threshold) { 
-        pixels[loc] = video.pixels[loc];
-        Mx += x;
-        My += y;
-        ave++;
-      } else {
-        pixels[loc] = video.pixels[loc];
-      }
+
+        addParticle( x*scaleX, y*scaleY, video.pixels[loc] );
+      } 
     }
   }
 
-  if(ave != 0){ 
-    Mx = Mx/ave;
-    My = My/ave;
+  rect(-5, -5, width+10, height+10);
+  fill(0, 3);
+  moveAndRemoveParticles();
+
+  if( mousePressed == true ) {
+    saveFrame("records/frame-###.png");
   }
-  if (Mx > ballX + rsp/2 && Mx > 50){
-    ballX+= rsp;
-  }else if (Mx < ballX - rsp/2 && Mx > 50){
-    ballX-= rsp;
-  }
-  if (My > ballY + rsp/2 && My > 50){
-    ballY+= rsp;
-  } else if (My < ballY - rsp/2 && My > 50){
-    ballY-= rsp;
-  }
+
+  
+}
+
+void captureEvent(Capture video) {
+  
+  prevFrame.copy(
+    video,
+    0,0,video.width,video.height,
+    0,0,video.width,video.height
+  ); 
+  prevFrame.updatePixels();
+  video.read();
 }
