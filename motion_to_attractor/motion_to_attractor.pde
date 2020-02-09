@@ -11,15 +11,16 @@ float threshold = 150;
 // Compare pixels betwwen (in pixels)
 int trackingResolution = 8;
 // Maximum age of particles (in moves)
-int particleMaxAge = 1;
+int particleMaxAge = 620;
 float particleMaxSize = 1;
 // Upscale factor between capture and sketch size
-float scaleX = 1;
-float scaleY = 1;
+float scaleX = 0;
+float scaleY = 0;
 // How many frames before change constants
 int constantMaxFrame = 320;
 // Print value if you want to debug
 boolean debug = false;
+boolean videoLaunched = false;
 
 // Init attractor constant
 void newConstant() {
@@ -42,8 +43,8 @@ void addParticle(float xPos, float yPos, color particleColor) {
 
   Particle newParticle = new Particle(
     new PVector(xPos, yPos),   // possition
-    color(r, g, b, 80),        // color
-    random(0.1, particleMaxSize) // size
+    color(r, g, b, 180),        // color
+    random(0.01, particleMaxSize) // size
   );
   particles.add(newParticle);
 }
@@ -56,30 +57,25 @@ void moveAndRemoveParticles() {
   for ( int i = 0; i < particles.size(); i++ ) {
 
     Particle particle = particles.get(i);
-    particle.updatePosition(A, B, C, D, 0.05);
+    particle.updatePosition(A, B, C, D, 0.03);
     particle.display();
-    particle.age += 1;
 
     if( particle.age >= particleMaxAge || particle.isOutsideSketch() > 0) {
-      particlesToRemove.append(i);
+      particle.isLiving = false;
     }
   }
-  if(debug) {
-    println("Delete "+ particlesToRemove.size() + " particles.");
-  }
-  for( int d = 0; d < particlesToRemove.size(); d++ ) {
-    int deleteID = particlesToRemove.get(d);
-    if( particles.contains( deleteID ) ) {
-      particles.remove( deleteID );
-    }
+  
+  for( int d = particles.size()-1; d >= 0 ; d-- ) {
+    Particle particle = particles.get(d);
+    if( particle.isLiving == false ) {
+      particles.remove( d );
+    } 
   }
 }
 
 // init and debug video object
 void initCamera() {
   String[] cameras = Capture.list();
-  int camWidth = 0;
-  int camHeight = 0;
   if (cameras.length == 0) {
     println("There are no cameras available for capture.");
     exit();
@@ -89,23 +85,27 @@ void initCamera() {
       println(cameras[i]);
     }
     video = new Capture(this, cameras[0]);
-    video.start(); 
-    prevFrame = createImage(video.width,video.height, RGB);
+    video.start();
+
+    prevFrame = createImage(video.width, video.height, RGB);
+    scaleX = width > video.width ? width / video.width : video.width / width;
+    scaleY = height > video.height ? height / video.height: video.height / height;
+
   }
 }
 
 void setup() {
   //size(640,480);
-  size(1280, 860);
+  size(1280, 960);
   //fullScreen();
   //colorMode(RGB, 255, 255, 255, 1);
   newConstant();
   initCamera();
-  scaleX = width / video.width;
-  scaleY = height / video.height;
-  particleMaxSize = scaleX+scaleY / 2;
+  
+  particleMaxSize = scaleX+scaleY;
   fill(0);
   rect(-5, -5, width+10, height+10);
+  
 }
 
 
@@ -114,7 +114,7 @@ void draw() {
   if( frameCount % constantMaxFrame == 0 ) {
     newConstant();
   }
-  //loadPixels();
+  loadPixels();
   video.loadPixels();
   prevFrame.loadPixels();
 
@@ -136,14 +136,16 @@ void draw() {
       float diff = dist(r1,g1,b1,r2,g2,b2);
       
       if (diff > threshold) { 
-
-        addParticle( x*scaleX, y*scaleY, video.pixels[loc] );
+        float particlePosX  = x * scaleX;
+        float particlePosY  = y * scaleY;
+        color particleColor = video.pixels[loc];
+        addParticle( particlePosX, particlePosY, particleColor );
       } 
     }
   }
 
   rect(-5, -5, width+10, height+10);
-  fill(0, 3);
+  fill(0, 0.25);
   moveAndRemoveParticles();
 
   if( mousePressed == true ) {

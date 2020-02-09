@@ -7,6 +7,7 @@ class Particle {
     int     brightness;
     int     age;
     color   particleColor;
+    boolean isLiving;
     boolean isPositionResetWhenOutside;
 
     Particle() {
@@ -16,6 +17,7 @@ class Particle {
         stepSize = 1;
         particleColor = color(0,0);
         isPositionResetWhenOutside = true;
+        isLiving = true;
         brightness = 150;
         age = 0;
     }
@@ -27,6 +29,7 @@ class Particle {
         this.particleColor = pixelsColor;
         this.age           = 0;
         this.stepSize      = size;
+        this.isLiving      = true;
     }
 
     void updatePosition(float A, float B, float C, float D, float magnitude) {
@@ -51,7 +54,7 @@ class Particle {
         vector.y *= 0.99;
         
         previousPosition = position;
-        //age += 1;
+        age += 1;
 
        /*  
        if (isPositionResetWhenOutside && isOutsideSketch() > 0) {
