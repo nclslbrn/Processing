@@ -11,13 +11,13 @@ float threshold = 150;
 // Compare pixels betwwen (in pixels)
 int trackingResolution = 8;
 // Maximum age of particles (in moves)
-int particleMaxAge = 620;
+int particleMaxAge = 760;
 float particleMaxSize = 1;
 // Upscale factor between capture and sketch size
 float scaleX = 0;
 float scaleY = 0;
 // How many frames before change constants
-int constantMaxFrame = 320;
+int constantMaxFrame = 480;
 // Print value if you want to debug
 boolean debug = false;
 boolean videoLaunched = false;
@@ -43,7 +43,7 @@ void addParticle(float xPos, float yPos, color particleColor) {
 
   Particle newParticle = new Particle(
     new PVector(xPos, yPos),   // possition
-    color(r, g, b, 180),        // color
+    color(r, g, b),        // color
     random(0.01, particleMaxSize) // size
   );
   particles.add(newParticle);
