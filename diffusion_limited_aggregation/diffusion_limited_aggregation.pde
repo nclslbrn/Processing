@@ -14,19 +14,32 @@ List<Branch> branches = new ArrayList<Branch>();
 //float r = 4;
 int maxWalkers = 75;
 int iterations = 1000;
-float radius = 6;
+float initRadius = 12;
+float radius = initRadius;
 float hue = 0;
 float shrink = 0.999;
+int numFrame = 16000;
+int frameLoopCount = 0;
+int drawingCount = 0;
 
-void setup() {
-  size(1080, 1080);
 
+void reset() {
+  tree.clear();
+  branches.clear();
+  walkers.clear();
+  
   tree.add(new Walker(width / 2, height / 2));
-  radius *= shrink;
+  
+  radius = initRadius;
   for (int i = 0; i < maxWalkers; i++) {
     walkers.add(new Walker());
     radius *= shrink;
   }
+}
+
+void setup() {
+  size(2080, 2080);
+  reset();
 }
 
 void draw() {
@@ -57,7 +70,12 @@ void draw() {
     radius *= shrink;
     walkers.add(new Walker());
   }
-
+  frameLoopCount = (frameCount > numFrame ? frameCount % numFrame : frameCount);
+  if( frameLoopCount >= numFrame ){
+    saveFrame("records/drawng-"+drawingCount+".jpg");
+    drawingCount++;
+    reset();
+  }
   if( mousePressed == true ) {
     saveFrame("records/frame-###.jpg");
   }
