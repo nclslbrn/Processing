@@ -48,7 +48,7 @@ void draw() {
         int(result[i][2]*1.0/samplesPerFrame);
     updatePixels();
 
-    saveFrame("records/frame-###.jpg");
+    saveFrame("records/frame-###.gif");
     if (frameCount==numFrames)
       exit();
   } else if (preview) {
@@ -68,8 +68,8 @@ void draw() {
 
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
-int samplesPerFrame = 6,
-    numFrames       = 240;     
+int samplesPerFrame = 8,
+    numFrames       = 60;     
 
 float shutterAngle = .4;
 
@@ -81,11 +81,13 @@ int cubeSize;
 float halfSize;
 color cubeColor = color(75);
 
+
 void setup() {
-  size(1080, 1080, P3D);
+  size(800, 800, P3D);
   ortho();
   noStroke();
   colorMode(HSB, 3, 100, 100);
+  fill(0, 0, 100);
   cubeSize = height/4;
   halfSize = cubeSize/2;
   center = new PVector(width/2, height/2, height/2);
@@ -93,9 +95,11 @@ void setup() {
 
 
 void draw_() {
+
   background(0);
-  lights();
-  spotLight(1,2,3, 0, center.y, height, 1, 1, -1, HALF_PI, 0.03);
+  //lights();
+  directionalLight(1, 0, 100, -0.3, 0.5, -1);
+  //(1,0,3, width, 0, -height/2, 1, -1, 1, QUARTER_PI, 0.5);
 
   float t1 = ease( map(t, 0, 0.33, 0, 1));
   float t2 = ease( map(t, 0.33, 0.66, 0, 1));
@@ -105,25 +109,30 @@ void draw_() {
   translate(width*0.5, height*0.5);
   rotateX(-QUARTER_PI);
   rotateZ(QUARTER_PI);
-  fill(0);
-  stroke(cubeColor);
+  //fill(0);
+  //stroke(cubeColor);
   box(cubeSize);
 
   
   noStroke();
+  if( t > 5.0f/6.0f || t < 1.0f/6.0f ) {
+    fill( 1, 100, 100);
+  }
+  if( t > 1.0f/6.0f && t < 3.0f/6.0f) {
+    fill( 2, 100, 100);
+  }
+  if( t > 3.0f/6.0f && t < 5.0f/6.0f) {
+    fill( 3, 100, 100);
+  }
 
-  if( t < 0.33 ) {
-    fill( 1, 75, 75);
-
+  if( t < 1.0f/3.0f ) {
     push();
     translate(-halfSize, -halfSize, halfSize);
     rotateX(PI*1.5*t1);
     rect(0, 0, cubeSize, cubeSize);
     pop();
   }
-  if( t > 0.33 && t < 0.66 ) {
-    fill( 2, 75, 75);
-
+  if( t > 1.0f/3.0f && t < 2.0f/3.0f ) {
     push();
     translate(-halfSize, -halfSize, -halfSize);
     rotateZ(PI*1.5*-t2);
@@ -131,9 +140,7 @@ void draw_() {
     rect(0, 0, cubeSize, cubeSize);
     pop();
   }
-  if( t > 0.66 && t < 1 ) {
-    fill( 3, 75, 75);
-
+  if( t > 2.0f/3.0f ) {
     push();
     translate(-halfSize, -halfSize, halfSize);
     rotateY(PI*0.5 + PI*1.5*t3);
@@ -144,5 +151,5 @@ void draw_() {
   
 
   pop();
-
 }
+
