@@ -38,7 +38,7 @@ void draw() {
         int(result[i][2]*1.0/samplesPerFrame);
     updatePixels();
 
-    saveFrame("records/frame-###.jpg");
+    saveFrame("records/frame-###.gif");
     if (frameCount==numFrames)
       exit();
   } else if (preview) {
@@ -59,23 +59,23 @@ void draw() {
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
 
-int samplesPerFrame = 3,
-    numFrames = 620; // animation loop duration (in frame)   
+int samplesPerFrame = 2,
+    numFrames = 80; // animation loop duration (in frame)   
 
-float shutterAngle = .6;
+float shutterAngle = .15;
 
 boolean recording = true,
         preview = true;
 
-
+OpenSimplexNoise noise;
 ArrayList<EllipseSection> arcs = new ArrayList<EllipseSection>(); // Custom arc class
 PVector center; //  center of circle
 
-int   margin         = 16,   // margin between circle
+int   margin         = 8,   // margin between circle
       noiseScale     = 86,  
-      noiseRadius    = 8,
+      noiseRadius    = 2,
       noiseStrength  = 8,
-      lineSize       = 16;
+      lineSize       = 2;
       
 
 float speed,      // the value wich increments circle's radiuses
@@ -93,13 +93,13 @@ float getNoiseIntensity(float x, float y, float t ) {
 
 void setup() {
   //fullScreen(P3D);
-  size(1080, 1080, P3D);
-  smooth(20);
+  size(800, 800, P3D);
+  //smooth(20);
 
-  //noise = new OpenSimplexNoise();
+  noise = new OpenSimplexNoise();
   center = new PVector( width/2, height/2 );
-  maxRadius = width/1.75;
-  speed     = (maxRadius / numFrames) / 2;
+  maxRadius = width/1.5;
+  speed     = (maxRadius-margin) / numFrames;
 
   for( int c = margin; c <= maxRadius; c += margin ) {
 
@@ -126,8 +126,8 @@ void draw_() {
 
     for( int angleID = 0; angleID < arc.angles.size() - 1; angleID+= 2 ) {
       
-      float stroke = map(arc.radius, 0, maxRadius, 255, 0 );
-      float weight = map(arc.radius, 0, maxRadius, 0.1, 1.5 );
+      float stroke = map(arc.radius, 0, maxRadius, 255, 1 );
+      float weight = map(arc.radius, 0, maxRadius, 0.1, 4 );
 
       float start = currentAngle + arc.angles.get( angleID );
       float end   = currentAngle + arc.angles.get( angleID + 1 );
@@ -148,7 +148,7 @@ void draw_() {
       stroke(stroke);
       strokeWeight( weight );
       beginShape();
-      for( float d = 0; d <= distance; d+= lineSize ) {
+      for( float d = 0; d < distance; d+= lineSize ) {
 
         float ratio = d / distance;
 
@@ -164,7 +164,7 @@ void draw_() {
 
 
       }
-      endShape();
+      endShape(CLOSE);
       currentAngle = end;
     }
 
