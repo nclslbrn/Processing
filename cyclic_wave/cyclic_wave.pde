@@ -59,10 +59,10 @@ void draw() {
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
 
-int samplesPerFrame = 2,
-    numFrames = 80; // animation loop duration (in frame)   
+int samplesPerFrame = 3,
+    numFrames = 30; // animation loop duration (in frame)   
 
-float shutterAngle = .15;
+float shutterAngle = .8;
 
 boolean recording = true,
         preview = true;
@@ -71,11 +71,11 @@ OpenSimplexNoise noise;
 ArrayList<EllipseSection> arcs = new ArrayList<EllipseSection>(); // Custom arc class
 PVector center; //  center of circle
 
-int   margin         = 8,   // margin between circle
-      noiseScale     = 86,  
-      noiseRadius    = 2,
-      noiseStrength  = 8,
-      lineSize       = 2;
+int   margin         = 16,   // margin between circle
+      noiseScale     = 32,  
+      noiseRadius    = 4,
+      noiseStrength  = 32,
+      lineSize       = 4;
       
 
 float speed,      // the value wich increments circle's radiuses
@@ -98,7 +98,7 @@ void setup() {
 
   noise = new OpenSimplexNoise();
   center = new PVector( width/2, height/2 );
-  maxRadius = width/1.5;
+  maxRadius = width/1.75;
   speed     = (maxRadius-margin) / numFrames;
 
   for( int c = margin; c <= maxRadius; c += margin ) {
@@ -170,7 +170,7 @@ void draw_() {
 
     arc.radius += speed;
 
-    if( arc.radius >= maxRadius ) {
+    if( arc.radius > maxRadius ) {
 
       if( arcID != 1 ) {
 
