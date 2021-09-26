@@ -6,33 +6,35 @@ PGraphics canvas;
 
 int numTrianglePerCircle = 7;
 int drawStartTime = 0;
-int drawDuration = 20000;
+int drawDuration = 80000;
 int alphaValue = 126;
-int innerMargin = 10;
+int innerMargin = 50;
+int loopCount = 1;
 int pdfCount = 10;
 Grid grid;
 ArrayList < Point_in_triangle > points = new ArrayList < Point_in_triangle > ();
-int loopCount = 0;
 
 void setup() {
-    // 2250 × 3000 pixels / 2.5
-    size(3000, 2250);
+    // 2250 × 3000 pixels
+    // 72 to 300 dpi = *4,166666667
+    // 9375 * 12500
+    size(9375, 12500);
     surface.setVisible(false);
     init();
 }
 
 void init() {
       
-    canvas = createGraphics(3000, 2250, PDF, "records/" + loopCount + ".pdf");
+    canvas = createGraphics(9375, 12500, PDF, "records/" + loopCount + ".pdf");
     canvas.beginDraw();
     
-    // canvas.background(0);
+    canvas.background(5);
     canvas.strokeWeight(0.5);
     
     grid = new Grid();
     points.clear();
     grid.cellMargin = innerMargin * 2;
-    grid.cellWidth = 900; //(int) random(400, 600);
+    grid.cellWidth = 3600; //(int) random(400, 600);
     grid.init();
 
     for (int x = 0; x < grid.cols; x++) {
@@ -46,20 +48,20 @@ void init() {
                
                 Point_in_triangle newPoint;
                 newPoint = new Point_in_triangle(
-                    getRandomPoints(_x, _y, (grid.cellWidth-grid.cellMargin) / 2),
+                    getRandomPoints(_x, _y, floor((grid.cellWidth-grid.cellMargin) / 2.2)),
                     color((255 / numTrianglePerCircle) * t),
                     alphaValue
                 );
                 points.add(newPoint);
 
             }
-            canvas.stroke(50);
+            canvas.stroke(20);
             canvas.fill(0);
             canvas.rect(
                 grid.outer_x_margin + _x,  
                 grid.outer_y_margin + _y, 
-                grid.cellWidth - innerMargin, 
-                grid.cellWidth - innerMargin
+                grid.cellWidth - grid.cellMargin, 
+                grid.cellWidth - grid.cellMargin
             );
         }
     }

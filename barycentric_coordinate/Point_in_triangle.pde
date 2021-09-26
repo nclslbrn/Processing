@@ -39,19 +39,19 @@ class Point_in_triangle {
 			canvas.stroke( this.col );
 
 			for( int n = 0; n < point_by_frame; n++ ) {
-          PVector p = new PVector(random(n), random(n));
-          float r = -1 * noise(p.x);
-          float s = -1 * noise(p.y);
-					//float r = random( -1, 0 );
-					//float s = random( -1, 0 );
+				PVector p = new PVector(random(n), random(n));
+				float r = -1 * noise(p.x);
+				float s = -1 * noise(p.y);
+				//float r = random( -1, 0 );
+				//float s = random( -1, 0 );
 
-					if( r + s >= -1 ) {
+				if( r + s >= -1 ) {
 
-							canvas.point(
-									( a.x + r * ab.x + s * ac.x ),
-									( a.y + r * ab.y + s * ac.y )
-							);
-					}
+					canvas.point(
+						( a.x + r * ab.x + s * ac.x ),
+						( a.y + r * ab.y + s * ac.y )
+					);
+				}
 			}
 
 		}
