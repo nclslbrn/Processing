@@ -1,3 +1,5 @@
+
+
 int[][] getRandomPoints( int x, int y, int radius) {
 
     float last_angle = 0.0;

@@ -1,5 +1,5 @@
 color randomColor() {
- 
+ /*
   color[] colors = {
     #1abc9c,
     #16a085,
@@ -22,7 +22,13 @@ color randomColor() {
     #95a5a6,
     #7f8c8d
   };
-
+  */
+  
+  color[] colors = {
+     255,
+     235,
+     215
+  };
   int colorID = (int)random( 0, colors.length );
   color choosenColor = color( colors[ colorID ] );
   

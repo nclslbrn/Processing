@@ -14,14 +14,13 @@ class Point_in_triangle {
 			this.alpha = alpha;
 	}
 
-	void display() {
+	void display(PGraphics canvas) {
 
-			this.a = new PVector( triangle[0][0], triangle[0][1] );
-			this.b = new PVector( triangle[1][0], triangle[1][1] );
-			this.c = new PVector( triangle[2][0], triangle[2][1] );
+			this.a = new PVector( this.triangle[0][0], this.triangle[0][1] );
+			this.b = new PVector( this.triangle[1][0], this.triangle[1][1] );
+			this.c = new PVector( this.triangle[2][0], this.triangle[2][1] );
 
-			this.col = col;
-			this.col = color( red( col ), green( col ), blue( col ), this.alpha );
+			this.col = color( red( this.col ), green( this.col ), blue( this.col ), this.alpha );
 
 			PVector ab = new PVector( a.x - b.x, a.y - b.y );
 			PVector ac = new PVector( a.x - c.x, a.y - c.y );
@@ -36,17 +35,19 @@ class Point_in_triangle {
 			};
 
 			int point_by_frame = max( points_to_compare );
-
-			stroke( this.col );
+      
+			canvas.stroke( this.col );
 
 			for( int n = 0; n < point_by_frame; n++ ) {
-
-					float r = random( -1, 0 );
-					float s = random( -1, 0 );
+          PVector p = new PVector(random(n), random(n));
+          float r = -1 * noise(p.x);
+          float s = -1 * noise(p.y);
+					//float r = random( -1, 0 );
+					//float s = random( -1, 0 );
 
 					if( r + s >= -1 ) {
 
-							point(
+							canvas.point(
 									( a.x + r * ab.x + s * ac.x ),
 									( a.y + r * ab.y + s * ac.y )
 							);
