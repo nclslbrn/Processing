@@ -40,8 +40,9 @@ class Point_in_triangle {
 
 			for( int n = 0; n < point_by_frame; n++ ) {
 				PVector p = new PVector(random(n), random(n));
-				float r = -1 * noise(p.x);
-				float s = -1 * noise(p.y);
+				float r = -1 * noise(p.x * 4, p.y * 4);
+				float s = -1 * noise(p.x % 4, p.y % 4);
+				
 				//float r = random( -1, 0 );
 				//float s = random( -1, 0 );
 
