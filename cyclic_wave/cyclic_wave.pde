@@ -59,10 +59,10 @@ void draw() {
 //////////////////////////////////////////////////////////////////////////////
 int[][] result;
 
-int samplesPerFrame = 3,
-    numFrames = 30; // animation loop duration (in frame)   
+int samplesPerFrame = 2,
+    numFrames = 60; // animation loop duration (in frame)   
 
-float shutterAngle = .8;
+float shutterAngle = 0.5;
 
 boolean recording = true,
         preview = true;
@@ -72,10 +72,10 @@ ArrayList<EllipseSection> arcs = new ArrayList<EllipseSection>(); // Custom arc 
 PVector center; //  center of circle
 
 int   margin         = 16,   // margin between circle
-      noiseScale     = 32,  
+      noiseScale     = 24,  
       noiseRadius    = 4,
       noiseStrength  = 32,
-      lineSize       = 4;
+      lineSize       = 3;
       
 
 float speed,      // the value wich increments circle's radiuses
@@ -168,9 +168,8 @@ void draw_() {
       currentAngle = end;
     }
 
-    arc.radius += speed;
 
-    if( arc.radius > maxRadius ) {
+    if( arc.radius >= maxRadius) {
 
       if( arcID != 1 ) {
 
@@ -178,6 +177,9 @@ void draw_() {
 
       }
       
+    } else {
+
+      arc.radius += speed;
     } 
   }
   popMatrix();
