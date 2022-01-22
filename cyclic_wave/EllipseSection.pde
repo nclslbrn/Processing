@@ -26,7 +26,7 @@ class EllipseSection {
 
     while( initialAngle <= TWO_PI ) {
 
-      newAngle = random( TWO_PI / 12 );
+      newAngle = random( TWO_PI / 10 );
 
       angles.append( newAngle );
 

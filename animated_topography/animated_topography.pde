@@ -79,7 +79,7 @@ void draw() {
     updatePixels();
 
     if (frameCount <= numFrames && recording) {
-        saveFrame("records/frame-###.jpg");
+        saveFrame("records/frame-###.gif");
     }
     if (frameCount == numFrames && recording) {
         exit();
