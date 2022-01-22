@@ -8,8 +8,8 @@ int numTrianglePerCircle = 7;
 int drawStartTime = 0;
 int drawDuration = 30000;
 int alphaValue = 75;
-int loopCount = 10;
-int pdfCount = 1;
+int loopCount = 1;
+int pdfCount = 10;
 Grid grid;
 ArrayList < Point_in_triangle > points = new ArrayList < Point_in_triangle > ();
 
@@ -29,8 +29,8 @@ void init() {
     //canvas.background(5);
     
     grid = new Grid(
-        940, // cellWidth
-        16 // cellPadding
+        560, // cellWidth
+        20 // cellPadding
     );
     points.clear();
     canvas.stroke(20);
@@ -50,7 +50,7 @@ void init() {
                     getRandomPoints(
                         _x, 
                         _y, 
-                        floor((grid.cellWidth-(grid.cellPadding*2)) / 2)
+                        floor((grid.cellWidth-(grid.cellPadding*2.1)) / 2)
                     ),
                     color((255 / (numTrianglePerCircle+1)) * t+1),
                     alphaValue

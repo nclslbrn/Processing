@@ -45,6 +45,8 @@ void addParticle(float xPos, float yPos, color particleColor) {
     new PVector(xPos, yPos),   // possition
     color(r, g, b),        // color
     random(0.01, particleMaxSize) // size
+    // TODO: add random max age 
+
   );
   particles.add(newParticle);
 }
@@ -52,8 +54,7 @@ void addParticle(float xPos, float yPos, color particleColor) {
 // Move particles and delete oldest
 void moveAndRemoveParticles() {
 
-  IntList particlesToRemove = new IntList();
-
+  //TODO: check if every particles are close 
   for ( int i = 0; i < particles.size(); i++ ) {
 
     Particle particle = particles.get(i);

@@ -20,7 +20,7 @@ float hue = 0;
 float shrink = 0.999;
 int numFrame = 16000;
 int frameLoopCount = 0;
-int drawingCount = 0;
+int drawingCount = 5;
 
 
 void reset() {
@@ -72,11 +72,12 @@ void draw() {
   }
   frameLoopCount = (frameCount > numFrame ? frameCount % numFrame : frameCount);
   if( frameLoopCount >= numFrame ){
-    saveFrame("records/drawng-"+drawingCount+".jpg");
+    saveFrame("records/drawing-"+drawingCount+".jpg");
     drawingCount++;
     reset();
   }
   if( mousePressed == true ) {
-    saveFrame("records/frame-###.jpg");
+    //saveFrame("records/frame-###.jpg");
+    println("[" + drawingCount + "] "+ frameLoopCount +"/"+numFrame);
   }
 }
