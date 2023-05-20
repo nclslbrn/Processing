@@ -48,7 +48,7 @@ void draw() {
         int(result[i][2]*1.0/samplesPerFrame);
     updatePixels();
 
-    saveFrame("records/frame-###.jpg");
+    saveFrame("records/frame-###.gif");
     if (frameCount==numFrames)
       exit();
   } else if (preview) {
@@ -75,14 +75,14 @@ boolean recording = true,
 PVector[] circleCenter, infinitePoints;
 float[] infiniteAngle;
 
-int   samplesPerFrame = 6,
-      numFrames       = 75,
-      cubeSize        = 56,
+int   samplesPerFrame = 60,
+      numFrames       = 30,
+      cubeSize        = 48,
       pointPerCircle,
       totalPoint,
       animPointSum;
 
-float shutterAngle = .4,
+float shutterAngle = .9,
       mainCircleRadius,
       mainCircleAngleStep;
 
@@ -96,17 +96,17 @@ void setup() {
   mainCircleRadius = width/6;
   pointPerCircle = ceil((2 * PI * mainCircleRadius) / cubeSize);
   circleCenter = new PVector[2];
-  circleCenter[0] = new PVector(width*0.333333333, height/2);
-  circleCenter[1] = new PVector(width*0.666666666, height/2);
+  circleCenter[0] = new PVector(width*1/3, height/2);
+  circleCenter[1] = new PVector(width*2/3, height/2);
 
-  totalPoint = pointPerCircle * circleCenter.length + 2;
+  totalPoint = pointPerCircle * circleCenter.length + 1;
   infinitePoints = new PVector[totalPoint];
   infiniteAngle = new float[totalPoint];
-
+  println(totalPoint);
   float circleAngleStep = TWO_PI/(pointPerCircle);
   int pointNum = 0;
   
-  for( float angle = 0; angle >= (TWO_PI)*-1; angle-= circleAngleStep ) {
+  for( float angle = circleAngleStep; angle >= -TWO_PI; angle-= circleAngleStep ) {
     PVector start = new PVector(
       circleCenter[0].x + mainCircleRadius * cos(angle),
       circleCenter[0].y + mainCircleRadius * sin(angle)
@@ -116,17 +116,18 @@ void setup() {
     pointNum++;
   }
 
-  for( float angle = PI; angle <= TWO_PI+ PI; angle+= circleAngleStep ) {
+  for( float angle = PI + circleAngleStep; angle < (TWO_PI+ PI) - circleAngleStep; angle+= circleAngleStep ) {
     PVector start = new PVector(
       circleCenter[1].x + mainCircleRadius * cos(angle),
       circleCenter[1].y + mainCircleRadius * sin(angle)
     );
+    println(pointNum);
     infinitePoints[pointNum] = new PVector(start.x, start.y);
     infiniteAngle[pointNum] = angle/2;
     pointNum++;
   }
-  colorMode(HSB, totalPoint*3, 100, 100);
-
+  
+  colorMode(HSB, totalPoint, 100, 100);
 }
 
 void draw_() {
@@ -138,20 +139,20 @@ void draw_() {
 
   int pointCount = (int) map(
     t,
-    (t < 0.5 ? 0   : 0.5),
+    (t < 0.5 ? 0 : 0.5),
     (t < 0.5 ? 0.5 : 1),
-    (t < 0.5 ? 1 : 15),
-    (t < 0.5 ? 15 : 1)
+    (t < 0.5 ? 1 : 6),
+    (t < 0.5 ? 6 : 1)
   );
 
   for( int p = 0; p <= pointCount; p++ ) {
     
     int newPointId = pointId - p;
     if(newPointId < 0 ) {
-      newPointId = (infinitePoints.length-1) + newPointId;
+      newPointId = infinitePoints.length + newPointId;
     }
     
-    fill( totalPoint + p, 100, 50 );
+    fill( newPointId, 100, 100 );
     
     pushMatrix();
     
