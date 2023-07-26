@@ -37,7 +37,7 @@ int blackValue = -3456789;
 int brightValue = 50;
 // sort all pixels darker than the threshold
 int darkValue = 230;
-int bandSize = 60;
+int bandSize = 92;
 int lastBandPos = 0;
 boolean sortInverse = true;
 
@@ -69,7 +69,7 @@ void draw() {
       sortColumn();
       column++;
       imgs[edition].updatePixels();
-      mode = floor(random(4));
+      mode = column % 4; // floor(random(4));
     }
     
     // loop through rows
@@ -79,7 +79,7 @@ void draw() {
       sortRow();
       row++;
       imgs[edition].updatePixels();
-      mode = floor(random(4));
+      mode = row % 4; // floor(random(4));
     }
     println( "edition #" + edition + " sorted" );
   }
@@ -230,7 +230,7 @@ void updateBand(int value) {
   if ((value - lastBandPos) % bandSize == 0) {
       sortInverse = !sortInverse;
       lastBandPos = value;
-      bandSize = ceil(random(1, 8)) * 16;
+      bandSize = ceil(random(1, 8)) * 128;
   }
 }
 
