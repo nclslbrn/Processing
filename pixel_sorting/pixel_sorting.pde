@@ -16,7 +16,7 @@ int mode = 0;
 
 // image path is relative to sketch directory
 String imgFileName = "Stacks-";
-int edition = 0;
+int edition = 1;
 int editionNum = 50;
 String fileType = "png";
 PImage[] imgs = new PImage[editionNum];
@@ -36,10 +36,10 @@ int blackValue = -3456789;
 // sort all pixels brighter than the threshold
 int brightValue = 50;
 // sort all pixels darker than the threshold
-int darkValue = 230;
-int bandSize = 92;
+int darkValue = 200;
+int bandSize = 32;
 int lastBandPos = 0;
-boolean sortInverse = true;
+boolean sortInverse = false;
 
 int row = 0;
 int column = 0;
@@ -47,7 +47,7 @@ int column = 0;
 boolean saved = false;
 
 void setup() {
-  for (int i = edition; i < editionNum; i++) { 
+  for (int i = 0; i < editionNum; i++) { 
     imgs[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
     // println("sample/" + imgFileName + i + "." + fileType + " loaded");
   }
@@ -230,7 +230,7 @@ void updateBand(int value) {
   if ((value - lastBandPos) % bandSize == 0) {
       sortInverse = !sortInverse;
       lastBandPos = value;
-      bandSize = ceil(random(1, 8)) * 128;
+      bandSize = ceil(random(1, 8)) * 32;
   }
 }
 
