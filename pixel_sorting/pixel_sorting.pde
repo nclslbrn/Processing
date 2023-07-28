@@ -1,22 +1,22 @@
 
 /********
+Image manipulation based on Kim Asendorf ASDF Pixel Sort
+Kim Asendorf | 2010 | kimasendorf.com
+https://github.com/kimasendorf/ASDFPixelSort/blob/master/ASDFPixelSort.pde
 
- ASDF Pixel Sort
- Kim Asendorf | 2010 | kimasendorf.com
- 
- Sorting modes
- 0 = white
- 1 = black
- 2 = bright
- 3 = dark
- 
+Sorting modes
+0 = white
+1 = black
+2 = bright
+3 = dark
+
  */
 
-int mode = 0;
+int mode = 0; // will change on loop
 
 // image path is relative to sketch directory
 String imgFileName = "Stacks-";
-int edition = 1;
+int edition = 2;
 int editionNum = 50;
 String fileType = "png";
 PImage[] imgs = new PImage[editionNum];
@@ -36,10 +36,11 @@ int blackValue = -16581375; //-3456789;
 // sort all pixels brighter than the threshold
 int brightValue = 50;
 // sort all pixels darker than the threshold
-int darkValue = 255;
-int bandSize = 48;
+int darkValue = 230;
+int bandSize = 92;
 int lastBandPos = 0;
 boolean sortInverse = false;
+boolean toPolar = false;
 
 int row = 0;
 int column = 0;
@@ -62,6 +63,9 @@ void setup() {
 void draw() {
   
   if (frameCount <= loops) {
+    if (toPolar) {
+      imgs[edition] = polarInterpolation(imgs[edition], 0.25);
+    }
     // loop through columns
     println("Sorting Columns");
     while (column < imgs[edition].width-1) {
@@ -69,7 +73,7 @@ void draw() {
       sortColumn();
       column++;
       imgs[edition].updatePixels();
-      mode =  (column % 2); // floor(random(4));
+      mode =  column % 4; // floor(random(4));
     }
     
     // loop through rows
@@ -79,7 +83,7 @@ void draw() {
       sortRow();
       row++;
       imgs[edition].updatePixels();
-      mode = floor(random(4));
+      mode = row % 4; // floor(random(4));
     }
     println( "edition #" + edition + " sorted" );
   }
@@ -89,7 +93,7 @@ void draw() {
 }
 
 void keyPressed() {
-   if (keyCode == LEFT) {
+    if (keyCode == LEFT) {
       if (edition > 0)  edition--;
     }
     
@@ -110,6 +114,7 @@ void mousePressed() {
     println("Saved edition " + edition);
   }
 }
+
 
 void sortRow() {
   // current row
@@ -159,6 +164,7 @@ void sortRow() {
       sorted = reverse(sorted);
     }
     
+
     for (int i = 0; i < sortingLength; i++) {
       imgs[edition].pixels[x + i + y * imgs[edition].width] = sorted[i];      
     }
@@ -230,7 +236,7 @@ void updateBand(int value) {
   if ((value - lastBandPos) % bandSize == 0) {
       sortInverse = !sortInverse;
       lastBandPos = value;
-      bandSize = ceil(random(1, 4)) * 48;
+      bandSize = ceil(random(1, 4)) * 96;
   }
 }
 
