@@ -34,13 +34,13 @@ int whiteValue = -12345678;
 int blackValue = -3456789;
 // using the brightness value
 // sort all pixels brighter than the threshold
-int brightValue = 200;
+int brightValue = 80;
 // sort all pixels darker than the threshold
-int darkValue = 50;
+int darkValue = 200;
 int bandSize = 8;
 int lastBandPos = 0;
 boolean sortInverse = true;
-boolean toPolar = true;
+boolean toPolar = false;
 boolean willSortRow = true;
 boolean willSortColumn = false;
 
@@ -66,7 +66,7 @@ void draw() {
   
   if (frameCount <= loops) {
     if (toPolar) {
-      imgs[edition] = polarInterpolation(imgs[edition], 0.45);
+      imgs[edition] = polarInterpolation(imgs[edition], 0.6);
     }
     if (willSortColumn) {
       println("Sorting Columns");
@@ -75,7 +75,7 @@ void draw() {
         sortColumn();
         column++;
         imgs[edition].updatePixels();
-        // mode = floor(random(4)); // column % 4;
+        mode = floor(random(4)); // column % 4;
       }
     }
     if (willSortRow) {
@@ -85,7 +85,7 @@ void draw() {
         sortRow();
         row++;
         imgs[edition].updatePixels();
-        // mode = floor(random(4)); // row % 4;
+        mode = floor(random(4)); // row % 4;
       }
     }
     println( "edition #" + edition + " sorted" );
@@ -165,10 +165,11 @@ void sortRow() {
     }
     
     sorted = sort(unsorted);
+    /*
     if(sortInverse) {
       sorted = reverse(sorted);
     }
-    
+    */
 
     for (int i = 0; i < sortingLength; i++) {
       imgs[edition].pixels[x + i + y * imgs[edition].width] = sorted[i];      
