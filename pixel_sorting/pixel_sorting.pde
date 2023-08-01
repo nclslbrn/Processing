@@ -16,7 +16,7 @@ int mode = 0; // will change on loop
 
 // image path is relative to sketch directory
 String imgFileName = "Stacks-";
-int edition = 2;
+int edition = 4;
 int editionNum = 50;
 String fileType = "png";
 PImage[] imgs = new PImage[editionNum];
@@ -29,20 +29,20 @@ int loops = 1;
 // 0 = white
 // -16581375 = black
 // sort all pixels whiter than the threshold
-int whiteValue = -12345678;
+int whiteValue = -10345678;
 // sort all pixels blacker than the threshold
-int blackValue = -3456789;
+int blackValue = -1456789;
 // using the brightness value
 // sort all pixels brighter than the threshold
-int brightValue = 80;
+int brightValue = 50;
 // sort all pixels darker than the threshold
 int darkValue = 200;
 int bandSize = 8;
 int lastBandPos = 0;
 boolean sortInverse = true;
 boolean toPolar = false;
-boolean willSortRow = true;
-boolean willSortColumn = false;
+boolean willSortRow = false;
+boolean willSortColumn = true;
 
 int row = 0;
 int column = 0;
@@ -52,7 +52,6 @@ boolean saved = false;
 void setup() {
   for (int i = 0; i < editionNum; i++) { 
     imgs[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
-    // println("sample/" + imgFileName + i + "." + fileType + " loaded");
   }
   // use only numbers (not variables) for the size() command, Processing 3
   size(1, 1);
@@ -66,8 +65,9 @@ void draw() {
   
   if (frameCount <= loops) {
     if (toPolar) {
-      imgs[edition] = polarInterpolation(imgs[edition], 0.6);
+      imgs[edition] = polarInterpolation(imgs[edition], 0.45);
     }
+
     if (willSortColumn) {
       println("Sorting Columns");
       while (column < imgs[edition].width-1) {
@@ -75,7 +75,7 @@ void draw() {
         sortColumn();
         column++;
         imgs[edition].updatePixels();
-        mode = floor(random(4)); // column % 4;
+        mode = column % 4; // floor(random(4));
       }
     }
     if (willSortRow) {
@@ -85,7 +85,7 @@ void draw() {
         sortRow();
         row++;
         imgs[edition].updatePixels();
-        mode = floor(random(4)); // row % 4;
+        mode = 2 + (row % 2); //floor(random(4));
       }
     }
     println( "edition #" + edition + " sorted" );
@@ -165,11 +165,11 @@ void sortRow() {
     }
     
     sorted = sort(unsorted);
-    /*
+    
     if(sortInverse) {
       sorted = reverse(sorted);
     }
-    */
+
 
     for (int i = 0; i < sortingLength; i++) {
       imgs[edition].pixels[x + i + y * imgs[edition].width] = sorted[i];      
@@ -240,9 +240,9 @@ void sortColumn() {
 
 void updateBand(int value) {
   if ((value - lastBandPos) % bandSize == 0) {
-      //sortInverse = !sortInverse;
+      sortInverse = !sortInverse;
       lastBandPos = value;
-      bandSize = ceil(random(1, 4)) * 4;
+      bandSize = ceil(random(1, 4)) * 64;
       mode = floor(random(4));
   }
 }
