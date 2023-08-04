@@ -3,25 +3,18 @@
 Image manipulation based on Kim Asendorf ASDF Pixel Sort
 Kim Asendorf | 2010 | kimasendorf.com
 https://github.com/kimasendorf/ASDFPixelSort/blob/master/ASDFPixelSort.pde
-
-Sorting modes
-0 = white
-1 = black
-2 = bright
-3 = dark
-
- */
+*/
 
 int mode = 0; // will change on loop
 
+String[] modes = { "white", "black", "bright", "dark" };
 // image path is relative to sketch directory
 String imgFileName = "Stacks-";
-int edition = 4;
+int edition = 5;
 int editionNum = 50;
 String fileType = "png";
 PImage[] imgs = new PImage[editionNum];
-
-int loops = 1;
+PImage[] original = new PImage[editionNum];
 
 // threshold values to determine sorting start and end pixels
 // using the absolute rgb value
@@ -29,87 +22,114 @@ int loops = 1;
 // 0 = white
 // -16581375 = black
 // sort all pixels whiter than the threshold
-int whiteValue = -10345678;
+int whiteValue = -12345678;
 // sort all pixels blacker than the threshold
-int blackValue = -1456789;
+int blackValue = -3456789;
 // using the brightness value
 // sort all pixels brighter than the threshold
-int brightValue = 50;
+int brightValue = 200;
 // sort all pixels darker than the threshold
-int darkValue = 200;
-int bandSize = 8;
+int darkValue = 50;
+
+// step until we change mode 
+int bandSize = 8; 
+int bandBaseSize = 4;
 int lastBandPos = 0;
+
 boolean sortInverse = true;
+// interpolate source image
 boolean toPolar = false;
-boolean willSortRow = false;
+boolean toSpiral = true;
+
+// choose sorting type (can be both)
+boolean willSortRow = true;
 boolean willSortColumn = true;
 
+// to do
+boolean useNoiseDisplacement = false;
+// sample spiral or polar (if both are true it will sample polar image)  
+boolean willMovePixInSpiral = false;
+boolean willMovePixInCircle = false;
 int row = 0;
 int column = 0;
 
 boolean saved = false;
 
+PImage polarImage;
+PImage spiralImage;
+
+
 void setup() {
-  for (int i = 0; i < editionNum; i++) { 
-    imgs[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
+  for (int i = 0; i < editionNum; i++) {
+    original[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
+    imgs[i] = original[i].get();
   }
-  // use only numbers (not variables) for the size() command, Processing 3
   size(1, 1);
   surface.setResizable(true);
   surface.setSize(imgs[edition].width, imgs[edition].height);
-  image(imgs[edition], 0, 0, width, height);
+
+  //image(imgs[edition], 0, 0, width, height);
+  noLoop();
 }
 
 
 void draw() {
-  
-  if (frameCount <= loops) {
-    if (toPolar) {
-      imgs[edition] = polarInterpolation(imgs[edition], 0.45);
-    }
+  if (willMovePixInCircle || toPolar) polarImage = polarInterpolation(imgs[edition], 0.45);    
+  if (willMovePixInSpiral || toSpiral) spiralImage = spiralInterpolation(imgs[edition]);
 
-    if (willSortColumn) {
-      println("Sorting Columns");
-      while (column < imgs[edition].width-1) {
-        imgs[edition].loadPixels();
-        sortColumn();
-        column++;
-        imgs[edition].updatePixels();
-        mode = column % 4; // floor(random(4));
-      }
-    }
-    if (willSortRow) {
-      println("Sorting Rows");
-      while (row < imgs[edition].height-1) {
-        imgs[edition].loadPixels();
-        sortRow();
-        row++;
-        imgs[edition].updatePixels();
-        mode = 2 + (row % 2); //floor(random(4));
-      }
-    }
-    println( "edition #" + edition + " sorted" );
+
+  if (toPolar) {
+    imgs[edition] = polarImage;
+    imgs[edition].updatePixels();
   }
-  
+  if (toSpiral) {
+    imgs[edition] = spiralImage;
+    imgs[edition].updatePixels();
+  }
+
+  if (willSortColumn) {
+    while (column < imgs[edition].width-1) {
+      imgs[edition].loadPixels();
+      sortColumn();
+      column++;
+      //mode = (mode + 1) % 4;
+      imgs[edition].updatePixels();
+    }
+  }
+  if (willSortRow) {
+    while (row < imgs[edition].height-1) {
+      imgs[edition].loadPixels();
+      sortRow();
+      row++;
+      //mode = (mode + 1) % 4;
+      imgs[edition].updatePixels();
+    }
+  }  
   // load updated image onto surface and scale to fit the display width and height
   image(imgs[edition], 0, 0, width, height);
 }
 
 void keyPressed() {
-    if (keyCode == LEFT) {
-      if (edition > 0)  edition--;
-    }
-    
-    if(keyCode == RIGHT) {
-      if (edition < editionNum-1) edition++;
-    }
-    loops = frameCount + 1;
-    row = 0;
-    column = 0;
-    bandSize = 8;
-    lastBandPos = 0;
-    image(imgs[edition], 0, 0, width, height);
-    saved = false;
+  
+  if (keyCode == LEFT && edition > 0) edition--;
+  if(keyCode == RIGHT && edition < editionNum-1) edition++;
+
+  if (keyCode == UP) willSortRow = !willSortRow;
+  if (keyCode == DOWN) willSortColumn = ! willSortColumn;
+
+  row = 0;
+  column = 0;
+  bandSize = 8;
+  lastBandPos = 0;
+  imgs[edition].loadPixels();
+  imgs[edition] = original[edition].get();
+  imgs[edition].updatePixels();
+  //image(imgs[edition], 0, 0, width, height);
+  saved = false;
+  redraw();
+  println(
+    "#" + edition + 
+    " sort [ " + (willSortColumn ? "column " : "") + (willSortRow ? "row " : "") + "]" );
 }
 
 void mousePressed() {
@@ -131,7 +151,7 @@ void sortRow() {
   // where to stop sorting
   int xEnd = 0;
   
-  while (xEnd < imgs[edition].width-1) {
+  while (xEnd < imgs[edition].width - 1) {
     switch (mode) {
       case 0:
         x = getFirstNoneWhiteX(x, y);
@@ -161,7 +181,13 @@ void sortRow() {
     color[] sorted = new color[sortingLength];
     
     for (int i = 0; i < sortingLength; i++) {
-      unsorted[i] = imgs[edition].pixels[x + i + y * imgs[edition].width];
+      if( willMovePixInSpiral) {
+        unsorted[i] = spiralImage.pixels[x + i + y * imgs[edition].width];
+      } else if (willMovePixInCircle) {
+        unsorted[i] = polarImage.pixels[x + i + y * imgs[edition].width];
+      } else {
+        unsorted[i] = imgs[edition].pixels[x + i + y * imgs[edition].width];
+      }
     }
     
     sorted = sort(unsorted);
@@ -169,7 +195,6 @@ void sortRow() {
     if(sortInverse) {
       sorted = reverse(sorted);
     }
-
 
     for (int i = 0; i < sortingLength; i++) {
       imgs[edition].pixels[x + i + y * imgs[edition].width] = sorted[i];      
@@ -191,7 +216,7 @@ void sortColumn() {
   // where to stop sorting
   int yEnd = 0;
   
-  while (yEnd < imgs[edition].height-1) {
+  while (yEnd < imgs[edition].height - 1) {
     switch (mode) {
       case 0:
         y = getFirstNoneWhiteY(x, y);
@@ -221,7 +246,13 @@ void sortColumn() {
     color[] sorted = new color[sortingLength];
     
     for (int i = 0; i < sortingLength; i++) {
-      unsorted[i] = imgs[edition].pixels[x + (y+i) * imgs[edition].width];
+      if (willMovePixInSpiral) { 
+        unsorted[i] = spiralImage.pixels[x + (y+i) * imgs[edition].width];
+      } else if (willMovePixInCircle) {
+        unsorted[i] = polarImage.pixels[x + (y+i) * imgs[edition].width];
+      } else {
+        unsorted[i] = imgs[edition].pixels[x + (y+i) * imgs[edition].width];
+      }
     }
     
     sorted = sort(unsorted);
@@ -242,168 +273,16 @@ void updateBand(int value) {
   if ((value - lastBandPos) % bandSize == 0) {
       sortInverse = !sortInverse;
       lastBandPos = value;
-      bandSize = ceil(random(1, 4)) * 64;
-      mode = floor(random(4));
+      bandSize = ceil(random(1, 4)) * bandBaseSize;
+      //mode = (mode + 1) % 4;
   }
 }
 
-// white x
-int getFirstNoneWhiteX(int x, int y) {
-  while (imgs[edition].pixels[x + y * imgs[edition].width] < whiteValue) {
-    x++;
-    if (x >= imgs[edition].width) return -1;
-  }
-  return x;
-}
-
-int getNextWhiteX(int x, int y) {
-  x++;
-  while (imgs[edition].pixels[x + y * imgs[edition].width] > whiteValue) {
-    x++;
-    if (x >= imgs[edition].width) return imgs[edition].width-1;
-  }
-  return x-1;
-}
-
-// black x
-int getFirstNoneBlackX(int x, int y) {
-  while (imgs[edition].pixels[x + y * imgs[edition].width] > blackValue) {
-    x++;
-    if (x >= imgs[edition].width) return -1;
-  }
-  return x;
-}
-
-int getNextBlackX(int x, int y) {
-  x++;
-  while (imgs[edition].pixels[x + y * imgs[edition].width] < blackValue) {
-    x++;
-    if (x >= imgs[edition].width) return imgs[edition].width-1;
-  }
-  return x-1;
-}
-
-// bright x
-int getFirstNoneBrightX(int x, int y) {
-  while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) < brightValue) {
-    x++;
-    if (x >= imgs[edition].width) return -1;
-  }
-  return x;
-}
-
-int getNextBrightX(int x, int y) {
-  x++;
-  while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) > brightValue) {
-    x++;
-    if (x >= imgs[edition].width) return imgs[edition].width-1;
-  }
-  return x-1;
-}
-
-// dark x
-int getFirstNoneDarkX(int x, int y) {
-  while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) > darkValue) {
-    x++;
-    if (x >= imgs[edition].width) return -1;
-  }
-  return x;
-}
-
-int getNextDarkX(int x, int y) {
-  x++;
-  while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) < darkValue) {
-    x++;
-    if (x >= imgs[edition].width) return imgs[edition].width-1;
-  }
-  return x-1;
-}
-
-// white y
-int getFirstNoneWhiteY(int x, int y) {
-  if (y < imgs[edition].height) {
-    while (imgs[edition].pixels[x + y * imgs[edition].width] < whiteValue) {
-      y++;
-      if (y >= imgs[edition].height) return -1;
-    }
-  }
-  return y;
-}
-
-int getNextWhiteY(int x, int y) {
-  y++;
-  if (y < imgs[edition].height) {
-    while (imgs[edition].pixels[x + y * imgs[edition].width] > whiteValue) {
-      y++;
-      if (y >= imgs[edition].height) return imgs[edition].height-1;
-    }
-  }
-  return y-1;
-}
-
-
-// black y
-int getFirstNoneBlackY(int x, int y) {
-  if (y < imgs[edition].height) {
-    while (imgs[edition].pixels[x + y * imgs[edition].width] > blackValue) {
-      y++;
-      if (y >= imgs[edition].height) return -1;
-    }
-  }
-  return y;
-}
-
-int getNextBlackY(int x, int y) {
-  y++;
-  if (y < imgs[edition].height) {
-    while (imgs[edition].pixels[x + y * imgs[edition].width] < blackValue) {
-      y++;
-      if (y >= imgs[edition].height) return imgs[edition].height-1;
-    }
-  }
-  return y-1;
-}
-
-// bright y
-int getFirstNoneBrightY(int x, int y) {
-  if (y < imgs[edition].height) {
-    while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) < brightValue) {
-      y++;
-      if (y >= imgs[edition].height) return -1;
-    }
-  }
-  return y;
-}
-
-int getNextBrightY(int x, int y) {
-  y++;
-  if (y < imgs[edition].height) {
-    while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) > brightValue) {
-      y++;
-      if (y >= imgs[edition].height) return imgs[edition].height-1;
-    }
-  }
-  return y-1;
-}
-
-// dark y
-int getFirstNoneDarkY(int x, int y) {
-  if (y < imgs[edition].height) {
-    while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) > darkValue) {
-      y++;
-      if (y >= imgs[edition].height) return -1;
-    }
-  }
-  return y;
-}
-
-int getNextDarkY(int x, int y) {
-  y++;
-  if (y < imgs[edition].height) {
-    while (brightness(imgs[edition].pixels[x + y * imgs[edition].width]) < darkValue) {
-      y++;
-      if (y >= imgs[edition].height) return imgs[edition].height-1;
-    }
-  }
-  return y-1;
+PVector noiseMove(int x, int y) {
+  float noiseScale = 0.02;
+  float noiseAngle = noise(x * noiseScale, y * noiseScale) * TWO_PI;
+  return new PVector(
+    abs(x + cos(noiseAngle)) % imgs[edition].width,
+    abs(y + sin(noiseAngle)) % imgs[edition].height
+  );
 }
