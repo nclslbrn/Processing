@@ -1,9 +1,13 @@
-
 /********
 Image manipulation based on Kim Asendorf ASDF Pixel Sort
 Kim Asendorf | 2010 | kimasendorf.com
 https://github.com/kimasendorf/ASDFPixelSort/blob/master/ASDFPixelSort.pde
 */
+import controlP5.*;
+PixelSortingApplet applet;
+ControlP5 cp5;
+Slider s1, s2;
+RadioButton r1, r2;
 
 int mode = 0; // will change on loop
 
@@ -58,232 +62,201 @@ boolean saved = false;
 PImage polarImage;
 PImage spiralImage;
 
-
 void setup() {
+  size(300, 600);
+    
   for (int i = 0; i < editionNum; i++) {
     original[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
     imgs[i] = original[i].get();
   }
-  size(1, 1);
-  surface.setResizable(true);
-  surface.setSize(imgs[edition].width, imgs[edition].height);
+  
+  String[] args = {"TwoFrameTest", "Pixel Sorting"};
+  applet = new PixelSortingApplet();
+  PApplet.runSketch(args, applet);
+  
+  cp5 = new ControlP5(this);
+  cp5.addSlider("brightValueSlider")
+    .setPosition(20, 40)
+    .setSize(200, 20)
+    .setRange(0, 255)
+    .setValue(50)
+    .setColorCaptionLabel(color(20,20,20));
+    
+  cp5.addSlider("darkValueSlider")
+    .setPosition(20, 80)
+    .setSize(200, 20)
+    .setRange(0, 255)
+    .setValue(200)
+    .setColorCaptionLabel(color(20,20,20));
+    
+  cp5.addSlider("whiteValueSlider")
+    .setPosition(20, 120)
+    .setSize(200, 20)
+    .setRange(-12345678, 0)
+    .setValue(-12345678)
+    .setColorCaptionLabel(color(255));
+  
+  cp5.addSlider("blackValueSlider")
+    .setPosition(20, 160)
+    .setSize(200, 20)
+    .setRange(-3456789, -12345678)
+    .setValue(-3456789)
+    .setColorCaptionLabel(color(255));
+    
+  cp5.addButton("previous")
+     .setValue(0)
+     .setPosition(20, 240)
+     .setSize(40, 20);
 
-  //image(imgs[edition], 0, 0, width, height);
-  noLoop();
+  cp5.addButton("next")
+     .setValue(0)
+     .setPosition(180, 240)
+     .setSize(40, 20);
+  
+  r1 = cp5.addRadioButton("radioButton")
+     .setPosition(40,200)
+     .setSize(40, 20)
+     .setColorForeground(color(120))
+     .setColorActive(color(255))
+     .setColorLabel(color(255))
+     .setItemsPerRow(2)
+     .setSpacingColumn(50)
+     .addItem("spiral", 1)
+     .addItem("circle", 2);
+   
+  
 }
-
 
 void draw() {
-  if (willMovePixInCircle || toPolar) polarImage = polarInterpolation(imgs[edition], 0.45).get();    
-  if (willMovePixInSpiral || toSpiral) spiralImage = spiralInterpolation(imgs[edition]).get();
-
-
-  if (toPolar) {
-    imgs[edition] = polarImage;
-    imgs[edition].updatePixels();
-  }
-  if (toSpiral) {
-    imgs[edition] = spiralImage;
-    imgs[edition].updatePixels();
-  }
-
-  if (willSortColumn) {
-    while (column < imgs[edition].width-1) {
-      imgs[edition].loadPixels();
-      sortColumn();
-      column++;
-      mode = (mode + 1) % 4;
-      imgs[edition].updatePixels();
-    }
-  }
-  if (willSortRow) {
-    while (row < imgs[edition].height-1) {
-      imgs[edition].loadPixels();
-      sortRow();
-      row++;
-      mode = (mode + 1) % 4;
-      imgs[edition].updatePixels();
-    }
-  }  
-  // load updated image onto surface and scale to fit the display width and height
-  image(imgs[edition], 0, 0, width, height);
+  background(0); 
 }
-
+void brightValueSlider(int val) { brightValue = val; applet.init(); }
+void darkValueSlider(int val) {  darkValue  = val; applet.init(); }
+void whiteValueSlider(int val) { whiteValue = val; applet.init(); }
+void blackValueSlider(int val) { blackValue = val; applet.init(); }
+void previous() { 
+  if (edition > 0) {
+    edition--;
+    applet.init();
+  } 
+}
+void next() {
+  if(edition < editionNum-1) {
+    edition++;
+    applet.init();
+  }
+}
 void keyPressed() {
-  
-  if (keyCode == LEFT && edition > 0) edition--;
-  if (keyCode == RIGHT && edition < editionNum-1) edition++;
-  if (keyCode == UP) willSortRow = !willSortRow;
-  if (keyCode == DOWN) willSortColumn = !willSortColumn;
-  if (keyCode == 67) willMovePixInCircle = !willMovePixInCircle;
-  if (keyCode == 83) willMovePixInSpiral = !willMovePixInSpiral;
-  println(keyCode);
-  row = 0;
-  column = 0;
-  bandSize = 8;
-  lastBandPos = 0;
-  //imgs[edition].loadPixels();
-  imgs[edition] = original[edition].get();
-  //imgs[edition].updatePixels();
-  saved = false;
-  
-  redraw();
-  println(
-    "#" + edition + 
-    " sort [ " + (willSortColumn ? "column " : "") + (willSortRow ? "row " : "") + "]" +
-    (willMovePixInSpiral || willMovePixInCircle ? " on " : "") + 
-    (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "")
-  );
+  switch(key) {
+    case('0'): r1.deactivateAll(); break;
+    case('1'): r1.activate(0); break;
+    case('2'): r1.activate(1); break;
+  }
 }
 
-void mousePressed() {
-  if ( ! saved ) {
-    imgs[edition].save(
-      "output/" + imgFileName + edition + "-" +
-      (willSortColumn ? "column-" : "") + (willSortRow ? "row-" : "") +
-      (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + 
-      ".png"
+void controlEvent(ControlEvent theEvent) {
+  if(theEvent.isFrom(r1)) {
+    if (int(theEvent.getGroup().getValue()) == 1) {
+      willMovePixInSpiral = !willMovePixInSpiral;
+      applet.init();
+
+    }
+    if (int(theEvent.getGroup().getValue()) == 2) {
+      willMovePixInCircle = !willMovePixInCircle;
+      applet.init();
+    }
+  }
+}
+
+public class PixelSortingApplet extends PApplet {
+  public void settings() {
+    
+    size(1000, 1000);
+    // surface.setResizable(true);
+    //surface.setSize(imgs[edition].width, imgs[edition].height);
+    //image(imgs[edition], 0, 0, width, height);
+    noLoop();
+  }
+  
+  
+  public void draw() {
+    if (willMovePixInCircle || toPolar) polarImage = polarInterpolation(imgs[edition], 0.45).get();    
+    if (willMovePixInSpiral || toSpiral) spiralImage = spiralInterpolation(imgs[edition]).get();
+  
+  
+    if (toPolar) {
+      imgs[edition] = polarImage;
+      imgs[edition].updatePixels();
+    }
+    if (toSpiral) {
+      imgs[edition] = spiralImage;
+      imgs[edition].updatePixels();
+    }
+  
+    if (willSortColumn) {
+      while (column < imgs[edition].width-1) {
+        imgs[edition].loadPixels();
+        sortColumn();
+        column++;
+        mode = (mode + 1) % 4;
+        imgs[edition].updatePixels();
+      }
+    }
+    if (willSortRow) {
+      while (row < imgs[edition].height-1) {
+        imgs[edition].loadPixels();
+        sortRow();
+        row++;
+        mode = (mode + 1) % 4;
+        imgs[edition].updatePixels();
+      }
+    }  
+    // load updated image onto surface and scale to fit the display width and height
+    image(imgs[edition], 0, 0, width, height);
+  }
+  
+  public void keyPressed() {
+    
+    if (keyCode == LEFT && edition > 0) edition--;
+    if (keyCode == RIGHT && edition < editionNum-1) edition++;
+    if (keyCode == UP) willSortRow = !willSortRow;
+    if (keyCode == DOWN) willSortColumn = !willSortColumn;
+    if (keyCode == 67) willMovePixInCircle = !willMovePixInCircle;
+    if (keyCode == 83) willMovePixInSpiral = !willMovePixInSpiral;
+    println(keyCode);
+    println(
+      "#" + edition + 
+      " sort [ " + (willSortColumn ? "column " : "") + (willSortRow ? "row " : "") + "]" +
+      (willMovePixInSpiral || willMovePixInCircle ? " on " : "") + 
+      (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "")
     );
-    saved = true;
-    println("Saved edition " + edition);
+    init();
   }
-}
-
-
-void sortRow() {
-  // current row
-  int y = row;
   
-  // where to start sorting
-  int x = 0;
-  
-  // where to stop sorting
-  int xEnd = 0;
-  
-  while (xEnd < imgs[edition].width - 1) {
-    switch (mode) {
-      case 0:
-        x = getFirstNoneWhiteX(x, y);
-        xEnd = getNextWhiteX(x, y);
-        break;
-      case 1:
-        x = getFirstNoneBlackX(x, y);
-        xEnd = getNextBlackX(x, y);
-        break;
-      case 2:
-        x = getFirstNoneBrightX(x, y);
-        xEnd = getNextBrightX(x, y);
-        break;
-      case 3:
-        x = getFirstNoneDarkX(x, y);
-        xEnd = getNextDarkX(x, y);
-        break;
-      default:
-        break;
-    }
+  public void init() {
+   row = 0;
+   column = 0;
+   bandSize = 8;
+   lastBandPos = 0;
+    //imgs[edition].loadPixels();
+   imgs[edition] = original[edition].get();
+    //imgs[edition].updatePixels();
+   saved = false;
     
-    if (x < 0) break;
-    
-    int sortingLength = xEnd-x;
-    
-    color[] unsorted = new color[sortingLength];
-    color[] sorted = new color[sortingLength];
-    
-    for (int i = 0; i < sortingLength; i++) {
-      if( willMovePixInSpiral) {
-        unsorted[i] = spiralImage.pixels[x + i + y * imgs[edition].width];
-      } else if (willMovePixInCircle) {
-        unsorted[i] = polarImage.pixels[x + i + y * imgs[edition].width];
-      } else {
-        unsorted[i] = imgs[edition].pixels[x + i + y * imgs[edition].width];
-      }
-    }
-    
-    sorted = sort(unsorted);
-    
-    if(sortInverse) {
-      sorted = reverse(sorted);
-    }
-
-    for (int i = 0; i < sortingLength; i++) {
-      imgs[edition].pixels[x + i + y * imgs[edition].width] = sorted[i];      
-    }
-    
-    x = xEnd+1;
-    updateBand(x);
+   redraw();
   }
-}
-
-
-void sortColumn() {
-  // current column
-  int x = column;
   
-  // where to start sorting
-  int y = 0;
-  
-  // where to stop sorting
-  int yEnd = 0;
-  
-  while (yEnd < imgs[edition].height - 1) {
-    switch (mode) {
-      case 0:
-        y = getFirstNoneWhiteY(x, y);
-        yEnd = getNextWhiteY(x, y);
-        break;
-      case 1:
-        y = getFirstNoneBlackY(x, y);
-        yEnd = getNextBlackY(x, y);
-        break;
-      case 2:
-        y = getFirstNoneBrightY(x, y);
-        yEnd = getNextBrightY(x, y);
-        break;
-      case 3:
-        y = getFirstNoneDarkY(x, y);
-        yEnd = getNextDarkY(x, y);
-        break;
-      default:
-        break;
+  public void mousePressed() {
+    if ( ! saved ) {
+      imgs[edition].save(
+        "output/" + imgFileName + edition + "-" +
+        (willSortColumn ? "column-" : "") + (willSortRow ? "row-" : "") +
+        (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + 
+        ".png"
+      );
+      saved = true;
+      println("Saved edition " + edition);
     }
-    
-    if (y < 0) break;
-    
-    int sortingLength = yEnd-y;
-    
-    color[] unsorted = new color[sortingLength];
-    color[] sorted = new color[sortingLength];
-    
-    for (int i = 0; i < sortingLength; i++) {
-      if (willMovePixInSpiral) { 
-        unsorted[i] = spiralImage.pixels[x + (y+i) * imgs[edition].width];
-      } else if (willMovePixInCircle) {
-        unsorted[i] = polarImage.pixels[x + (y+i) * imgs[edition].width];
-      } else {
-        unsorted[i] = imgs[edition].pixels[x + (y+i) * imgs[edition].width];
-      }
-    }
-    
-    sorted = sort(unsorted);
-    if(sortInverse) {
-      sorted = reverse(sorted);
-    }
-
-    for (int i = 0; i < sortingLength; i++) {
-      imgs[edition].pixels[x + (y+i) * imgs[edition].width] = sorted[i];
-    }
-    
-    y = yEnd+1;
-    updateBand(y);
-  }
-}
-
-void updateBand(int value) {
-  if ((value - lastBandPos) % bandSize == 0) {
-      sortInverse = !sortInverse;
-      lastBandPos = value;
-      bandSize = ceil(random(1, 4)) * bandBaseSize;
-      //mode = (mode + 1) % 4;
   }
 }
 
@@ -294,4 +267,13 @@ PVector noiseMove(int x, int y) {
     abs(x + cos(noiseAngle)) % imgs[edition].width,
     abs(y + sin(noiseAngle)) % imgs[edition].height
   );
+}
+
+void updateBand(int value) {
+  if ((value - lastBandPos) % bandSize == 0) {
+      sortInverse = !sortInverse;
+      lastBandPos = value;
+      bandSize = ceil(random(1, 4)) * bandBaseSize;
+      //mode = (mode + 1) % 4;
+  }
 }
