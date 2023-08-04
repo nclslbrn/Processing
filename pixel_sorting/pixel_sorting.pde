@@ -27,19 +27,19 @@ int whiteValue = -12345678;
 int blackValue = -3456789;
 // using the brightness value
 // sort all pixels brighter than the threshold
-int brightValue = 200;
+int brightValue = 50;
 // sort all pixels darker than the threshold
-int darkValue = 50;
+int darkValue = 200;
 
 // step until we change mode 
-int bandSize = 8; 
-int bandBaseSize = 4;
+int bandSize = 32; 
+int bandBaseSize = 16;
 int lastBandPos = 0;
 
 boolean sortInverse = true;
 // interpolate source image
 boolean toPolar = false;
-boolean toSpiral = true;
+boolean toSpiral = false;
 
 // choose sorting type (can be both)
 boolean willSortRow = true;
@@ -74,8 +74,8 @@ void setup() {
 
 
 void draw() {
-  if (willMovePixInCircle || toPolar) polarImage = polarInterpolation(imgs[edition], 0.45);    
-  if (willMovePixInSpiral || toSpiral) spiralImage = spiralInterpolation(imgs[edition]);
+  if (willMovePixInCircle || toPolar) polarImage = polarInterpolation(imgs[edition], 0.45).get();    
+  if (willMovePixInSpiral || toSpiral) spiralImage = spiralInterpolation(imgs[edition]).get();
 
 
   if (toPolar) {
@@ -92,7 +92,7 @@ void draw() {
       imgs[edition].loadPixels();
       sortColumn();
       column++;
-      //mode = (mode + 1) % 4;
+      mode = (mode + 1) % 4;
       imgs[edition].updatePixels();
     }
   }
@@ -101,7 +101,7 @@ void draw() {
       imgs[edition].loadPixels();
       sortRow();
       row++;
-      //mode = (mode + 1) % 4;
+      mode = (mode + 1) % 4;
       imgs[edition].updatePixels();
     }
   }  
@@ -112,29 +112,38 @@ void draw() {
 void keyPressed() {
   
   if (keyCode == LEFT && edition > 0) edition--;
-  if(keyCode == RIGHT && edition < editionNum-1) edition++;
-
+  if (keyCode == RIGHT && edition < editionNum-1) edition++;
   if (keyCode == UP) willSortRow = !willSortRow;
-  if (keyCode == DOWN) willSortColumn = ! willSortColumn;
-
+  if (keyCode == DOWN) willSortColumn = !willSortColumn;
+  if (keyCode == 67) willMovePixInCircle = !willMovePixInCircle;
+  if (keyCode == 83) willMovePixInSpiral = !willMovePixInSpiral;
+  println(keyCode);
   row = 0;
   column = 0;
   bandSize = 8;
   lastBandPos = 0;
-  imgs[edition].loadPixels();
+  //imgs[edition].loadPixels();
   imgs[edition] = original[edition].get();
-  imgs[edition].updatePixels();
-  //image(imgs[edition], 0, 0, width, height);
+  //imgs[edition].updatePixels();
   saved = false;
+  
   redraw();
   println(
     "#" + edition + 
-    " sort [ " + (willSortColumn ? "column " : "") + (willSortRow ? "row " : "") + "]" );
+    " sort [ " + (willSortColumn ? "column " : "") + (willSortRow ? "row " : "") + "]" +
+    (willMovePixInSpiral || willMovePixInCircle ? " on " : "") + 
+    (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "")
+  );
 }
 
 void mousePressed() {
   if ( ! saved ) {
-    imgs[edition].save("output/" + imgFileName + edition + ".png");
+    imgs[edition].save(
+      "output/" + imgFileName + edition + "-" +
+      (willSortColumn ? "column-" : "") + (willSortRow ? "row-" : "") +
+      (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + 
+      ".png"
+    );
     saved = true;
     println("Saved edition " + edition);
   }
