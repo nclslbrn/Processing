@@ -53,6 +53,9 @@ void sortColumn() {
     }
 
     for (int i = 0; i < sortingLength; i++) {
+      if (useNoiseDisplacement) {
+         noiseDisplacement(x, y+i, sorted[i]); 
+      }
       imgs[edition].pixels[x + (y+i) * imgs[edition].width] = sorted[i];
     }
     

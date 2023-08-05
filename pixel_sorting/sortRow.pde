@@ -54,6 +54,9 @@ void sortRow() {
     }
 
     for (int i = 0; i < sortingLength; i++) {
+      if (useNoiseDisplacement) {
+         noiseDisplacement(x+i, y, sorted[i]); 
+      }
       imgs[edition].pixels[x + i + y * imgs[edition].width] = sorted[i];      
     }
     
