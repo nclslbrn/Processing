@@ -1,5 +1,7 @@
 public void initUI() {
+
   cp5 = new ControlP5(this);
+  
   cp5.addSlider("brightValueSlider")
     .setPosition(20, 40)
     .setSize(200, 20)
@@ -28,55 +30,82 @@ public void initUI() {
     .setValue(-3456789)
     .setColorCaptionLabel(color(255));
     
+  willSortRowToggle = cp5.addToggle("willSortRow")
+     .setPosition(20, 220)
+     .setSize(60, 20);
+     
+  willSortColumnToggle = cp5.addToggle("willSortColumn")
+     .setPosition(140, 220)
+     .setSize(60, 20);
+     
+  radioButton = cp5.addRadioButton("interpolation")
+    .setPosition(20, 280)
+    .setSize(60, 40)
+    .setColorForeground(color(120))
+    .setColorActive(color(255))
+    .setColorLabel(color(255))
+    .setItemsPerRow(2)
+    .setSpacingColumn(60)
+    .addItem("spiral", 1)
+    .addItem("circle", 2);
+  
+  useNoiseDisplacementToggle = cp5.addToggle("useNoiseDisplacement")
+    .setPosition(20, 340)
+    .setSize(180, 20);
+      
   cp5.addButton("previous")
-     .setValue(0)
-     .setPosition(20, 360)
-     .setSize(40, 20);
+    .setValue(0)
+    .setPosition(20, 380)
+    .setSize(40, 20);
 
   cp5.addButton("next")
-     .setValue(0)
-     .setPosition(180, 360)
-     .setSize(40, 20);
-  
-  r1 = cp5.addRadioButton("radioButton")
-     .setPosition(40,200)
-     .setSize(40, 20)
-     .setColorForeground(color(120))
-     .setColorActive(color(255))
-     .setColorLabel(color(255))
-     .setItemsPerRow(2)
-     .setSpacingColumn(50)
-     .addItem("spiral", 1)
-     .addItem("circle", 2);
+    .setValue(0)
+    .setPosition(180, 380)
+    .setSize(40, 20);
+
+  textLabel = cp5.addTextlabel("label")
+    .setText("Edition #" + edition)
+    .setPosition(90, 385)
+    .setColorValue(#FFFFFF);
 }
 
-
 void brightValueSlider(int val) { brightValue = val; applet.init(); }
+
 void darkValueSlider(int val) {  darkValue  = val; applet.init(); }
+
 void whiteValueSlider(int val) { whiteValue = val; applet.init(); }
+
 void blackValueSlider(int val) { blackValue = val; applet.init(); }
+
 void previous() { 
   if (edition > 0) {
     edition--;
+    if (textLabel != null) textLabel.setText("Edition #" + edition);
     applet.init();
   } 
 }
+
 void next() {
   if(edition < editionNum-1) {
     edition++;
+    if (textLabel != null) textLabel.setText("Edition #" + edition);
     applet.init();
   }
 }
+
+void toggle() { println("toggle"); applet.init(); }
+
 void keyPressed() {
   switch(key) {
-    case('0'): r1.deactivateAll(); break;
-    case('1'): r1.activate(0); break;
-    case('2'): r1.activate(1); break;
+    case('0'): radioButton.deactivateAll(); break;
+    case('1'): radioButton.activate(0); break;
+    case('2'): radioButton.activate(1); break;
   }
+  println(key);
 }
 
 void controlEvent(ControlEvent theEvent) {
-  if(theEvent.isFrom(r1)) {
+  if (theEvent.isFrom(radioButton)) {
     if (int(theEvent.getGroup().getValue()) == -1) {
       willMovePixInSpiral = false;
       willMovePixInCircle = false;
@@ -87,6 +116,14 @@ void controlEvent(ControlEvent theEvent) {
     if (int(theEvent.getGroup().getValue()) == 2) {
       willMovePixInCircle = !willMovePixInCircle;
     }
+    applet.init();
+  }
+  
+  if (
+    theEvent.isFrom(willSortColumnToggle) || 
+    theEvent.isFrom(willSortRowToggle) ||
+    theEvent.isFrom(useNoiseDisplacementToggle)
+  ) {
     applet.init();
   }
 }
