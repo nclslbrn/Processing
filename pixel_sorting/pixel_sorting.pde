@@ -7,7 +7,9 @@ import controlP5.*;
 PixelSortingApplet applet;
 ControlP5 cp5;
 Slider s1, s2;
-RadioButton r1, r2;
+RadioButton radioButton;
+Textlabel textLabel;
+Toggle willSortRowToggle, willSortColumnToggle, useNoiseDisplacementToggle;
 
 int mode = 0; // will change on loop
 
@@ -41,16 +43,13 @@ int bandBaseSize = 16;
 int lastBandPos = 0;
 
 boolean sortInverse = true;
-// interpolate source image
-boolean toPolar = false;
-boolean toSpiral = false;
 
 // choose sorting type (can be both)
 boolean willSortRow = true;
 boolean willSortColumn = true;
 
 // to do
-boolean useNoiseDisplacement = true;
+boolean useNoiseDisplacement = false;
 // sample spiral or polar (if both are true it will sample polar image)  
 boolean willMovePixInSpiral = false;
 boolean willMovePixInCircle = false;
@@ -63,7 +62,7 @@ PImage polarImage;
 PImage spiralImage;
 
 void setup() {
-  size(300, 400);
+  size(300, 440);
     
   for (int i = 0; i < editionNum; i++) {
     original[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
@@ -73,11 +72,13 @@ void setup() {
   String[] args = {"TwoFrameTest", "Pixel Sorting"};
   applet = new PixelSortingApplet();
   PApplet.runSketch(args, applet);
+
   initUI();
 }
 
 void draw() {
   background(0); 
+  textLabel.draw(this); 
 }
 
 
