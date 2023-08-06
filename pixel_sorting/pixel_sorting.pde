@@ -16,7 +16,7 @@ int mode = 0; // will change on loop
 String[] modes = { "white", "black", "bright", "dark" };
 // image path is relative to sketch directory
 String imgFileName = "Stacks-";
-int edition = 5;
+int edition = 13;
 int editionNum = 50;
 String fileType = "png";
 PImage[] imgs = new PImage[editionNum];
@@ -70,8 +70,8 @@ void setup() {
   }
   
   String[] args = {
-  "--display=0",
-  "location=" + 40 + "," + 40,
+  // "--display=0",
+  // "location=" + 40 + "," + 40,
   "TwoFrameTest", "Pixel Sorting"};
   applet = new PixelSortingApplet();
   PApplet.runSketch(args, applet);
@@ -88,7 +88,7 @@ void draw() {
 void noiseDisplacement(int x, int y, color c) {
   float[] noiseScale = { 0.02, 0.5 };
   float noiseAngle = noise(x * noiseScale[0], y * noiseScale[0]) * TWO_PI;
-  float dist = noise(x * noiseScale[1], y * noiseScale[1]) * 100;
+  float dist = max(20, noise(x * noiseScale[1], y * noiseScale[1]) * 100);
   PVector pos = new PVector(x, y);
   
   for (int i = 0; i < dist; i++) {
