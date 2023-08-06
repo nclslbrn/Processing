@@ -28,9 +28,9 @@ PImage[] original = new PImage[editionNum];
 // 0 = white
 // -16581375 = black
 // sort all pixels whiter than the threshold
-int whiteValue = -12345678;
+int whiteValue = 50*50*50*-1;
 // sort all pixels blacker than the threshold
-int blackValue = -3456789;
+int blackValue = 200*200*200*-1;
 // using the brightness value
 // sort all pixels brighter than the threshold
 int brightValue = 50;
@@ -69,7 +69,10 @@ void setup() {
     imgs[i] = original[i].get();
   }
   
-  String[] args = {"TwoFrameTest", "Pixel Sorting"};
+  String[] args = {
+  "--display=0",
+  "location=" + 40 + "," + 40,
+  "TwoFrameTest", "Pixel Sorting"};
   applet = new PixelSortingApplet();
   PApplet.runSketch(args, applet);
 
@@ -106,6 +109,6 @@ void updateBand(int value) {
       sortInverse = !sortInverse;
       lastBandPos = value;
       bandSize = ceil(random(1, 4)) * bandBaseSize;
-      //mode = (mode + 1) % 4;
+      mode = (mode + 1) % 4;
   }
 }

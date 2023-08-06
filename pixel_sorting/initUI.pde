@@ -19,25 +19,25 @@ public void initUI() {
   cp5.addSlider("whiteValueSlider")
     .setPosition(20, 120)
     .setSize(200, 20)
-    .setRange(-12345678, 0)
-    .setValue(-12345678)
+    .setRange(0, 255)
+    .setValue(50)
     .setColorCaptionLabel(color(255));
   
   cp5.addSlider("blackValueSlider")
     .setPosition(20, 160)
     .setSize(200, 20)
-    .setRange(-3456789, -12345678)
-    .setValue(-3456789)
+    .setRange(0, 255)
+    .setValue(200)
     .setColorCaptionLabel(color(255));
     
   willSortRowToggle = cp5.addToggle("willSortRow")
-     .setPosition(20, 220)
-     .setSize(60, 20);
-     
+    .setPosition(20, 220)
+    .setSize(60, 20);
+
   willSortColumnToggle = cp5.addToggle("willSortColumn")
-     .setPosition(140, 220)
-     .setSize(60, 20);
-     
+    .setPosition(140, 220)
+    .setSize(60, 20);
+
   radioButton = cp5.addRadioButton("interpolation")
     .setPosition(20, 280)
     .setSize(60, 40)
@@ -73,9 +73,9 @@ void brightValueSlider(int val) { brightValue = val; applet.init(); }
 
 void darkValueSlider(int val) {  darkValue  = val; applet.init(); }
 
-void whiteValueSlider(int val) { whiteValue = val; applet.init(); }
+void whiteValueSlider(int val) { whiteValue = val*val*val*-1; applet.init(); }
 
-void blackValueSlider(int val) { blackValue = val; applet.init(); }
+void blackValueSlider(int val) { blackValue = val*val*val*-1; applet.init(); }
 
 void previous() { 
   if (edition > 0) {
@@ -109,12 +109,18 @@ void controlEvent(ControlEvent theEvent) {
     if (int(theEvent.getGroup().getValue()) == -1) {
       willMovePixInSpiral = false;
       willMovePixInCircle = false;
+      println("deactivate willMovePixInSpiral & willMovePixInCircle");
+      
     }
     if (int(theEvent.getGroup().getValue()) == 1) {
       willMovePixInSpiral = !willMovePixInSpiral;
+      willMovePixInCircle = false;
+      println("toggle willMovePixInSpiral");
     }
     if (int(theEvent.getGroup().getValue()) == 2) {
       willMovePixInCircle = !willMovePixInCircle;
+      willMovePixInSpiral = false;
+      println("toggle willMovePixInCircle");
     }
     applet.init();
   }

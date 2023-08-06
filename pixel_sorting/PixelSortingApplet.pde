@@ -8,14 +8,14 @@ public class PixelSortingApplet extends PApplet {
   public void setup() {
     surface.setResizable(true);
     surface.setSize(imgs[edition].width, imgs[edition].height);
+    //surface.setLocation(40, 40);
     image(imgs[edition], 0, 0, width, height);
     init();
   }
   
   public void draw() {
-     if (willMovePixInCircle) polarImage = polarInterpolation(imgs[edition], 0.45);    
-     if (willMovePixInSpiral) spiralImage = spiralInterpolation(imgs[edition]);
-  
+    imgs[edition] = original[edition].get();
+    
     if (willSortColumn) {
       while (column < imgs[edition].width-1) {
         imgs[edition].loadPixels();
@@ -55,6 +55,14 @@ public class PixelSortingApplet extends PApplet {
    lastBandPos = 0;
    imgs[edition] = original[edition].get();
    saved = false;
+   
+   if (willMovePixInCircle) {
+     polarImage = polarInterpolation(imgs[edition], 1.45).get();
+   }
+   if (willMovePixInSpiral) {
+     spiralImage = spiralInterpolation(imgs[edition]).get();
+   }
+     
    println(
       "#" + edition + 
       " sort [ " + (willSortColumn ? "column " : "") + (willSortRow ? "row " : "") + "]" +
