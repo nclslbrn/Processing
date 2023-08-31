@@ -16,7 +16,7 @@ int mode = 0; // will change on loop
 String[] modes = { "white", "black", "bright", "dark" };
 // image path is relative to sketch directory
 String imgFileName = "Stacks-";
-int edition = 13;
+int edition = 20;
 int editionNum = 50;
 String fileType = "png";
 PImage[] imgs = new PImage[editionNum];
@@ -37,8 +37,8 @@ int brightValue = 50;
 // sort all pixels darker than the threshold
 int darkValue = 200;
 
-// step until we change mode 
-int bandSize = 32; 
+// step until we change mode
+int bandSize = 32;
 int bandBaseSize = 16;
 int lastBandPos = 0;
 
@@ -48,11 +48,13 @@ boolean sortInverse = true;
 boolean willSortRow = true;
 boolean willSortColumn = true;
 
-// to do
+
 boolean useNoiseDisplacement = false;
-// sample spiral or polar (if both are true it will sample polar image)  
+// sample spiral or polar (if both are true it will sample polar image)
 boolean willMovePixInSpiral = false;
 boolean willMovePixInCircle = false;
+boolean willMovePixBitwise = false;
+
 int row = 0;
 int column = 0;
 
@@ -60,15 +62,16 @@ boolean saved = false;
 
 PImage polarImage;
 PImage spiralImage;
+PImage bitwiseImage;
 
 void setup() {
   size(300, 440);
-    
+
   for (int i = 0; i < editionNum; i++) {
     original[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
     imgs[i] = original[i].get();
   }
-  
+
   String[] args = {
   // "--display=0",
   // "location=" + 40 + "," + 40,
@@ -80,8 +83,8 @@ void setup() {
 }
 
 void draw() {
-  background(0); 
-  textLabel.draw(this); 
+  background(0);
+  textLabel.draw(this);
 }
 
 
@@ -90,15 +93,15 @@ void noiseDisplacement(int x, int y, color c) {
   float noiseAngle = noise(x * noiseScale[0], y * noiseScale[0]) * TWO_PI;
   float dist = max(20, noise(x * noiseScale[1], y * noiseScale[1]) * 100);
   PVector pos = new PVector(x, y);
-  
+
   for (int i = 0; i < dist; i++) {
     pos.x += cos(noiseAngle) * i;
     pos.y += sin(noiseAngle) * i;
-    
-    if (pos.x < 0) pos.x = imgs[edition].width - 1; 
-    if (pos.y < 0) pos.y = imgs[edition].height - 1; 
-    if (pos.x > imgs[edition].width - 1) pos.x = 0; 
-    if (pos.y < imgs[edition].height - 1) pos.y = 0; 
+
+    if (pos.x < 0) pos.x = imgs[edition].width - 1;
+    if (pos.y < 0) pos.y = imgs[edition].height - 1;
+    if (pos.x > imgs[edition].width - 1) pos.x = 0;
+    if (pos.y < imgs[edition].height - 1) pos.y = 0;
 
     imgs[edition].pixels[x + y * imgs[edition].width] = c;
   }

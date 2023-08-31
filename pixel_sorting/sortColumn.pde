@@ -42,6 +42,8 @@ void sortColumn() {
         unsorted[i] = spiralImage.pixels[x + (y+i) * imgs[edition].width];
       } else if (willMovePixInCircle) {
         unsorted[i] = polarImage.pixels[x + (y+i) * imgs[edition].width];
+      } else if (willMovePixBitwise) {
+        unsorted[i] = bitwiseImage.pixels[x + (y+i) * imgs[edition].width];
       } else {
         unsorted[i] = imgs[edition].pixels[x + (y+i) * imgs[edition].width];
       }

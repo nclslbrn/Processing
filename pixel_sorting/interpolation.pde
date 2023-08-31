@@ -27,9 +27,9 @@ PImage spiralInterpolation(PImage input) {
 
   for (int i=0; i < maxI-1; i++){
     if (
-      (-input.width/2 <= x) && 
-      (x <= input.width/2) && 
-      (-input.height/2 <= y) && 
+      (-input.width/2 <= x) &&
+      (x <= input.width/2) &&
+      (-input.height/2 <= y) &&
       (y <= input.height/2)
     ) {
         int outputIndex = (x+(input.width-1)/2) + (y+(input.height-1)/2) * output.width;
@@ -38,8 +38,27 @@ PImage spiralInterpolation(PImage input) {
 
     if( (x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1-y))) {
         t=dx; dx=-dy; dy=t;
-    }   
+    }
     x+=dx; y+=dy;
+  }
+  return output;
+}
+
+PImage bitwiseInterpolation(PImage input) {
+  PImage output = input;
+  int[] nums = {3, 5, 6, 7, 9};
+  int a = nums[int(random(4))];
+  int decay = int(pow(a, 5));
+
+  for (int x = 0; x < output.width; x++) {
+    for(int y = 0; y < output.height; y++) {
+
+      if ((x ^ y) % a != 0) {
+        int inputIndex = x * output.width + y;
+        int outputIndex = (inputIndex + decay) % (output.pixels.length-1);
+        output.pixels[outputIndex] = input.pixels[inputIndex];
+      }
+    }
   }
   return output;
 }

@@ -4,7 +4,7 @@ public class PixelSortingApplet extends PApplet {
     size(1000, 1000);
     noLoop();
   }
-  
+
   public void setup() {
     surface.setResizable(true);
     surface.setSize(imgs[edition].width, imgs[edition].height);
@@ -12,10 +12,10 @@ public class PixelSortingApplet extends PApplet {
     image(imgs[edition], 0, 0, width, height);
     init();
   }
-  
+
   public void draw() {
     imgs[edition] = original[edition].get();
-    
+
     if (willSortColumn) {
       while (column < imgs[edition].width-1) {
         imgs[edition].loadPixels();
@@ -33,11 +33,11 @@ public class PixelSortingApplet extends PApplet {
         mode = (mode + 1) % 4;
         imgs[edition].updatePixels();
       }
-    }  
+    }
     // load updated image onto surface and scale to fit the display width and height
     image(imgs[edition], 0, 0, width, height);
   }
-  
+
   public void keyPressed() {
     if (keyCode == LEFT && edition > 0) edition--;
     if (keyCode == RIGHT && edition < editionNum-1) edition++;
@@ -47,7 +47,7 @@ public class PixelSortingApplet extends PApplet {
     if (keyCode == 83) willMovePixInSpiral = !willMovePixInSpiral;
     init();
   }
-  
+
   public void init() {
    row = 0;
    column = 0;
@@ -55,30 +55,32 @@ public class PixelSortingApplet extends PApplet {
    lastBandPos = 0;
    imgs[edition] = original[edition].get();
    saved = false;
-   
+
    if (willMovePixInCircle) {
      polarImage = polarInterpolation(imgs[edition], 1.45).get();
    }
    if (willMovePixInSpiral) {
      spiralImage = spiralInterpolation(imgs[edition]).get();
    }
-     
+   if (willMovePixBitwise) {
+     bitwiseImage = bitwiseInterpolation(imgs[edition]).get();
+   }
    println(
-      "#" + edition + 
+      "#" + edition +
       " sort [ " + (willSortColumn ? "column " : "") + (willSortRow ? "row " : "") + "]" +
-      (willMovePixInSpiral || willMovePixInCircle ? " on " : "") + 
-      (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + 
+      (willMovePixInSpiral || willMovePixInCircle ? " on " : "") +
+      (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") +
       (useNoiseDisplacement ? " - noise" : "")
    );
    redraw();
   }
-  
+
   public void mousePressed() {
     if ( ! saved ) {
       imgs[edition].save(
         "output/" + imgFileName + edition + "-" +
         (willSortColumn ? "column-" : "") + (willSortRow ? "row-" : "") +
-        (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + 
+        (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + (willMovePixBitwise ? "bitwise" : "") +
         ".png"
       );
       saved = true;

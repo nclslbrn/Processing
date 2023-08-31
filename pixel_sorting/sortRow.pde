@@ -42,6 +42,8 @@ void sortRow() {
         unsorted[i] = spiralImage.pixels[x + i + y * imgs[edition].width];
       } else if (willMovePixInCircle) {
         unsorted[i] = polarImage.pixels[x + i + y * imgs[edition].width];
+      } else if (willMovePixBitwise) {
+        unsorted[i] = bitwiseImage.pixels[x + i + y * imgs[edition].width];
       } else {
         unsorted[i] = imgs[edition].pixels[x + i + y * imgs[edition].width];
       }
