@@ -18,7 +18,7 @@ String[] modes = { "white", "black", "bright", "dark" };
 String imgFileName = "Stacks-";
 int edition = 20;
 int editionNum = 50;
-String fileType = "png";
+String fileType = "jpg";
 PImage[] imgs = new PImage[editionNum];
 PImage[] original = new PImage[editionNum];
 
@@ -68,7 +68,7 @@ void setup() {
   size(300, 440);
 
   for (int i = 0; i < editionNum; i++) {
-    original[i] = loadImage("sample/" + imgFileName + i + "." + fileType);
+    original[i] = loadImage("sample-2K/" + imgFileName + i + "." + fileType);
     imgs[i] = original[i].get();
   }
 
