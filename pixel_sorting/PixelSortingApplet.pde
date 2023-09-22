@@ -77,10 +77,11 @@ public class PixelSortingApplet extends PApplet {
 
   public void mousePressed() {
     if ( ! saved ) {
+      String timeStamp = "-" + String.valueOf(year() + "-" + month() + "-" + day() + "-T-" + hour() + ":" + minute() + ":" + second());  
       imgs[edition].save(
         "output/" + imgFileName + edition + "-" +
         (willSortColumn ? "column-" : "") + (willSortRow ? "row-" : "") +
-        (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + (willMovePixBitwise ? "bitwise" : "") +
+        (willMovePixInSpiral ? "spiral" : "") + (willMovePixInCircle ? "circle" : "") + (willMovePixBitwise ? "bitwise" : "") + timeStamp + 
         ".png"
       );
       saved = true;
